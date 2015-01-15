@@ -101,26 +101,35 @@ Qed.
 
 (* Hmmm, this is going to be a problem to prove even though it's true. *)
 Lemma Extends1D_agreement:
-  forall (alpha0 alpha : TVar),
-   beq_tvar alpha0 alpha = false ->
-   forall (d0 d : Delta) (k0 : Kappa),
-     WFD d ->
-     WFD d0 ->
-     Extends1D alpha0 k0 d0 d ->
-     forall (k : Kappa),
-       Extends1D alpha0 k0 ([(alpha, k)] ++ d0) ([(alpha, k)] ++ d).
+  forall (d : Delta),
+    WFD d ->
+    forall (d0 : Delta),
+      WFD d0 ->
+      forall (beta : TVar) (k0 : Kappa),
+        Extends1D beta k0 d0 d ->
+        getD d beta = None ->
+        forall (alpha : TVar),
+          beq_tvar beta alpha = false ->
+          forall (k : Kappa),
+            getD d0 alpha = None ->
+            getD d alpha = None ->
+            Extends1D beta k0 ([(alpha, k)] ++ d0) ([(alpha, k)] ++ d).
 Proof.
-  intros alpha0 alpha beqtvar d0 d k0 WFDd WFDd0 ext.
+  intros d WFDd d0 WFDd0 alpha0 k0 ext.
   induction ext.
   intros.
-  rewrite H.
   constructor.
+  rewrite H.
   (* Okay, I'm stuck here because I'm not using a full definition of
      partial maps. *)
   admit.
+  constructor; try assumption.
   (* Are these two goals correct? *)
-
-Admitted.
+  rewrite <- cons_is_append_singleton.
+  unfold getD.
+  fold getD.
+  rewrite H3; try assumption.
+Qed.
 
 Lemma K_weakening1 :
   forall d0,
