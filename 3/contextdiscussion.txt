@@ -1,0 +1,64 @@
+
+James,
+
+ Let's start a conversation about building the right set of context structures and
+lemmas so that it's easier to build programming language semantics proofs into
+Coq. And perhaps if we succeed at this, we'll do the same for alpha conversion.
+
+ 
+Variables, V.
+
+   beq_v      - binary equivalence
+   beq_v_refl - reflexivity
+   beq_v_eq:   forall (v v': Vappa), beq_v v v' = true -> v = v'.
+   beq_v_neq:  forall (v v': Vappa), beq_v v v' = false -> v <> v'.
+
+Contexts
+
+Module Type Context_Type.
+  Parameter K    : Type.
+  Parameter K_eq : K -> K -> bool.
+  Parameter T    : Type.
+  Parameter T_eq : T -> T -> bool.
+
+  
+  Parameter Context : Type -> Type -> Type.
+  Parameter In      : K -> Context K T ->  Prop.
+  Parameter NoDup   : Context K T -> Prop.
+
+  Parameter empty   : Context K T.
+  Parameter add     : Context K T -> K -> T -> Context K T.
+  Parameter map     : Context K T -> K -> option T.
+  Parameter ink     : Context K T -> K -> bool.
+  Parameter inkt    : Context K T -> K -> T ->  bool.
+  Parameter equal   : Context K T -> Context K T -> bool.
+
+  Parameter extends  : Context K T -> Context K T -> bool.
+  Parameter extends1 : Context K T -> K -> T -> Context K T -> bool.
+
+End Context_Type.
+
+ Composition of contexts might be nice. NoDup here is our only
+wellformedness critera but there may be other ones we'll need
+to parameterize. 
+
+Lemmas
+  Axiom empty1    : forall k,      map empty k = None.
+  Axiom add1      : forall c k t,  map (add c k t) k = Some t.
+  Axiom equal1    : forall c c' k t, inkt c k t = true <-> inkt c' k t = true.
+  Axiom emptyext  : forall c, extends empty c.
+
+  map_weakening:           map c v = o -> extends c c' ->  map c' v = o.
+  map_none_strengthening:  map c' v = None -> extends c c' ->  map c v  = None.                                 
+  map_some_none_neq     :  map c v = None -> map c v' = some -> beq_v v v' = false.
+  
+  extends_weakening:        extends c c' -> ~ in v c' -> extends c (add c' v t).
+  extends_dual_weakening    extends c c' -> ~ in v c' -> extends (add c v t) (add c' v t).
+  empty_extends_only_empty: extends c empty -> c = empty. (* Or beq? *)
+  extends_reflexive:        extends c c.
+
+These seem to be the totality of what I'm using. 
+
+ What do you think?
+
+ Thanks, Brian

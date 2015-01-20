@@ -99,7 +99,6 @@ Proof.
   constructor; try assumption.
 Qed.
 
-(* Hmmm, this is going to be a problem to prove even though it's true. *)
 Lemma Extends1D_agreement:
   forall (d : Delta),
     WFD d ->
@@ -159,6 +158,8 @@ Lemma A_6_Substitution_1_Extends1D:
       WFD d -> 
       AK d t k ->
       forall (alpha : TVar), 
+        getD d alpha = None ->
+        getD d' alpha = None ->
         Extends1D alpha k d d' ->
         K d (subst_Tau t' t alpha) k'.
 Proof.
@@ -174,15 +175,15 @@ Proof.
   case_eq (beq_tvar alpha0 alpha).
   SCase "(beq_tvar alpha0 alpha) = true".
    intros. (* The proof of the pudding is here. *)
-   apply beq_tvar_eq in H3.
-   rewrite H3 in *.
-   clear H3.
-   apply getD_Extends1D_inversion with (k':= B) in H2; try assumption.
-   rewrite H2 in H1.
+   apply beq_tvar_eq in H5.
+   rewrite H5 in *.
+   clear H5.
+   apply getD_Extends1D_inversion with (k':= B) in H4; try assumption.
+   rewrite H4 in H1.
    inversion H1; try assumption.
   SCase "(beq_tvar alpha0 alpha) = false".
    intros. 
-   apply getD_Extends1D_agreement_1 with (alpha:= alpha) (O:= Some B) in H2; try assumption.
+   apply getD_Extends1D_agreement_1 with (alpha:= alpha) (O:= Some B) in H4; try assumption.
    apply K_B; try assumption.
  Case "K d (ptype (tv_t alpha)) B".
   intros.
@@ -190,18 +191,18 @@ Proof.
   case_eq (beq_tvar alpha0 alpha).
   SCase "(beq_tvar alpha0 alpha) = true".
    intros.
-   apply beq_tvar_eq in H3.
-   rewrite H3 in *.
-   clear H3.
-   apply getD_Extends1D_inversion with (k':= A) in H2; try assumption.
-   rewrite H2 in *.
+   apply beq_tvar_eq in H5.
+   rewrite H5 in *.
+   clear H5.
+   apply getD_Extends1D_inversion with (k':= A) in H4; try assumption.
+   rewrite H4 in *.
    inversion H1; try assumption.
    apply K_ptype; try assumption.
    apply K_star_A; try assumption.
   SCase "(beq_tvar alpha0 alpha) = false".
    intros.
    apply K_star_A; try assumption.
-   apply getD_Extends1D_agreement_1 with (alpha:= alpha) (O:= Some A) in H2; try assumption.
+   apply getD_Extends1D_agreement_1 with (alpha:= alpha) (O:= Some A) in H4; try assumption.
  Case "K d tau A".
   intros.
   apply IHKder with (alpha:= alpha) (t:= t) (k:= k) (d0:=d0) in WFDd'; try assumption.
@@ -232,20 +233,30 @@ Proof.
   SCase "(beq_tvar alpha0 alpha) = true".
    intros. (* Can I do this without alpha conversion. *)
    AdmitAlphaConversion.
+   (* Broken by lemma changes. *)
   SCase "(beq_tvar alpha0 alpha) = false".
    intros.
-   pose proof H3 as H3'.
+   pose proof H5 as H5'.
    apply getD_Extends1D_agreement_1 with (alpha:= alpha) (O:= None)
-     in H3'; try assumption.
-   apply K_utype; try assumption.
-   apply WFD_weakening with (k:= k) in H3'; try assumption.
+     in H5; try assumption.
+   pose proof H1 as H1'.
+   apply WFD_weakening with (alpha:= alpha) (k:= k) in H1; try assumption.
+   apply K_utype; try assumption.   
    apply IHKder with (alpha0:= alpha0) (t:= t) (k0:= k0) 
      (d0:= [(alpha,k)] ++ d0)  in H; try assumption.
-   apply WFD_weakening with (k:= k) in H3'; try assumption.
-   apply AK_weakening with (k0:= k0) (t:= t) (k:= k) in H3'; try assumption.
-   constructor; try assumption.
-   apply Extends1D_agreement 
-   with (d0:= d0) (d:= d) (k0:= k0) (k:= k) in H4; try assumption.
+   apply AK_weakening with (d:= d0) (tau:= t) (k:= k0) in H1; try assumption.
+   assert (Z: ExtendedByD d0 d0).
+   apply ExtendedByD_reflexive.
+   apply ExtendedByD_weakening with (alpha:= alpha) (k:= k) in Z; try assumption.
+   rewrite <- cons_is_append_singleton.
+   unfold getD.
+   fold getD.
+   rewrite H6; try assumption.
+   rewrite <- cons_is_append_singleton.
+   unfold getD.
+   fold getD.
+   rewrite H6; try assumption.
+   apply Extends1D_agreement; try assumption.
  Case "K d (etype p alpha k tau) A)".
   intros.
   simpl.
@@ -253,19 +264,28 @@ Proof.
   SCase "(beq_tvar alpha0 alpha) = true".
    intros. (* Can I do this without alpha conversion. *)
    AdmitAlphaConversion.
+   (* Broken by lemma changes. *)
   SCase "(beq_tvar alpha0 alpha) = false".
    intros.
-   pose proof H3 as H3'.
+   pose proof H5 as H5'.
    apply getD_Extends1D_agreement_1 with (alpha:= alpha) (O:= None)
-     in H3'; try assumption.
-   apply K_etype; try assumption.
-   apply WFD_weakening with (k:= k) in H3'; try assumption.
+     in H5; try assumption.
+   pose proof H1 as H1'.
+   apply WFD_weakening with (alpha:= alpha) (k:= k) in H1; try assumption.
+   apply K_etype; try assumption.   
    apply IHKder with (alpha0:= alpha0) (t:= t) (k0:= k0) 
      (d0:= [(alpha,k)] ++ d0)  in H; try assumption.
-   apply WFD_weakening with (k:= k) in H3'; try assumption.
-   apply AK_weakening with (k0:= k0) (t:= t) (k:= k) in H3'; try assumption.
-   constructor; try assumption.
-   apply Extends1D_agreement 
-   with (d0:= d0) (d:= d) (k0:= k0) (k:= k) in H4; try assumption.
+   apply AK_weakening with (d:= d0) (tau:= t) (k:= k0) in H1; try assumption.
+   assert (Z: ExtendedByD d0 d0).
+   apply ExtendedByD_reflexive.
+   apply ExtendedByD_weakening with (alpha:= alpha) (k:= k) in Z; try assumption.
+   rewrite <- cons_is_append_singleton.
+   unfold getD.
+   fold getD.
+   rewrite H6; try assumption.
+   rewrite <- cons_is_append_singleton.
+   unfold getD.
+   fold getD.
+   rewrite H6; try assumption.
+   apply Extends1D_agreement; try assumption.
 Qed. 
-

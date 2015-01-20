@@ -220,9 +220,6 @@ Proof.
   inversion getDder.
 Qed.
 
-
-
-
 Lemma getD_weakening:
   forall (d : Delta) (alpha beta : TVar),
     getD d alpha = None -> 
