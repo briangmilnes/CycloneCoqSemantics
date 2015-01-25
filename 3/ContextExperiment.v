@@ -6,6 +6,8 @@
 
 *)
 
+(* TODO v-> k hunt. *)
+
 Require Import List.
 Export ListNotations.
 Require Import ZArith.
@@ -129,6 +131,7 @@ Tactic Notation "Tau_ind_cases" tactic(first) ident(c) :=
 | Case_aux c "(cross t t0)"
 ].
 
+(* Todo  *)
 Function beq_tau (t t' : Tau) : bool :=
  match t, t' with
  | tv_t alpha, tv_t beta => beq_tvar alpha beta
@@ -252,17 +255,6 @@ Function map (c : Context K T) (k: K) : option T :=
       end
   end.
 
-Functional Scheme map_ind2 := Induction for map Sort Prop.
-
-Function map' (c : Context K T) (k: K) : option T :=
-  match k, c with
-    | k'', (Ctxt k' t' c') =>
-      if K_eq k'' k'
-      then Some t'
-      else (map' c' k)
-    | _, Ctxt_dot => None
-  end.
-
 Function nodup (c : (Context K T)) : bool :=
   match c with
     | Ctxt_dot => true
@@ -273,32 +265,16 @@ Function nodup (c : (Context K T)) : bool :=
       end
 end.
 
-Function nodup' (c : (Context K T)) : bool :=
-  match c with
-    | Ctxt_dot => true
-    | (Ctxt k' t' c') =>
-      match map' c' k' with
-        | Some t  => false
-        | None  => nodup' c'
-      end
-end.
-
 Function extends (c c' : Context K T) : bool :=
   match c with 
     | Ctxt_dot => true
     | Ctxt k t c'' =>
       match map c' k with
-       | Some t => extends c'' c' 
-       | None => false
-      end
-  end.
-
-Function extends' (c c' : Context K T) : bool :=
-  match c with 
-    | Ctxt_dot => true
-    | Ctxt k t c'' =>
-      match map' c' k with
-       | Some t => extends' c'' c' 
+       | Some t' => 
+         match (T_eq t t') with
+           | true => extends c'' c' 
+           | false => false
+         end
        | None => false
       end
   end.
@@ -378,32 +354,49 @@ Proof.
   induction c; crush.
 Qed.
 
-(* I'm not checking the correctness of c' but it works. *)
 Lemma extends_r_strengthen:
   forall c c', 
     extends c c' = true -> 
     forall v t, 
+      nodup (Ctxt v t c') = true ->
       extends c (Ctxt v t c') = true.
 Proof.
-  intros c c' ext; induction c; try solve [crush].
+  intros c c'.
+  functional induction (extends c c'); try solve[crush].
   intros.
+  apply IHb with (v:= v) (t:= t0) in H.
   unfold extends.
   fold extends.
-  unfold map.
-  fold map.
-  unfold extends in ext.
-  fold extends in ext.
-  unfold map in ext.
-  fold map in ext.
-  case_eq(map c' k); case_eq(K_eq k v); intros; rewrite H0 in ext.
-  apply IHc with (v:=v) (t:= t0) in ext; try assumption.  
-  apply IHc with (v:=v) (t:= t0) in ext; try assumption.
-  inversion ext.
-  inversion ext.
+  case_eq(map (Ctxt v t0 c') k); intros.
+  case_eq(T_eq t t1); intros; try assumption.
+  pose proof H0 as H0'.
+  unfold map in H1.
+  fold map in H1.
+  case_eq(K_eq k v); intros; try rewrite H3 in H1.
+  move t1 before t.
+  unfold nodup in H0.
+  fold nodup in H0.
+  apply beq_tvar_eq in H3.
+  rewrite <- H3 in H0.
+  rewrite e0 in H0.
+  inversion H0.
+  rewrite e0 in H1.
+  crush.
+
+  pose proof H1 as H1'.
+  unfold map in H1.
+  fold map in H1.
+  case_eq(K_eq k v); intros; rewrite H2 in H1.
+  inversion H1.
+  rewrite e0 in H1.
+  inversion H1.
+  assumption.
 Qed.
 
 Lemma extends_refl:
-  forall c, extends c c = true.
+  forall c, 
+    nodup c = true ->
+    extends c c = true.
 Proof.
   intros.
   induction c; try solve [crush].
@@ -411,7 +404,14 @@ Proof.
   fold extends.
   simpl.
   rewrite beq_tvar_refl.
+  rewrite beq_tau_refl.
   apply extends_r_strengthen; try assumption.
+  unfold nodup in H.
+  fold nodup in H.
+  case_eq(map c k); intros; rewrite H0 in H.
+  inversion H.
+  apply IHc in H.
+  assumption.
 Qed.
 
 Lemma extends_l_weaken:
@@ -427,6 +427,7 @@ Proof.
   unfold map.
   fold map.
   rewrite H0.
+  rewrite beq_tau_refl.
   assumption.
 Qed.
 
@@ -435,6 +436,7 @@ Lemma extends_l_weaken_r_strengthen:
     extends c c' = true -> 
     map c' k = None  -> 
     forall t, 
+      nodup c' = true ->
       extends (Ctxt k t c) (Ctxt k t c') = true.
 Proof.
   intros.
@@ -443,38 +445,27 @@ Proof.
   unfold map.
   fold map.
   rewrite beq_tvar_refl.
+  rewrite beq_tau_refl.
+  
   apply extends_r_strengthen; try assumption.
+  unfold nodup.
+  fold nodup.
+  rewrite H0.
+  assumption.
 Qed.
 
 Lemma extends_l_strengthen: 
   forall c c' k t, 
     extends (Ctxt k t c) c' = true -> extends c c' = true.
 Proof.
- intros.
- Context_ind_cases(induction c) Case; try solve [crush].
- Case  "(Ctxt k t c)".
+  intros.
+  induction c; try solve[crush].
   unfold extends in H.
   fold extends in H.
-  case_eq (map c' k); intros.
-  SCase "map c' v = Some t".
-   intros.
-   rewrite H0 in H.
-   case_eq (map c' k0).
-   SSCase "map c' k0 = Some t2".
-    intros.
-    rewrite H1 in H.
-    unfold extends.
-    rewrite H1.
-    fold extends.
-    assumption.
-   SSCase "map c' k0 = None".
-    intros.
-    rewrite H1 in H.
-    inversion H.
-  SCase "map c' k0 = None".
-   intros.
-   rewrite H0 in H.
-   inversion H.
+  unfold extends.
+  fold extends.
+  case_eq(map c' k); intros; rewrite H0 in *;  case_eq(map c' k0); intros; try rewrite H1 in *; try inversion H; case_eq(T_eq t t1); intros; try rewrite H2 in *; try inversion H. 
+  case_eq(T_eq t0 t2); intros; rewrite H4 in *; try inversion H; reflexivity.
 Qed.
 
 Lemma map_extends_none_agreement:
@@ -532,12 +523,6 @@ Lemma map_r_strengthen_add:
     K_eq k k0 = false -> 
     map c k = Some t.
 Proof.
-  (* c, map add *)
-(* map , stuck 
-  intros.
-  functional induction (map (add c k0 t0) k).
-  inversion H.
-*)  
   intros.
   induction c.
   unfold add in H.
@@ -577,7 +562,7 @@ Proof.
   assumption.
 Qed.
 
-Lemma nodup_add:
+Lemma nodup_add_none:
   forall c,
     nodup c = true ->
     forall k,
@@ -609,6 +594,17 @@ Proof.
   apply IHc with (k:= k0) (t:= t0) in H; try assumption.
 Qed.
 
+(* Perhaps I want this someday too. *)
+(*
+Lemma nodup_add_some:
+  forall c,
+    nodup c = true ->
+    forall k t,
+     map c k = Some t  ->
+    forall t', 
+      nodup (add c k t') = true.
+*)
+
 Lemma map_extension_disagreement_absurd:
   forall c c',
     extends c c' = true ->
@@ -620,7 +616,7 @@ Proof.
   intros c c' ext.
   functional induction (extends c c'); try solve [crush].
   intros.
-  apply IHb with (v:= v) (t:= t1) in ext; try assumption.
+  apply IHb with (v:= v) (t:= t0) in ext; try assumption.
   unfold map in H.
   fold map in H.
   case_eq(K_eq v k); intros; rewrite H1 in H; try assumption.
@@ -630,50 +626,101 @@ Proof.
   inversion H0.
 Qed.
   
+Lemma map_add_recursion:
+  forall c k t k',
+    map (add c k' t) k = Some t ->
+    K_eq k k' = false ->
+    map c k = Some t.
+Proof.
+  intros.
+  induction c.
+  simpl in H.
+  rewrite H0 in H.
+  inversion H.
+  unfold map.
+  fold map.
+  case_eq(K_eq k k0); intros.
+  apply beq_tvar_eq in H1.
+  subst.
+  unfold add in H.
+  fold add in H.
+  rewrite K_eq_sym in H0.
+  rewrite H0 in H.
+  unfold map in H.
+  fold map in H.
+  rewrite beq_tvar_refl in H.
+  assumption.
+  unfold add in H.
+  fold add in H.
+  case_eq(K_eq k' k0); intros; rewrite H2 in H.
+  unfold map in H.
+  fold map in H.
+  rewrite H0 in H.
+  assumption.
+  unfold map in H.
+  fold map in H.
+  rewrite H1 in H.
+  apply IHc in H.
+  assumption.
+Qed.
+
 Lemma extends_r_weaken:
   forall c c' k t, 
     extends c (Ctxt k t c') = true -> 
+    nodup (Ctxt k t c') = true ->
     map c k = None -> 
     extends c c' = true.
 Proof.
-  intros c.
-  induction c; try solve [crush].
   intros.
-  specialize (IHc c' k0 t0).
+  induction c; try solve[crush].
   unfold extends in H.
   fold extends in H.
   unfold extends.
   fold extends.
-  case_eq(map c' k); case_eq (map (Ctxt k0 t0 c') k); intros.
-  rewrite H1 in H.
-  apply IHc in H; try assumption.
-  unfold map in H0.
-  fold map in H0.
-  case_eq (K_eq k0 k); intros.
-  rewrite H3 in H0.
-  inversion H0.
-  rewrite H3 in H0; try assumption.
-  rewrite H1 in H.
-  inversion H.
-  rewrite H1 in H.
+  case_eq(map c' k0); intros;
+  case_eq(map (Ctxt k t c') k0); intros; rewrite H3 in H; try solve[inversion H];
+  case_eq(T_eq t0 t1); intros; try rewrite H4 in *; try solve[inversion H].
+  case_eq(T_eq t0 t2); intros; rewrite H5 in H; try solve[inversion H].
   unfold map in H1.
   fold map in H1.
-  case_eq(K_eq k k0); intros.
-  rewrite H3 in H1.
-  unfold map in H0.
-  fold map in H0.
-  rewrite K_eq_sym in H3.
-  rewrite H3 in H0.
-  inversion H0.
-  rewrite H3 in H1.
-  rewrite H1 in H2.
-  inversion H2.
-  rewrite H1 in H.
-  inversion H.
+  case_eq(K_eq k k0); intros; rewrite H6 in H1; try inversion H1.
+  apply IHc in H; try assumption.
+  case_eq(T_eq t0 t2); intros; rewrite H5 in H; try solve[inversion H].
+  apply beq_tau_eq in H5.
+  subst.
+  unfold map in H3.
+  fold map in H3.
+  unfold map in H1.
+  fold map in H1.
+  case_eq(K_eq k0 k); intros.
+  rewrite K_eq_sym in H1.
+  rewrite H5 in *.
+  inversion H1.
+  rewrite K_eq_sym in H1.
+  rewrite H5 in *.
+  apply beq_tau_neq in H4.
+  rewrite H2 in H3.
+  inversion H3.
+  crush.
+  apply beq_tau_eq in H4.
+  subst.
+  unfold map in H3.
+  fold map in H3.
+  unfold map in H1.
+  fold map in H1.
+  case_eq(K_eq k0 k); intros.
+  rewrite K_eq_sym in H1.
+  rewrite H4 in *.
+  inversion H1.
+  rewrite K_eq_sym in H1.
+  rewrite H4 in *.
+  rewrite H2 in H3.
+  inversion H3.
 Qed.
 
 Lemma map_disagreement_absurd:
   forall c k t,
+    nodup c = true -> 
     map c k = Some t ->
     forall k' t', 
     map (Ctxt  k' t' c) k = None ->
@@ -682,8 +729,16 @@ Proof.
   intros.
   assert (Z: extends c (Ctxt k' t' c) = true).
   assert (Y: extends c c = true).
-  apply extends_refl.
+  apply extends_refl; try assumption.
   apply extends_r_strengthen with (v:= k') (t:= t') in Y; try assumption.
+  unfold nodup.
+  fold nodup.
+  case_eq(map c k'); intros; try assumption.
+  unfold map in H1.
+  fold map in H1.
+  case_eq(K_eq k k'); intros; rewrite H3 in H1; try solve [inversion H1].
+  rewrite H1 in H0.
+  inversion H0.
   apply map_extension_disagreement_absurd with (v:= k) (t:= t) in Z; try assumption.
 Qed.
 
@@ -732,32 +787,94 @@ Proof.
   apply IHc with (k':= k') (t':= t') in H; try assumption.
 Qed.
 
-Lemma extends_r_strengthen_add: 
+Lemma map_add_some_agreement:
+  forall c k t,
+    map c k = Some t ->
+    forall k0 t0,
+      K_eq k k0 = false ->
+      map (add c k0 t0) k = Some t.
+Proof.
+(*
+  intros.
+  functional induction (map c k); try solve[crush].
+*)
+
+  intros.
+  functional induction (add c k0 t0); try solve [crush].
+  unfold map.
+  fold map.
+  rewrite H0.
+  apply beq_tvar_eq in e0.
+  subst.
+  unfold map in H.
+  fold map in H.
+  rewrite H0 in H.
+  assumption.
+
+  unfold map in H.
+  fold map in H.
+  unfold map.
+  fold map.
+  case_eq(K_eq k k'); intros; rewrite H1 in H.
+  assumption.
+
+  apply IHc0 in H; try assumption.
+Qed.
+
+Lemma extends_r_strengthen_add:
   forall c c', 
     extends c c' = true -> 
     forall k t, 
+      map c k = None -> 
       extends c (add c' k t) = true.
 Proof.
+  (* extends *)
   intros c c'.
   functional induction (extends c c'); try solve [crush].
   intros.
-  apply IHb with (k:= k0) (t:= t1) in H.
-  unfold extends.
-  fold extends.
-  case_eq (map (add c' k0 t1) k); intros; try assumption.
-  apply map_add_disagreement_absurd with (k':= k0) (t':= t1)in e0; try assumption.
-  inversion e0.
-Qed.  
+  pose proof e1 as e1'.
+  apply beq_tau_eq in e1.
+  subst.
+  unfold map in H0.
+  fold map in H0.
+  case_eq(K_eq k0 k); intros; rewrite H1 in H0.
+  inversion H0.
+  apply IHb with (k:= k0) (t:= t0) in H; try assumption.
+  apply extends_l_weaken; try assumption.
+  apply map_add_some_agreement; try assumption.
+  rewrite beq_tvar_sym in H1.
+  assumption.
+Qed.
 
 Lemma map_extends_some_agreement:
-  forall c c',
-   extends c c' = true -> 
-   nodup c = true ->
-   nodup c' = true ->
-   forall v t, 
-     map c v  = Some t ->
-     map c' v = Some t.
-Admitted.
+  forall c v t, 
+    map c v  = Some t ->
+    nodup c = true ->
+    forall c',
+      extends c c' = true -> 
+      nodup c' = true ->
+      map c' v = Some t.
+Proof.
+  intros.
+  functional induction (extends c c'); try solve [crush].
+  unfold map in H.
+  fold map in H.
+  unfold nodup in H0.
+  fold nodup in H0.
+  case_eq(K_eq v k); intros; rewrite H3 in H.
+  inversion H.
+  subst.
+  case_eq(map c'' k); intros; rewrite H4 in H0.
+  inversion H0.
+  clear H.
+  apply beq_tvar_eq in H3.
+  apply beq_tau_eq in e1.
+  subst.
+  assumption.
+  case_eq(map c'' k); intros; rewrite H4 in H0.
+  inversion H0.
+  apply IHb in H; try assumption.
+Qed.
 
 Lemma extends_trans:
   forall c c' c'',
@@ -818,14 +935,15 @@ Qed.
 
 Lemma equal_refl:
   forall c,
+    nodup c = true ->
     equal c c = true.
 Proof.
   intros.
   unfold equal.
   apply andb_true_iff.
   split.
-  apply extends_refl.
-  apply extends_refl.
+  apply extends_refl; try assumption.
+  apply extends_refl; try assumption.
 Qed.
 
 Lemma equal_sym:
@@ -862,8 +980,7 @@ Proof.
   apply extends_trans with (c:= c'') (c':= c') (c'':= c) in H0; try assumption.
 Qed.
 
-(* It would be nice if these were true but they're not. *)
-(* jrw I'd have to introduce ordering to get these, do I reall need it? *)
+(* It would be nice if these were true but they're not unless I cannonicalize. *)
 Lemma equal_eq:
   forall c c',
     equal c c' = true ->
@@ -889,779 +1006,35 @@ Proof.
   assumption.
 Qed.
 
-Lemma equal_if_map:
+Lemma equal_if_map_some:
   forall c c',
-    nodup c = true ->
+    nodup c  = true ->
+    nodup c' = true->
+    equal c c' = true ->
+    (forall k t, map c k = Some t -> map c' k = Some t).
+Proof.
+  intros c c'.
+  functional induction (equal c c').
+  intros.
+  apply andb_true_iff in H1.
+  inversion H1.
+  apply map_extends_some_agreement with (c':= c') in H2; try assumption.
+Qed.
+
+Lemma equal_iff_map_some:
+  forall c c',
+    nodup c  = true ->
     nodup c' = true ->
     equal c c' = true ->
-    (forall k o, map c k = o -> map c' k = o).
-Proof.
-  (* c, c', c&c', equal won't work but extends, map also. *)
-  intros.
-  functional induction (map c k).
-  apply equal_empty_only_empty in H.
-  rewrite H.
-  rewrite <- H0.
-  reflexivity.
-
-  apply beq_tvar_eq in e0.
-  subst.
-  unfold equal in H.
-  apply andb_true_iff in H.
-  inversion H.
-  assert (Z: map (Ctxt k' t' c'0) k' = Some t').
-  simpl.
-  (* jrw why won't it simplify using K_eq as tvar_beq_refl? *)
-  rewrite beq_tvar_refl.
-  reflexivity.
-  apply map_extends_some_agreement with (v:= k') (t:= t') in H0; try assumption.
-  (* strengthen with nodup. *)
-  admit.
-  admit.
-  unfold equal in H.
-  apply andb_true_iff in H.
-  inversion H.
-  apply extends_l_strengthen in H1.
-  (* apply map_extends_some_agreement with (v:= ) (t:= ) in H1; try assumption. *)
-  (* close but perhaps not there. *)
-Admitted.
-
-Lemma equal_iff_map:
-  forall c c',
-    equal c c' = true ->
-    (forall k o, map c k = o <-> map c' k = o).
+    (forall k t, map c k = Some t <-> map c' k = Some t).
 Proof.
   intros.
 
   split.
   intros.
-  apply equal_if_map with (k:= k) (o:= o) in H; try assumption.
+  apply equal_if_map_some with (c:= c) (c':= c') (k:= k) (t:= t) in H; try assumption.
   
   intros.
-  rewrite equal_sym in H.
-  apply equal_if_map with (k:= k) (o:= o) in H; try assumption.
+  rewrite equal_sym in H1.
+  apply equal_if_map_some with (c:= c') (c':= c) (k:= k) (t:= t) in H; try assumption.
 Qed.
-
-(* If I can't get map agreement with extends as a function, I have to go
- back to relations for extensions. *)
-Lemma m:
-  forall c v t,
-    map' c v  = Some t ->
-    nodup' c = true ->
-    forall c',
-      nodup' c' = true ->
-      extends' c c' = true -> 
-      map' c' v = Some t.
-Proof.
-  intros c v t.
-  functional induction (map' c v).
-  Case "Some k0 = k0".
-   intros.
-   apply beq_tvar_eq in e1.
-   inversion H.
-   subst.
-   inversion H2.
-   case_eq (map' c'0 k'); intros; rewrite H3 in H4.
-   admit.
-   inversion H4.
-  Case "getD d' alpha = Some k".
-   intros.
-   inversion H0.
-   inversion H2.
-   case_eq(map' c' k'); case_eq (map' c'0 k'); intros; rewrite H3 in H5; rewrite H6 in H4.
-   inversion H4.
-   inversion H4.
-   admit.
-   admit.
-  Case "None = Some".
-  intros.
-  inversion H.
-Admitted.
-
-Lemma map_extends_some_agreement_map:
-  forall c v t,
-    map c v  = Some t ->
-    nodup c = true ->
-    forall c',
-      extends c c' = true -> 
-      nodup c' = true ->
-      map c' v = Some t.
-Proof.
-  intros c v t.
-  intros.
-  pose proof H as H'.
-  functional induction (map c v).
-  inversion H.
-
-  apply extends_l_strengthen with (k:= k') (t:= t') in H1.
-  unfold nodup in H0.
-  fold nodup in H0.
-  case_eq(map c'0 k'); intros; rewrite H3 in H0.
-  inversion H0.
-  apply beq_tvar_eq in e0.
-  subst.
-  (* Nothing to work on, need a map to invert with. *)
-  (* I should have map c'0 k' = Some t, to invert against
-     mapc'0 k' = None. *)
-  (* but it gets rewritten by the induction even if I save it. *)
-  assert (Z: map c'0 k' = Some t).
-  admit. 
-  rewrite H3 in Z.
-  inversion Z.
-
-  apply extends_l_strengthen with (k:= k') (t:= t') in H1.
-  unfold nodup in H0.
-  fold nodup in H0.
-  case_eq(map c'0 k'); intros; rewrite H3 in H0.
-  inversion H0.
-  apply IHo in H; try assumption.
-Qed.
-
-
-(* Try with a functional scheme. *)
-Lemma map_extends_some_agreement_map_ind2:
-  forall c v t,
-    map c v  = Some t ->
-    nodup c = true ->
-    forall c',
-      extends c c' = true -> 
-      nodup c' = true ->
-      map c' v = Some t.
-Proof.
-  intros c v t.
-  intros.
-  pose proof H as H'.
-  pattern c, v, (map c v).
-  apply map_ind2.
-  intros.
-  (* disconnected, hence unprovable. *)
-  admit.
-  intros.
-  admit.
-  intros.
-  admit.
-Qed.
-
-Lemma map_extends_some_agreement_fun_ind:
-  forall c c',
-   extends c c' = true -> 
-   nodup c = true ->
-   nodup c' = true ->
-   forall v t, 
-     map c v  = Some t ->
-     map c' v = Some t.
-Proof.
- (* map *)
-  intros c c' ext nodupc nodupc' v t.
-  functional induction (map c v); try solve [crush].
-  intros.
-  inversion H.
-  apply beq_tvar_eq in e0.
-  subst.
-
-  admit. (* Don't see how to prove this. *)
-(*  
-  intros.
-  pose proof nodupc as Z.
-  unfold nodup in nodupc.
-  fold nodup in nodupc.
-  case_eq (map c'0 k'); intros; rewrite H0 in nodupc.
-  inversion nodupc.
-  
-
- (* c, ext, map *)
-  intros c c' ext.
-  functional induction (extends c c'); try solve [crush].
-  intros.
-  apply IHb with (v:= v) (t:= t1) in ext; try assumption.
-  unfold nodup in H.
-  fold nodup in H.
-  case_eq (map c'' k); intros; rewrite H2 in H.
-  inversion H.
-  assumption.
-  pose proof H1 as H1'.
-  unfold map in H1.
-  fold map in H1.
-  case_eq(K_eq v k); intros; rewrite H2 in H1.
-  inversion H1.
-  subst.
-  unfold nodup in H.
-  fold nodup in H.
-  case_eq (map c'' k); intros; rewrite H3 in H.
-  inversion H.
-  apply beq_tvar_eq in H2.
-  subst.
-  admit. (* It's just not invalidatable. *)
-  assumption.
-*)
-(* c 
-  intros c.
-  induction c; try solve [crush].
-
-  intros.
-  unfold extends in H.
-  fold extends in H.
-  unfold map in H2.
-  fold map in H2.
-  inversion H0.
-  case_eq (map c k); intros;  rewrite H3 in H4; try inversion H4.
-  case_eq(map c' k); 
-  case_eq(K_eq v k); 
-  intros; rewrite H5 in H2; rewrite H7 in H;
-  try solve [inversion H];
-  apply IHc with (t:= t0) (v:= v) in H; 
-  try assumption.
-
-  apply beq_tvar_eq in H5.
-  subst.
-  inversion H2.
-  subst.
-  admit. (* Can't invalidate, Stuck *)
-*)
-
-Admitted.
-
-
-Fixpoint map'' (c : Context K T) (k: K) : option T :=
-  match k, c with
-    | k'', (Ctxt k' t' c') =>
-      if K_eq k'' k'
-      then Some t'
-      else (map'' c' k)
-    | _, Ctxt_dot => None
-  end.
-
-Functional Scheme map''_ind := Induction for map'' Sort Prop.
-
-Function extends'' (c c' : Context K T) : bool :=
-  match c with 
-    | Ctxt_dot => true
-    | Ctxt k t c'' =>
-      match map'' c' k with
-       | Some t => extends'' c'' c' 
-       | None => false
-      end
-  end.
-
-Fixpoint nodup'' (c : (Context K T)) : bool :=
-  match c with
-    | Ctxt_dot => true
-    | (Ctxt k' t' c') =>
-      match map'' c' k' with
-        | Some _  => false
-        | None  => nodup'' c'
-      end
-end.
-
-Lemma map_extends_some_agreement_fschem_ind:
-  forall c c',
-   extends'' c c' = true -> 
-   nodup'' c = true ->
-   nodup'' c' = true ->
-   forall v t, 
-     map'' c v  = Some t ->
-     map'' c' v = Some t.
-Proof.
-  intros c c' ext nodupc nodupc' v t map''cv.
-  functional induction (map'' c v).
-  admit.
-  admit. (* bad *)
-  admit. (* ? *)
-Admitted.
-
-Lemma map_extends_some_agreement_fschem_ind_diff_order:
-  forall c v t, 
-   map'' c v  = Some t ->
-   nodup'' c = true ->
-   forall c',
-     extends'' c c' = true -> 
-     nodup'' c' = true ->
-     map'' c' v = Some t.
-Proof.
-  intros.
-  functional induction (map'' c v).
-  admit.
-  admit. (* bad *)
-  admit. (* ? *)
-Admitted.
-
-
-(* https://stackoverflow.com/questions/20554493/coq-induction-over-functions-without-losing-information *)
-
-Lemma map''_extends_some_agreement_remember:
-  forall c v t, 
-   map'' c v  = Some t ->
-   nodup'' c = true ->
-   forall c',
-     extends'' c c' = true -> 
-     nodup'' c' = true ->
-     map'' c' v = Some t.
-Proof.
-  intros.
-  remember (map'' c v) as F.
-  functional induction (map'' c v). 
-  admit. (* bad *)
-  admit. (* bad *)
-  admit. (* ? *)
-Admitted.
-
-Lemma map_extends_some_agreement_remember:
-  forall c v t, 
-   map c v  = Some t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros.
-  remember (map c v) as F.
-  induction F.
-  admit. (* bad *)
-  admit. (* bad *)
-Admitted.
-
-Lemma map_extends_some_agreement_remember_as:
-  forall c v t, 
-   map c v  = Some t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros.
-  (* pose (Z := (map c v)). No *)
-  set (map c v).
-  functional induction (map c v).
-  admit. (* bad *)
-  admit. (* bad *)
-  admit. (* ? *)
-Admitted.
-
-Lemma map_extends_some_agreement_remember_revert:
-  forall c v t, 
-   map c v  = Some t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros.
-  remember (map c v = Some t) as Fn.
-  functional induction (map c v).
-  admit. (* bad *)
-  admit. (* bad *)
-  admit. (* ? *)
-Admitted.
-
-Lemma map_extends_some_agreement_1:
-  forall c v t, 
-   map c v  = Some t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros.
-  destruct (map c v).
-  admit. (* bad *)
-  admit. (* bad *)
-Admitted.
-
-Lemma map_extends_some_agreement_2:
-  forall c v t, 
-   map c v  = Some t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros.
-  induction c, v, (map c v) using map_ind.
-  admit. (* bad *)
-  admit. (* bad *)
-  admit.
-Admitted.
-
-
-Function map3 (k: K) (c : Context K T) : option T :=
-  match k, c with
-    | k'', (Ctxt k' t' c') =>
-      match K_eq k'' k' with 
-      | true => Some t'
-      | false => (map3 k c')
-      end
-    | _, Ctxt_dot => None
-end.
-
-
-Function extends3 (c c' : Context K T) : bool :=
-  match c with 
-    | Ctxt_dot => true
-    | Ctxt k t c'' =>
-      match map3 k c'  with
-       | Some t => extends'' c'' c' 
-       | None => false
-      end
-  end.
-
-Function nodup3 (c : (Context K T)) : bool :=
-  match c with
-    | Ctxt_dot => true
-    | (Ctxt k' t' c') =>
-      match map3 k' c' with
-        | Some _  => false
-        | None  => nodup3 c'
-      end
-end.
-
-Lemma map_extends_some_agreement_3:
-  forall c v t, 
-   map3 v c = Some t ->
-   nodup3 c = true ->
-   forall c',
-     extends3 c c' = true -> 
-     nodup3 c' = true ->
-     map3 v c' = Some t.
-Proof.
-  intros.
-  functional induction (map3 v c).
-  admit. (* bad. *)
-  admit. (* good, is it argument order or the match ? *)
-  admit.
-Admitted.
-
-Lemma map_extends_some_agreement_4:
-  forall c v t, 
-   map3 v c = Some t ->
-   nodup3 c = true ->
-   forall c',
-     extends3 c c' = true -> 
-     nodup3 c' = true ->
-     map3 v c' = Some t.
-Proof.
-  intros.
-  remember (map3 v c) as HailMary.
-  induction v, c, HailMary using map3_ind.
-  admit. (* ? *)
-  admit. (* ? *)
-  admit.
-Admitted.
-
-Lemma map_extends_some_agreement_5:
-  forall c v t, 
-   map c v = Some t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros c v t.
-  remember (map c v = Some t) as mapcv.
-  induction c, v, mapcv using map_ind.
-  intros.
-  rewrite Heqmapcv in H.
-  inversion H.
-
-  intros.
-  rewrite Heqmapcv in H.
-  move H after H2.
-  move H1 after H2.
-  move e0 after H2.
-  move H0 after c'0.
-  apply beq_tvar_eq in e0.
-  rewrite e0.
-  rewrite e0 in H.
-  clear e.
-  clear Heqmapcv.
-  clear e0.
-  pose proof H as H'.
-  unfold map in H'.
-  fold map in H'.
-  rewrite beq_tvar_refl in H'.
-  inversion H'.
-  subst.
-  clear H'.
-
-  induction c'0.
-  
-
-  admit. (* Still stuck. *)
-
-(*
-  intros.
-  apply extends_l_strengthen with (k:= k') (t:= t') in H1.
-  unfold nodup in H0.
-  fold nodup in H0.
-  case_eq(map c' k'); intros.
-  rewrite H3 in H0.
-  inversion H0.
-  unfold map in Heqmapcv.
-  fold map in Heqmapcv.
-  rewrite e0 in Heqmapcv.
-  rewrite H3 in H0.
-  apply IHmapcv with (c'0:= c'0) in Heqmapcv; try assumption.
-*)
-Admitted.
-
-
-Lemma map_extends_some_agreement_6:
-  forall c v o t,
-   map c v = o ->
-   nodup c = true ->
-   o = Some t ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = o.
-Proof.
-  intros c v o t.
-  functional induction (map c v).
-  admit. (* bad *)
-  admit. (* bad *)
-  admit. (* bad *)
-Qed.
-
-
-Lemma map_extends_some_agreement_7:
-  forall c v t, 
-   map c v = Some t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros c v t.
-  functional induction (map c v); try solve [crush].
-  intros.
-  inversion H.
-  apply beq_tvar_eq in e0.
-  subst.
-
-Lemma map_extends_some_agreement_8_extends:
-  forall c v t,
-    map c v = Some t ->
-    forall c', 
-      extends c c' = true -> 
-      nodup c = true ->
-      nodup c' = true ->
-      map c' v = Some t.
-Proof.
-  intros c v t mapcvt c'.
-  pose proof mapcvt as X.
-  functional induction (extends c c'); try solve [crush].
-  intros.
-  inversion H0.
-  case_eq(map c'' k); intros; rewrite H2 in H3.
-  inversion H3.
-
-  unfold map in mapcvt.
-  fold map in mapcvt.
-  case_eq(K_eq v k); intros; rewrite H4 in mapcvt.
-  apply beq_tvar_eq in H4.
-  subst.
-  inversion mapcvt.
-  subst.
-  admit. (* need to invert but the context is consistent. *)
-
-  apply IHb in mapcvt; try assumption.
-Qed.  
-
-
-Lemma map_extends_some_agreement_8_map':
-  forall c c',
-    extends' c c' = true -> 
-    nodup' c = true ->
-    nodup' c' = true ->
-    forall v t, 
-      map' c v = Some t ->
-      map' c' v = Some t.
-Proof.
-  intros c c'.
-  functional induction (extends' c c'); try solve [crush].
-  intros.
-  inversion H0.
-  case_eq(map' c'' k); intros; rewrite H3 in H4.
-  inversion H4.
-
-  apply IHb with (v:= v) (t:= t1) in H; try assumption.
-  case_eq(K_eq v k); intros.
-  apply beq_tvar_eq in H5.
-  subst.
-  admit. (* need to invert but the context is consistent. *)
-
-  unfold map' in H2.
-  fold map' in H2.
-  rewrite H5 in H2.
-  assumption.
-Qed.  
-
-
-Inductive maptr: (Context K T) -> K -> T -> Prop :=
-  | maptr1: 
-      forall c k t,
-        map c k = Some t ->
-        maptr c k t.
-
-Function maptf (c : Context K T) (k: K) (t : T): bool := 
-  match c with
-    | Ctxt_dot => false
-    | (Ctxt k' t' c') =>
-      match K_eq k k' with
-        | true  => beq_tau t t'
-        | false => (maptf c' k t)
-      end
-  end.
-
-Lemma map_extends_some_agreement_9_maptf:
-  forall c v t,
-   maptf c v t = true ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros c v t.
-  remember (maptf c v t = true) as X.
-  functional induction (maptf c v t); try solve [crush].
-  intros.
-  admit.  (* bad *)
-  admit. 
-Admitted.
-
-(* Totally useless. *)
-Lemma map_extends_some_agreement_10_maptr:
-  forall c v  t,
-   maptr c v t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros c v t maptrder.
-  induction maptrder.
-Admitted.
-
-(* The last approach is to build the map relation, prove it equivalent
-and induct on it. *)
-
-Inductive mapits: (Context K T) -> K -> T -> Prop :=
-  | mapits_top     : forall c k t,
-                       mapits (Ctxt k t c) k t
-  | mapits_recurse : forall k' c k t t',
-                       mapits c k t ->
-                       mapits (Ctxt k' t' c) k t.
-
-Lemma map_extends_some_agreement_11_mapits:
-  forall c v  t,
-   mapits c v t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' v = Some t.
-Proof.
-  intros c v t mapitder.
-  induction mapitder.
-  intros.
-  admit.
-  intros.
-  (* perhaps *)
-Admitted.
-
-(* Or I can go the way that worked for getD, functional induction but
- an extends relation. *)
-
-Inductive extendsr : (Context K T) -> (Context K T) -> Prop := 
-  | extendsr_empty   : forall c,
-                         extendsr empty c
-  | extendsr_left  : 
-      forall c c' k t,
-        map c' k = Some t ->
-        extendsr c c' ->
-        extendsr (Ctxt k t c) c'.
-
-(* Is it really NoDup that has to be a relation also? *)
-Lemma map_extends_some_agreement_12_extendsr:
-  forall c k  t,
-   map c k = Some t ->
-   nodup c = true ->
-   forall c',
-     nodup c' = true ->
-     extendsr c c' -> 
-     map c' k = Some t.
-Proof.
-  intros c k t.
-  functional induction (map c k).
-  intros.
-  inversion H.
-  Case "Some k0 = k0".
-   intros.
-   inversion H.
-   clear H.
-   pose proof e0 as e0'.
-   apply beq_tvar_eq in e0.
-   subst.
-   inversion H2.
-   assumption.
-  Case "getD d' alpha = Some k".
-   intros.
-   inversion H0. 
-   inversion H2.
-   subst.
-   apply IHo with (c'0 := c'0) in H; try assumption.
-   case_eq(map c' k'); intros; rewrite H3 in H4.
-   inversion H4.
-   assumption.
-Qed.
-
-Lemma map_extends_some_agreement_12_functional_inversion_on_extends:
-  forall c k  t,
-   map c k = Some t ->
-   nodup c = true ->
-   forall c',
-     extends c c' = true -> 
-     nodup c' = true ->
-     map c' k = Some t.
-Proof.
-  intros c v t.
-  intros.
-  pose proof H as H'.
-  functional induction (map c v).
-  inversion H.
-
-  apply beq_tvar_eq in e0.
-  inversion H'.
-  subst.
-  clear H'.
-  clear H.
-  functional inversion H1.
-  subst.
-
-  admit.
-
-(*
-  assert (Z: map c'0 k' = Some t).
-  admit. 
-  rewrite H3 in Z.
-  inversion Z.
-*)
-
-  apply extends_l_strengthen with (k:= k') (t:= t') in H1.
-  unfold nodup in H0.
-  fold nodup in H0.
-  case_eq(map c'0 k'); intros; rewrite H3 in H0.
-  inversion H0.
-  apply IHo in H; try assumption.
-Admitted.
-
-
-

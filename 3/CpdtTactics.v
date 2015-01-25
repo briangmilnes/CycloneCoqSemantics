@@ -248,3 +248,19 @@ Ltac guess v H :=
 Ltac guessKeep v H :=
   let H' := fresh "H'" in
     generalize H; intro H'; guess v H'.
+
+(* Plus one from somewhere else. *)
+
+Ltac clear_dup :=
+  match goal with
+    | [ H : ?X |- _ ] =>
+      match goal with
+        | [ H2 : ?Y |- _ ] =>
+          match H with
+            | H2 => fail 2
+            | _ => unify X Y ; (clear H2 || clear H)
+          end
+      end
+  end.
+
+Ltac clear_dups := repeat clear_dup.

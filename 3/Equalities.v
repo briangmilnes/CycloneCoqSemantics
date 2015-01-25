@@ -36,7 +36,7 @@ end.
 
 Fixpoint beq_tau (t t' : Tau) : bool :=
  match t, t with
- | 
+ | tv_t alpha, tv_t beta => beq_tvar alpha beta
  | cint, cint => true
  | (cross t0 t1), (cross t0' t1') => andb (beq_tau t0 t0') (beq_tau t1 t1')
  | (arrow t0 t1), (arrow t0' t1') => andb (beq_tau t0 t0') (beq_tau t1 t1')
