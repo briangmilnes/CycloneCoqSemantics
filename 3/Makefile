@@ -5,13 +5,17 @@ SRCFILES=FormalSyntax.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHea
 
 TESTFILES=TestUtilities.vo FormalSyntaxTest.vo DynamicSemanticsHeapObjectsTest.vo DynamicSemanticsTypeSubstitutionTest.vo DynamicSemanticsTest.vo StaticSemanticsTest.vo StaticSemanticsKindingAndContextWellFormednessTest.vo StaticSemanticsTypingHeapObjectsTest.vo MutualRecursionProof.vo KindingTest.vo ContextExtensionTest.vo
 
-LEMMAFILES= VarLemmas.vo ListLemmas.vo PathLemmas.vo AlphaConversion.vo GetLemmasRelation.vo StaticSemanticsHeapObjectsLemmas.vo StaticSemanticsKindingLemmas.vo StaticSemanticsLemmas.vo StaticSemanticsTypingLemmas.vo StaticSemanticsWellFormednessLemmas.vo ContextExtensionLemmas.vo ValueLemmas.vo
+LEMMAFILES= NatLemmas.vo VarLemmas.vo ListLemmas.vo PathLemmas.vo AlphaConversion.vo GetLemmasRelation.vo StaticSemanticsHeapObjectsLemmas.vo StaticSemanticsKindingLemmas.vo StaticSemanticsLemmas.vo StaticSemanticsTypingLemmas.vo StaticSemanticsWellFormednessLemmas.vo ContextExtensionLemmas.vo ValueLemmas.vo
 
 PROOFFILES=TypeSafetyProof.vo ContextWeakeningProof.vo TermWeakeningProof.vo HeapWeakeningProof.vo SubstitutionsProof.vo TypingWellFormednessProof.vo ReturnPreservationProof.vo CannonicalFormsProof.vo PathExtensionProof.vo HeapObjectSafetyProof.vo TermPreservationProof.vo TermProgressProof.vo
 
 TACTICFILES=CpdtTactics.vo Case.vo
 
 EXPERIMENTFILES=KindingExperiments.vo PFunExperiment.vo
+
+# You can't name the module the same as the file! LOL.
+MODULES=VariablesSigDef.vo VariablesDef.vo VariablesProofsSigDef.vo NonceSigDef.vo VariablesProofsFunDef.vo TVarDef.vo EVarDef.vo TypingInfoSigDef.vo TauTypingInfoDef.vo TypingInfoProofsSigDef.vo TauTypingInfoFunDef.vo ContextSigDef.vo
+
 
 %.vo: %.v 
 	coqc $<
@@ -28,12 +32,17 @@ proof: TAGS depends tactic lemma src $(PROOFFILES)
 
 experiment: TAGS depends tactic src lemma proof $(PROOFFILES)
 
+modules: $(MODULES)
+
 clean:
 	rm -f *.vo
 	rm -f #*#
 	rm -f *~ 
 	rm -f *.glob
 	rm -f TAGS
+
+clean-modules:
+	rm -f $(MODULES)
 
 tar:
 	tar zcvf backup.tar.gz *.v Makefile

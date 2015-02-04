@@ -18,7 +18,6 @@ Require Import FormalSyntax.
 
 Set Implicit Arguments.
 
-
 (* Modules for the operations. *)
 
 Module Type Context_Type.

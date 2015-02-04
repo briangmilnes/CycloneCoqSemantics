@@ -39,7 +39,6 @@ Function beq_kappa (k k' : Kappa) : bool :=
      |  _, _ => false
   end.
 
-
 (* The abstract syntax of types. *)
 
 (* A type variable, numbered. *)
@@ -56,6 +55,14 @@ Function beq_tvar (x y : TVar) : bool :=
 Inductive Phi : Type :=
  | witnesschanges  : Phi                            (* Allowing witness changes. \delta *)
  | aliases        : Phi.                             (* Allowing aliases as the opened type. \amp *)
+
+Function beq_phi (p p' : Phi) : bool :=
+  match p, p' with
+    | witnesschanges, witnesschanges => true
+    | aliases, aliases => true
+    | _, _ => false
+  end.
+
 
 (* The types. *)
 

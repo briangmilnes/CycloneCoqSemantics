@@ -2,231 +2,41 @@
  This is the definition of formal syntax for Dan Grossman's Thesis, 
   "SAFE PROGRAMMING AT THE C LEVEL OF ABSTRACTION". 
 
-  An attempt at a full context model, no modules. 
+  An attempt at a context module, just the operations, proofs in 
+ another module.
 
 *)
 
-(* TODO v-> k hunt. *)
-
 Require Import List.
 Export ListNotations.
-Require Import ZArith.
+Require Export ZArith.
 Require Import Init.Datatypes.
-Require Import Coq.Init.Logic.
-Require Import Coq.Bool.Bool.
+Require Export Coq.Bool.Bool.
 
+Add LoadPath "/home/milnes/Desktop/Research/Cyclone/CycloneCoq/3".
 Require Export CpdtTactics.
 Require Export Case.
-Require Export TacticNotations.
+
+Require Export ContextSigDef.
+Require Export BoolEqualitySigDef.
 
 Set Implicit Arguments.
 
-Lemma beq_nat_sym : forall (n m : nat),
-                      beq_nat n m = beq_nat m n.
-Proof.
-  apply NPeano.Nat.eqb_sym.
-Qed.
+Module ContextFun(K : BoolEqualitySig) (T : BoolEqualitySig) <: ContextSig.
 
-(* Why is this not in a standard library? *)
-Lemma beq_nat_trans : 
-  forall n1 n2 n3, 
-    beq_nat n1 n2 = true ->
-    beq_nat n2 n3 = true -> 
-    beq_nat n1 n3 = true.
-Proof.
-  induction n1; destruct n2;
-  induction n3; simpl; auto. intros. inversion H.
-  apply IHn1.
-Qed.
+  Module K := K.
+  Definition K    := K.T.
+  Definition K_eq := K.beq_t.
+  
+  Module T := T.
+  Definition T    := T.T.
+  Definition T_eq := T.beq_t.
 
-Inductive TVar : Type :=
- | tvar   : nat -> TVar.
+Inductive Context' (K : Type) (T : Type) : Type :=
+| Ctxt_dot  : Context' K T
+| Ctxt      : K -> T -> Context' K T -> Context' K T.
 
-Function beq_tvar (x y : TVar) : bool :=
-   match x, y with
-     | (tvar x'), (tvar y') => beq_nat x' y'
-  end.
-
-Lemma beq_tvar_refl:
- forall (alpha : TVar),
-   beq_tvar alpha alpha = true.
-Proof.
-  intros.
-  destruct alpha.
-  unfold beq_tvar.
-  apply eq_sym.
-  apply beq_nat_refl.
-Qed.
-Hint Resolve beq_tvar_refl.
-
-Lemma beq_tvar_sym : forall x y : TVar, beq_tvar x y = beq_tvar y x.
-Proof.
-  intros.
-  destruct x.
-  destruct y.
-  unfold beq_tvar.
-  rewrite beq_nat_sym.
-  reflexivity.
-Qed.
-Hint Immediate beq_tvar_sym.
-
-Lemma beq_tvar_trans : 
-  forall x y z,
-    beq_tvar x y = true -> beq_tvar y z = true -> beq_tvar x z = true.
-Proof.
-   destruct x.
-   destruct y.
-   destruct z.
-   apply beq_nat_trans.
-Qed.
-Hint Resolve beq_tvar_trans.
-
-Lemma beq_tvar_eq:
-  forall (alpha beta : TVar),
-    beq_tvar alpha beta = true ->
-    alpha = beta.
-Proof.
-  destruct alpha. 
-  destruct beta.
-  simpl.
-  intros.
-  symmetry in H.
-  apply beq_nat_eq in H.
-  rewrite H.
-  reflexivity.
-Qed.
-Hint Resolve beq_tvar_eq.
-
-Lemma beq_tvar_neq:
-  forall (alpha beta : TVar),
-    beq_tvar alpha beta = false ->
-    alpha <> beta.
-Proof.
-  intros.
-  case_eq (beq_tvar alpha beta).
-  intros.
-  destruct alpha; destruct beta.
-  unfold beq_tvar in H.
-  unfold beq_tvar in H0.
-  apply beq_nat_false in H.
-  congruence.
-  intros.
-  destruct alpha; destruct beta.  
-  unfold beq_tvar in H.
-  fold beq_tvar in H.
-  apply beq_nat_false in H.
-  congruence.
-Qed.  
-Hint Resolve beq_tvar_neq.
-
-Inductive Tau : Type :=
- | tv_t   : TVar -> Tau                             
- | cint   : Tau
- | cross  : Tau -> Tau -> Tau.
-
-Tactic Notation "Tau_ind_cases" tactic(first) ident(c) :=
- first;
-[ Case_aux c "(tv_t t)"
-| Case_aux c "cint"
-| Case_aux c "(cross t t0)"
-].
-
-(* Todo  *)
-Function beq_tau (t t' : Tau) : bool :=
- match t, t' with
- | tv_t alpha, tv_t beta => beq_tvar alpha beta
- | cint, cint => true
- | (cross t0 t1), (cross t0' t1') => andb (beq_tau t0 t0') (beq_tau t1 t1')
- | _ , _ => false
-end.
-
-Lemma beq_tau_refl:
- forall (t : Tau),
-   beq_tau t t = true.
-Proof.
-  intros.
-  induction t; crush.
-Qed.
-Hint Resolve beq_tau_refl.
-
-Lemma beq_tau_sym : forall x y, beq_tau x y = beq_tau y x.
-Proof.
-  induction x; induction y; try solve [crush].
-Qed.
-Hint Immediate beq_tau_sym.
-
-Lemma beq_tau_trans : 
-  forall x y z, 
-    beq_tau x y = true -> beq_tau y z = true -> beq_tau x z = true.
-Proof.
-  induction x; induction y; induction z; intros; try solve [inversion H]; try solve [inversion H0].
-  inversion H. inversion H0.
-  crush.
-  apply beq_tvar_trans with (x:= t) (y:= t0) (z:= t1) in H2; try assumption.
-  reflexivity.
-  unfold beq_tau.
-  fold beq_tau.
-  unfold beq_tau in H.
-  fold beq_tau in H.
-  unfold beq_tau in H0.
-  fold beq_tau in H0.
-  apply andb_true_iff in H.
-  apply andb_true_iff in H0.
-  inversion H.
-  inversion H0.
-  apply andb_true_iff.
-  apply IHx1 with (z:= z1)in H1; try assumption.
-  apply IHx2 with (z:= z2)in H2; try assumption.
-  split; try assumption.
-Qed.
-Hint Resolve beq_tau_trans.
-
-Lemma beq_tau_eq:
-  forall t0 t1, beq_tau t0 t1 = true -> t0 = t1.
-Proof.
-  induction t0; induction t1; intros; try solve [inversion H].
-  inversion H.
-  apply beq_tvar_eq in H1.
-  rewrite H1.
-  reflexivity.
-  reflexivity.
-  clear IHt1_1.
-  clear IHt1_2.
-  unfold beq_tau in H.
-  fold beq_tau in H.
-  apply andb_true_iff in H.
-  inversion H.
-  apply IHt0_1 in H0.
-  apply IHt0_2 in H1.
-  subst.
-  reflexivity.
-Qed.
-
-Lemma beq_tau_neq:
-  forall t0 t1, beq_tau t0 t1 = false -> t0 <> t1.
-Proof.
-  induction t0; induction t1; intros; try solve [inversion H]; try solve [discriminate].
-  apply beq_tvar_neq in H.
-  crush.
-  unfold beq_tau in H.
-  fold beq_tau in H.
-  apply andb_false_iff in H.
-  destruct H.
-  apply IHt0_1 in H.
-  crush.
-  apply IHt0_2 in H.
-  crush.
-Qed.  
-
-Definition K    := TVar.
-Definition K_eq := beq_tvar.
-Definition T    := Tau.
-Definition T_eq := beq_tau.
-
-Inductive Context (K : Type) (T : Type) : Type :=
-| Ctxt_dot  : Context K T
-| Ctxt      : K -> T -> Context K T -> Context K T.
-
+Definition Context := Context'.
 Tactic Notation "Context_ind_cases" tactic(first) ident(c) :=
  first;
 [ Case_aux c "(Ctxt_dot K T)"
@@ -235,7 +45,7 @@ Tactic Notation "Context_ind_cases" tactic(first) ident(c) :=
 
 Definition empty  := Ctxt_dot K T.
 
-Function add (c : Context K T) (k: K) (t : T)  : Context K T :=
+Function add (c : Context' K T) (k: K) (t : T)  : Context' K T :=
   match c with
     | Ctxt_dot => (Ctxt k t (Ctxt_dot K T))
     | (Ctxt k' t' c') =>
@@ -244,8 +54,9 @@ Function add (c : Context K T) (k: K) (t : T)  : Context K T :=
         | false => (Ctxt k' t' (add c' k t))
       end
   end.
+Hint Unfold add. 
 
-Function map (c : Context K T) (k: K) : option T :=
+Function map (c : Context' K T) (k: K) : option T :=
   match c with
     | Ctxt_dot => None
     | (Ctxt k' t' c') =>
@@ -254,8 +65,9 @@ Function map (c : Context K T) (k: K) : option T :=
         | false => (map c' k)
       end
   end.
+Hint Unfold map.
 
-Function nodup (c : (Context K T)) : bool :=
+Function nodup (c : (Context' K T)) : bool :=
   match c with
     | Ctxt_dot => true
     | (Ctxt k' t' c') =>
@@ -264,8 +76,9 @@ Function nodup (c : (Context K T)) : bool :=
         | None  => nodup c'
       end
 end.
+Hint Unfold nodup.
 
-Function extends (c c' : Context K T) : bool :=
+Function extends (c c' : Context' K T) : bool :=
   match c with 
     | Ctxt_dot => true
     | Ctxt k t c'' =>
@@ -278,13 +91,15 @@ Function extends (c c' : Context K T) : bool :=
        | None => false
       end
   end.
+Hint Unfold extends.
 
-Function equal (c c' : Context K T) : bool :=
+Function equal (c c' : Context' K T) : bool :=
   andb (extends c c') (extends c' c).
+Hint Unfold equal.
 
 Lemma map_empty_none: forall k, map empty k = None.
 Proof.
-  crush.
+   crush.
 Qed.
 
 Lemma nodup_empty: nodup empty = true.
@@ -295,25 +110,8 @@ Qed.
 Lemma map_add: forall c k t, map (add c k t) k = Some t.
 Proof.
   intros.
-  induction c.
-  Case "Ctxt_dot".
-   crush.
-   rewrite beq_tvar_refl.
-   reflexivity.
-  Case "(Ctxt k0 t0 c)".
-   crush.
-   case_eq (K_eq k k0).
-   SCase "K_eq k k0 = true".
-    intros.
-    unfold map.
-    rewrite beq_tvar_refl.
-    reflexivity.
-   SCase "K_eq k k0 = false".
-    intros.
-    unfold map.
-    rewrite H.
-    fold map.
-    assumption.
+  induction c; crush.
+  case_eq (K_eq k k0); crush.
 Qed.
 
 Lemma map_agreement:
@@ -376,7 +174,7 @@ Proof.
   move t1 before t.
   unfold nodup in H0.
   fold nodup in H0.
-  apply beq_tvar_eq in H3.
+  apply K.beq_t_eq in H3.
   rewrite <- H3 in H0.
   rewrite e0 in H0.
   inversion H0.
@@ -403,8 +201,8 @@ Proof.
   unfold extends.
   fold extends.
   simpl.
-  rewrite beq_tvar_refl.
-  rewrite beq_tau_refl.
+  rewrite K.beq_t_refl.
+  rewrite T.beq_t_refl.
   apply extends_r_strengthen; try assumption.
   unfold nodup in H.
   fold nodup in H.
@@ -427,7 +225,7 @@ Proof.
   unfold map.
   fold map.
   rewrite H0.
-  rewrite beq_tau_refl.
+  rewrite T.beq_t_refl.
   assumption.
 Qed.
 
@@ -444,8 +242,8 @@ Proof.
   fold extends.
   unfold map.
   fold map.
-  rewrite beq_tvar_refl.
-  rewrite beq_tau_refl.
+  rewrite K.beq_t_refl.
+  rewrite T.beq_t_refl.
   
   apply extends_r_strengthen; try assumption.
   unfold nodup.
@@ -482,7 +280,7 @@ Proof.
   unfold map.
   fold map.
   case_eq (K_eq v k); intros.
-  apply beq_tvar_eq in H0.
+  apply K.beq_t_eq in H0.
   subst.
   rewrite e0 in H.
   inversion H.
@@ -500,7 +298,7 @@ Qed.
 
 Lemma K_eq_sym:  forall k k', K_eq k k' = K_eq k' k.
 Proof.
-  apply beq_tvar_sym.
+  apply K.beq_t_sym.
 Qed.  
 
 Lemma map_r_strengthen_context:
@@ -535,16 +333,16 @@ Proof.
   unfold add in H.
   fold add in H.
   case_eq(K_eq k0 k1); case_eq(K_eq k k1); intros; rewrite H2 in H.
-  apply beq_tvar_trans with (x:= k) in H1.
-  apply beq_tvar_eq in H1.
+  apply K.beq_t_trans with (x:= k) in H1.
+  apply K.beq_t_eq in H1.
   subst.
-  rewrite beq_tvar_sym in H0.
-  apply beq_tvar_eq in H2.
+  rewrite K.beq_t_sym in H0.
+  apply K.beq_t_eq in H2.
   subst.
-  rewrite beq_tvar_refl in H0.
+  rewrite K.beq_t_refl in H0.
   inversion H0.
 
-  apply beq_tvar_refl.
+  apply K.beq_t_refl.
   unfold map in H.
   fold map in H.
   rewrite H0 in H.
@@ -590,7 +388,7 @@ Proof.
   rewrite H4 in H1.
   inversion H1.
   apply IHc with (k:= k0) (t:= t0) in H; try assumption.
-  rewrite beq_tvar_sym in H2; try assumption.
+  rewrite K.beq_t_sym in H2; try assumption.
   apply IHc with (k:= k0) (t:= t0) in H; try assumption.
 Qed.
 
@@ -620,7 +418,7 @@ Proof.
   unfold map in H.
   fold map in H.
   case_eq(K_eq v k); intros; rewrite H1 in H; try assumption.
-  apply beq_tvar_eq in H1.
+  apply K.beq_t_eq in H1.
   subst.
   rewrite e0 in H0.
   inversion H0.
@@ -640,7 +438,7 @@ Proof.
   unfold map.
   fold map.
   case_eq(K_eq k k0); intros.
-  apply beq_tvar_eq in H1.
+  apply K.beq_t_eq in H1.
   subst.
   unfold add in H.
   fold add in H.
@@ -648,7 +446,7 @@ Proof.
   rewrite H0 in H.
   unfold map in H.
   fold map in H.
-  rewrite beq_tvar_refl in H.
+  rewrite K.beq_t_refl in H.
   assumption.
   unfold add in H.
   fold add in H.
@@ -686,7 +484,7 @@ Proof.
   case_eq(K_eq k k0); intros; rewrite H6 in H1; try inversion H1.
   apply IHc in H; try assumption.
   case_eq(T_eq t0 t2); intros; rewrite H5 in H; try solve[inversion H].
-  apply beq_tau_eq in H5.
+  apply T.beq_t_eq in H5.
   subst.
   unfold map in H3.
   fold map in H3.
@@ -698,11 +496,11 @@ Proof.
   inversion H1.
   rewrite K_eq_sym in H1.
   rewrite H5 in *.
-  apply beq_tau_neq in H4.
+  apply T.beq_t_neq in H4.
   rewrite H2 in H3.
   inversion H3.
   crush.
-  apply beq_tau_eq in H4.
+  apply T.beq_t_eq in H4.
   subst.
   unfold map in H3.
   fold map in H3.
@@ -757,22 +555,22 @@ Proof.
   unfold add in H0.
   fold add in H0.
   case_eq(K_eq k0 k); case_eq(K_eq k' k); intros; rewrite H1 in H0; rewrite H2 in H.
-  apply beq_tvar_trans with (x:= k') in H1.
-  apply beq_tvar_eq in H2.
+  apply K.beq_t_trans with (x:= k') in H1.
+  apply K.beq_t_eq in H2.
   subst.
   unfold map in H0.
   fold map in H0.
-  rewrite beq_tvar_sym in H1.
-  apply beq_tvar_eq in H1.
+  rewrite K.beq_t_sym in H1.
+  apply K.beq_t_eq in H1.
   subst.
-  rewrite beq_tvar_refl in H0.
+  rewrite K.beq_t_refl in H0.
   inversion H0.
-  apply beq_tvar_refl.  
-  apply beq_tvar_eq in H2.
+  apply K.beq_t_refl.  
+  apply K.beq_t_eq in H2.
   subst.
   unfold map in H0.
   fold map in H0.
-  rewrite beq_tvar_refl in H0.
+  rewrite K.beq_t_refl in H0.
   inversion H0.
   unfold map in H0.
   fold map in H0.
@@ -804,7 +602,7 @@ Proof.
   unfold map.
   fold map.
   rewrite H0.
-  apply beq_tvar_eq in e0.
+  apply K.beq_t_eq in e0.
   subst.
   unfold map in H.
   fold map in H.
@@ -833,7 +631,7 @@ Proof.
   functional induction (extends c c'); try solve [crush].
   intros.
   pose proof e1 as e1'.
-  apply beq_tau_eq in e1.
+  apply T.beq_t_eq in e1.
   subst.
   unfold map in H0.
   fold map in H0.
@@ -842,7 +640,7 @@ Proof.
   apply IHb with (k:= k0) (t:= t0) in H; try assumption.
   apply extends_l_weaken; try assumption.
   apply map_add_some_agreement; try assumption.
-  rewrite beq_tvar_sym in H1.
+  rewrite K.beq_t_sym in H1.
   assumption.
 Qed.
 
@@ -867,8 +665,8 @@ Proof.
   case_eq(map c'' k); intros; rewrite H4 in H0.
   inversion H0.
   clear H.
-  apply beq_tvar_eq in H3.
-  apply beq_tau_eq in e1.
+  apply K.beq_t_eq in H3.
+  apply T.beq_t_eq in e1.
   subst.
   assumption.
   case_eq(map c'' k); intros; rewrite H4 in H0.
@@ -902,26 +700,26 @@ Proof.
   unfold map.
   fold map.
   case_eq (K_eq k k1); intros.
-  apply beq_tvar_eq in H1.
+  apply K.beq_t_eq in H1.
   rewrite <- H1 in extendsc'c''.
   rewrite <- H1 in H0.
   rewrite <- H1 in nodupc''.
   assert (Z: map (Ctxt k t c) k = Some t).
   simpl.
-  rewrite beq_tvar_refl.
+  rewrite K.beq_t_refl.
   reflexivity.
   apply map_extends_some_agreement with (v:= k) (t:= t) in H'; try assumption.
   apply map_extends_some_agreement with (v:= k) (t:= t) in extendsc'c'';
     try assumption.
   unfold map in extendsc'c''.
   fold map in extendsc'c''.
-  rewrite beq_tvar_refl in extendsc'c''.
+  rewrite K.beq_t_refl in extendsc'c''.
   assumption.
 
   assert (Z: map (Ctxt k t c) k = Some t).
   unfold map.
   fold map.
-  rewrite beq_tvar_refl.
+  rewrite K.beq_t_refl.
   reflexivity.
   apply map_extends_some_agreement with (v:= k) (t:= t) in H';
     try assumption.
@@ -1038,3 +836,4 @@ Proof.
   rewrite equal_sym in H1.
   apply equal_if_map_some with (c:= c') (c':= c) (k:= k) (t:= t) in H; try assumption.
 Qed.
+End ContextFun.
