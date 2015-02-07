@@ -24,7 +24,7 @@ Module EVarPathModule <: BoolEqualitySig.
   Module E := EVarModule.
   Module P := PathModule.
 
-  Definition UE := prod E.Var P.P.
+  Definition UE := prod E.Var P.Path.
   Definition T := UE.
 
 Function beq_ue (u u' : UE) : bool := 

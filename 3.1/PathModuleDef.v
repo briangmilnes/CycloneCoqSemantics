@@ -31,8 +31,8 @@ Inductive PE : Type :=
  | i_pe      : IPE -> PE
  | u_pe      : PE.
 
-Definition P : Type := list PE.
-Definition T := P.
+Definition Path : Type := list PE.
+Definition T := Path.
  
 Function beq_ipe (i i' : IPE) : bool := 
   match i, i' with
@@ -138,7 +138,7 @@ Proof.
 Qed.
 Hint Immediate beq_pe_neq.
 
-Function beq_path (p q : P) : bool := 
+Function beq_path (p q : Path) : bool := 
   match p, q with
     | [], [] => true
     | x :: p', y :: q' => andb (beq_pe x y) (beq_path p' q')
@@ -148,7 +148,7 @@ Hint Resolve beq_pe.
 Definition beq_t := beq_path.
 
 Lemma beq_path_refl:
- forall (p : P),
+ forall (p : Path),
    beq_path p p = true.
 Proof.
   induction p; crush.

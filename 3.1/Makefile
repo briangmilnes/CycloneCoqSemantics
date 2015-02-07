@@ -1,15 +1,15 @@
 -include coq.depends
-all: TAGS src tactic lemma  test proof experiment TODOS
+all: TAGS src tactic lemma test proof experiment 
 
-SRCFILES=BoolEqualitySigDef.vo  ContextFunDef.vo  ContextSigDef.vo  DeltaModuleDef.vo  EVarModuleDef.vo  EVarPathModuleDef.vo  GammaModuleDef.vo  KappaModuleDef.vo  NonceSigDef.vo  PathModuleDef.vo  PhiModuleDef.vo  TauModuleDef.vo  TVarModuleDef.vo  UpsilonModuleDef.vo  VariablesFunDef.vo  VariablesSigDef.vo TermModuleDef.vo
+SRCFILES=BoolEqualitySigDef.vo  ContextFunDef.vo  ContextSigDef.vo  DeltaModuleDef.vo  EVarModuleDef.vo  EVarPathModuleDef.vo  GammaModuleDef.vo  KappaModuleDef.vo  NonceSigDef.vo  PathModuleDef.vo  PhiModuleDef.vo  TauModuleDef.vo  TVarModuleDef.vo  UpsilonModuleDef.vo  VariablesFunDef.vo  VariablesSigDef.vo TermModuleDef.vo HeapModuleDef.vo LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemanticsTypingHeapObjects.vo StaticSemantics.vo TypeSafety.vo
 
-TESTFILES=
+TESTFILES=TestUtilities.vo FormalSyntaxTest.v DynamicSemanticsTypeSubstitutionTest.vo DynamicSemanticsTest.vo DynamicSemanticsHeapObjectsTest.vo StaticSemanticsKindingAndContextWellFormednessTest.v StaticSemanticsTest.vo StaticSemanticsTypingHeapObjectsTest.vo KindingTest.vo
 
-LEMMAFILES=NatLemmas.vo
+LEMMAFILES=NatLemmas.vo StaticSemanticsHeapObjectsLemmas.vo
 
 PROOFFILES=
 
-TACTICFILES=CpdtTactics.vo Case.vo
+TACTICFILES=CpdtTactics.vo Case.vo TacticNotations.vo
 
 EXPERIMENTFILES=
 
@@ -42,7 +42,7 @@ tar:
 	tar zcvf backup.tar.gz *.vo Makefile
 
 TAGS:  
-	~/bin/coqtags *.vo
+	~/bin/coqtags *.v
 
 count: 
 	echo "Source "

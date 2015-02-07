@@ -66,6 +66,17 @@ Function map (c : Context' K T) (k: K) : option T :=
   end.
 Hint Unfold map.
 
+Function delete (c : Context' K T) (k: K) : Context' K T :=
+  match k, c with
+    | k, Ctxt_dot => empty
+    | k, (Ctxt k' t' c') =>
+      match K_eq k k' with
+        | true  => c'
+        | false => (Ctxt k' t' (delete c' k))
+      end
+  end.
+Hint Unfold delete.
+
 Function nodup (c : (Context' K T)) : bool :=
   match c with
     | Ctxt_dot => true
