@@ -23,31 +23,15 @@ Require Export PathModuleDef.
 Require Export TauModuleDef.
 Require Export CpdtTactics. 
 Require Export Case.
-
+Require Export MoreTacticals.
 
 Module TermModule <: BoolEqualitySig.
-  Module K   := KappaModule.
-  Module P   := PhiModule.
-  Module T   := TVarModule.
-  Module E   := EVarModule.
-  Module Tau := TauModule.
-
-Import K.
-Import P.
-Import T.
-Definition TVar := TVarModule.Var.
-Definition tvar := TVarModule.var.
-Import E.
-Definition EVar := EVarModule.Var.
-Definition evar := EVarModule.var.
-
-Require Export PathModuleDef.
-Import PathModule.
-Definition PE  := PathModule.PE.
-Definition Path := PathModule.Path.
-Definition IPE := PathModule.IPE.
-
-Import TauModule.
+  Module K    := KappaModule.
+  Module Phi  := PhiModule.
+  Module TV   := TVarModule.
+  Module EV   := EVarModule.
+  Module T    := TauModule.
+  Module P    := PathModule.
 
 Inductive I  : Type :=  
  | i_i       : Z -> I.                         (* An integer value in an expression or statement. *)
@@ -58,25 +42,25 @@ Inductive St : Type :=                        (* Terms for statements. *)
  | seq       : St  -> St -> St                (* Statement sequencing. *)
  | if_s      : E   -> St -> St   -> St        (* if expression in a statement. *)
  | while     : E   -> St -> St                (* A while statement. *)
- | letx      : EVar -> E -> St   -> St        (* A let expression. *)
- | open      : E -> TVar -> EVar -> St -> St  (* open an existential package (elimination) to a value. *)
- | openstar  : E -> TVar -> EVar -> St -> St  (* open an existential package (elimination) with a pointer to the value. *)
+ | letx      : EV.T -> E -> St   -> St        (* A let expression. *)
+ | open      : E -> TV.T -> EV.T -> St -> St  (* open an existential package (elimination) to a value. *)
+ | openstar  : E -> TV.T -> EV.T -> St -> St  (* open an existential package (elimination) with a pointer to the value. *)
 with E : Type :=                              (* Terms for expressions. *)
  | i_e       : I -> E                         (* An integer value in an expression. *)
- | p_e       : EVar -> list PE -> E           (* This is a term that derefences a path into the value of the variable. *)
+ | p_e       : EV.T -> list P.PE -> E           (* This is a term that derefences a path into the value of the variable. *)
  | f_e       : F -> E                         (* A function identifier in an expression or statement. *)
  | amp       : E -> E                         (* Take the address of an expression. *)
  | star      : E -> E                         (* Derefence an expression of a pointer type. *)
  | cpair     : E -> E -> E                    (* A pair in an expression. *)
- | dot       : E -> IPE -> E                  (* A deference of a pair. *)
+ | dot       : E -> P.IPE -> E                  (* A deference of a pair. *)
  | assign    : E -> E -> E                    (* Equality expression. *)
  | appl      : E -> E -> E                    (* Application expression. app is append. *)
  | call      : St -> E                        (* A call expression for the semantics use. *)
- | inst      : E -> Tau -> E                  (* Type instantiation, e[\tau]. *)
- | pack      : Tau -> E -> Tau -> E           (* Existential type introduction. *)
+ | inst      : E -> T.Tau -> E                  (* Type instantiation, e[\tau]. *)
+ | pack      : T.Tau -> E -> T.Tau -> E           (* Existential type introduction. *)
 with F : Type :=
- | dfun      : Tau -> EVar -> Tau -> St -> F  (* Function definition. *)
- | ufun      : TVar -> Kappa -> F -> F        (* Univerally quantified polymorphic function definition.  *)
+ | dfun      : T.Tau -> EV.T -> T.Tau -> St -> F  (* Function definition. *)
+ | ufun      : TV.T -> K.Kappa -> F -> F        (* Univerally quantified polymorphic function definition.  *)
 .
 
 Scheme St_ind_mutual := Induction for St Sort Prop
@@ -88,6 +72,8 @@ Function beq_i (i i' : I) : bool :=
   match i, i' with
     | i_i i, i_i i' => Zeq_bool i i'
  end.
+Hint Unfold  beq_i.
+Hint Resolve beq_i.
 
 Function beq_st (s s' : St) : bool := 
   match s, s' with
@@ -99,41 +85,48 @@ Function beq_st (s s' : St) : bool :=
            (beq_st s2 s2')
     | while e s, while e' s' => andb (beq_e e e') (beq_st s s')
     | letx x e s, letx x' e' s' =>
-       andb (andb (E.beq_t x x') (beq_e e e')) (beq_st s s')
+       andb (andb (EV.beq_t x x') (beq_e e e')) (beq_st s s')
     | open e alpha x s, open e' beta x' s' =>
-      andb (andb (beq_e e e')    (T.beq_t alpha beta))
-           (andb (E.beq_t x x') (beq_st s s'))
+      andb (andb (beq_e e e')    (TV.beq_t alpha beta))
+           (andb (EV.beq_t x x') (beq_st s s'))
     | openstar e alpha x s, openstar e' beta x' s' =>
-      andb (andb (beq_e e e')    (T.beq_t alpha beta))
-           (andb (E.beq_t x x') (beq_st s s'))
+      andb (andb (beq_e e e')    (TV.beq_t alpha beta))
+           (andb (EV.beq_t x x') (beq_st s s'))
     | _, _ => false
   end
 with beq_e (e e' : E) : bool := 
  match e, e' with 
  | i_e i, i_e i'                 => beq_i i i'
- | p_e x p, p_e x' p'            => andb (E.beq_t x x') (beq_path p p')
+ | p_e x p, p_e x' p'            => andb (EV.beq_t x x') (P.beq_t p p')
  | f_e f, f_e f'                 => beq_f f f'
  | amp e, amp e'                 => beq_e e e'
  | star e, star e'               => beq_e e e'
  | cpair e0 e1, cpair e0' e1'    => andb (beq_e e0 e0') (beq_e e1 e1')
- | dot e ipe, dot e' ipe'        => andb (beq_e e e') (beq_ipe ipe ipe')
+ | dot e ipe, dot e' ipe'        => andb (beq_e e e')   (P.beq_ipe ipe ipe')
  | assign e1 e2, assign e1' e2'  => andb (beq_e e1 e1') (beq_e e2 e2')
  | appl e1 e2, appl e1' e2'      => andb (beq_e e1 e1') (beq_e e2 e2')
  | call s, call s'               => beq_st s s'
- | inst e t, inst e' t'          => andb (beq_e e e') (beq_tau t t')
- | pack t0 e t1, pack t0' e' t1' => andb (andb (beq_tau t0 t0') (beq_e e e'))
-                                         (beq_tau t1 t1')
+ | inst e t, inst e' t'          => andb (beq_e e e') (T.beq_t t t')
+ | pack t0 e t1, pack t0' e' t1' => andb (andb (T.beq_t t0 t0') (beq_e e e'))
+                                         (T.beq_t t1 t1')
  | _, _ => false
 end
 with beq_f (f f' : F) : bool :=
  match  f, f' with 
  | dfun t0 x t1 s, dfun t0' x' t1' s' => 
-   (andb (andb (beq_tau t0 t0') (E.beq_t x x'))
-         (andb (beq_tau t1 t1') (beq_st s s')))
- | ufun a k f, ufun a' k' f'     => (andb (andb (T.beq_t a a') (beq_kappa k k'))
+   (andb (andb (T.beq_t t0 t0') (EV.beq_t x x'))
+         (andb (T.beq_t t1 t1') (beq_st s s')))
+ | ufun a k f, ufun a' k' f'     => (andb (andb (TV.beq_t a a') (K.beq_t k k'))
                                           (beq_f f f'))
  | _, _ => false
 end.
+
+Hint Unfold  beq_st.
+Hint Resolve beq_st.
+Hint Unfold  beq_e.
+Hint Resolve beq_e.
+Hint Unfold  beq_f.
+Hint Resolve beq_f.
 
 (* Totally not working. 
 Functional Scheme beq_st_ind := Induction for beq_st Sort Prop
@@ -240,10 +233,9 @@ Proof.
 Qed.
 Hint Resolve beq_f_refl.
 
+(* The modules are causing name identity issues on fold/unfold. *)
 Ltac refold_term := unfold beq_st; unfold beq_e; unfold beq_f; fold beq_st; fold beq_e; fold beq_f.
 Ltac refold_term_in H := unfold beq_st in H; unfold beq_e in H; unfold beq_f in H; fold beq_st in H; fold beq_e in H; fold beq_f in H.
-
-
 
 Lemma beq_st_sym:
   forall s s', beq_st s s' = beq_st s' s.
@@ -263,14 +255,15 @@ Proof.
               refold_term;
               try rewrite H;
               try rewrite H0;
-              try rewrite E.beq_t_sym;
+              try rewrite EV.beq_t_sym;
+              try rewrite TV.beq_t_sym;
+              try rewrite P.beq_t_sym;
+              try rewrite TV.beq_t_sym;
+              try rewrite K.beq_t_sym;
+              try rewrite P.beq_ipe_sym;
               try rewrite T.beq_t_sym;
-              try rewrite beq_path_sym;
-              try rewrite beq_ipe_sym;
-              try rewrite beq_kappa_sym;
-              try rewrite beq_tau_sym;
               try reflexivity;
-              try setoid_rewrite beq_tau_sym at 2;
+              try setoid_rewrite T.beq_t_sym at 2;
               try reflexivity].
 Qed.
 Hint Resolve beq_st_refl.
@@ -293,14 +286,15 @@ Proof.
               refold_term;
               try rewrite H;
               try rewrite H0;
-              try rewrite E.beq_t_sym;
+              try rewrite EV.beq_t_sym;
               try rewrite T.beq_t_sym;
-              try rewrite beq_path_sym;
-              try rewrite beq_ipe_sym;
-              try rewrite beq_kappa_sym;
-              try rewrite beq_tau_sym;
+              try rewrite P.beq_t_sym;
+              try rewrite TV.beq_t_sym;
+              try rewrite K.beq_t_sym;
+              try rewrite P.beq_ipe_sym;
+              try rewrite T.beq_t_sym;
               try reflexivity;
-              try setoid_rewrite beq_tau_sym at 2;
+              try setoid_rewrite T.beq_t_sym at 2;
               try reflexivity].
 Qed.
 Hint Resolve beq_e_refl.
@@ -324,24 +318,18 @@ Proof.
               refold_term;
               try rewrite H;
               try rewrite H0;
-              try rewrite E.beq_t_sym;
+              try rewrite EV.beq_t_sym;
               try rewrite T.beq_t_sym;
-              try rewrite beq_path_sym;
-              try rewrite beq_ipe_sym;
-              try rewrite beq_kappa_sym;
-              try rewrite beq_tau_sym;
+              try rewrite P.beq_t_sym;
+              try rewrite TV.beq_t_sym;
+              try rewrite K.beq_t_sym;
+              try rewrite P.beq_ipe_sym;
+              try rewrite T.beq_t_sym;
               try reflexivity;
-              try setoid_rewrite beq_tau_sym at 2;
+              try setoid_rewrite T.beq_t_sym at 2;
               try reflexivity].
 Qed.
 Hint Resolve beq_f_refl.
-
-Ltac simplify_boolean_and_true:=
-  repeat match goal with
-    | [ H : andb _ _ = true |- _ ] => apply Bool.andb_true_iff in H
-    | [ H : (_ = true) /\ (_ = true) |- _ ] => try inversion H; clear H
-    | [ H :(_ && _ = true)  /\ (_ && _ = true) |- _ ] => try inversion H; clear H
-end.
 
 Ltac apply_beq_eqs := 
   repeat match goal with
@@ -354,22 +342,21 @@ Ltac apply_beq_eqs :=
     | [ H : forall _ , beq_f _ _ = true -> _ = _ ,
         I : beq_f _ _ = true 
         |- _ ] => apply H in I; subst
-    | [ I : E.beq_t _ _ = true 
-        |- _ ] => apply E.beq_t_eq in I; subst
-    | [ I : T.beq_t _ _ = true 
-        |- _ ] => apply T.beq_t_eq in I; subst
+    | [ I : EV.beq_t _ _ = true 
+        |- _ ] => apply EV.beq_t_eq in I; subst
+    | [ I : TV.beq_t _ _ = true 
+        |- _ ] => apply TV.beq_t_eq in I; subst
     | [ I : beq_i _ _ = true 
         |- _ ] => apply beq_i_eq in I; subst
-    | [ I : beq_ipe _ _ = true 
-        |- _ ] => apply beq_ipe_eq in I; subst
-    | [ I : beq_path _ _ = true 
-        |- _ ] => apply beq_path_eq in I; subst
-    | [ I : beq_tau _ _ = true 
-        |- _ ] => apply beq_tau_eq in I; subst
-    | [ I : beq_kappa _ _ = true 
-        |- _ ] => apply beq_kappa_eq in I; subst
+    | [ I : P.beq_ipe _ _ = true 
+        |- _ ] => apply P.beq_ipe_eq in I; subst
+    | [ I : P.beq_t _ _ = true 
+        |- _ ] => apply P.beq_t_eq in I; subst
+    | [ I : T.beq_t _ _ = true 
+        |- _ ] => apply T.beq_t_eq in I; subst
+    | [ I : K.beq_t _ _ = true 
+        |- _ ] => apply K.beq_t_eq in I; subst
 end.
-
 
 Lemma beq_st_eq:
   forall s s', beq_st s s' = true -> s = s'.
@@ -461,27 +448,20 @@ Ltac apply_beq_neqs :=
     | [ H : forall _ , beq_f _ _ = false -> _ <> _ ,
         I : beq_f _ _ = false 
         |- _ ] => apply H in I; subst
-    | [ I : E.beq_t _ _ = false 
-        |- _ ] => apply E.beq_t_neq in I; subst
+    | [ I : EV.beq_t _ _ = false 
+        |- _ ] => apply EV.beq_t_neq in I; subst
     | [ I : T.beq_t _ _ = false 
         |- _ ] => apply T.beq_t_neq in I; subst
     | [ I : beq_i _ _ = false 
         |- _ ] => apply beq_i_neq in I; subst
-    | [ I : beq_ipe _ _ = false 
-        |- _ ] => apply beq_ipe_neq in I; subst
-    | [ I : beq_path _ _ = false 
-        |- _ ] => apply beq_path_neq in I; subst
-    | [ I : beq_tau _ _ = false 
-        |- _ ] => apply beq_tau_neq in I; subst
-    | [ I : beq_kappa _ _ = false 
-        |- _ ] => apply beq_kappa_neq in I; subst
-end.
-
-Ltac simplify_boolean_and_false:=
-  repeat match goal with
-    | [ H : andb _ _ = false |- _ ] => apply Bool.andb_false_iff in H
-    | [ H : (_ = false) \/ (_ = false) |- _ ] => try inversion H; clear H
-    | [ H :(_ && _ = false)  /\ (_ && _ = false) |- _ ] => try inversion H; clear H
+    | [ I : P.beq_ipe _ _ = false 
+        |- _ ] => apply P.beq_ipe_neq in I; subst
+    | [ I : P.beq_t _ _ = false 
+        |- _ ] => apply P.beq_t_neq in I; subst
+    | [ I : TV.beq_t _ _ = false 
+        |- _ ] => apply TV.beq_t_neq in I; subst
+    | [ I : K.beq_t _ _ = false 
+        |- _ ] => apply K.beq_t_neq in I; subst
 end.
 
 Lemma beq_st_neq:
@@ -610,15 +590,34 @@ Proof.
 Qed.
 Hint Resolve beq_f_trans.
 
+Lemma beq_t_iff_eq:    forall a b, beq_t a b = true <-> a = b.
+Proof.
+  intros.
+  split.
+  apply beq_e_eq.
+  intros.
+  rewrite H.
+  apply beq_e_refl.
+Qed.
+Hint Resolve beq_t_iff_eq.
+
+Lemma beq_t_iff_neq:   forall a b, beq_t a b = false <-> a <> b.
+Proof.
+  intros.
+  split.
+  apply beq_e_neq.
+Admitted.
+Hint Resolve beq_t_iff_neq.
+
 Inductive Value : E -> Prop :=
  | IIsAValue    : forall (i : I),              Value (i_e i)
                                                      
- | AmpIsAValue  : forall (x : EVar) (p : Path),   Value (amp (p_e x p)) 
+ | AmpIsAValue  : forall (x : EV.T) (p : P.T),   Value (amp (p_e x p)) 
 
- | DfunIsAValue : forall (t1 t2 : Tau) (x : EVar) (s : St), 
+ | DfunIsAValue : forall (t1 t2 : T.T) (x : EV.T) (s : St), 
                         Value (f_e (dfun t1 x t2 s))
  | UfunIsAValue : 
-     forall (t : TVar) (k : Kappa) (f : F),
+     forall (t : TV.T) (k : K.T) (f : F),
        Value (f_e (ufun t k f))
 
  | PairIsAValue :
@@ -629,7 +628,7 @@ Inductive Value : E -> Prop :=
 
 (* Bug 40, forget a subvalue here. *)
  | PackIsAValue :
-     forall (tau tau': Tau) (v : E),
+     forall (tau tau': T.T) (v : E),
        Value v -> 
        Value (pack tau v tau').
 

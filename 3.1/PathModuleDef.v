@@ -41,6 +41,7 @@ Function beq_ipe (i i' : IPE) : bool :=
     | _, _ => false
   end.
 Hint Resolve beq_ipe.
+Hint Unfold beq_ipe.
 
 Lemma beq_ipe_refl:
   forall i, beq_ipe i i = true.
@@ -87,6 +88,7 @@ Function beq_pe (p p' : PE) : bool :=
     | _, _ => false
   end.
 Hint Resolve beq_pe.
+Hint Unfold beq_pe.
  
 Lemma beq_pe_refl:
   forall p, beq_pe p p = true.
@@ -138,43 +140,43 @@ Proof.
 Qed.
 Hint Immediate beq_pe_neq.
 
-Function beq_path (p q : Path) : bool := 
+Function beq_t (p q : Path) : bool := 
   match p, q with
     | [], [] => true
-    | x :: p', y :: q' => andb (beq_pe x y) (beq_path p' q')
+    | x :: p', y :: q' => andb (beq_pe x y) (beq_t p' q')
     | _  , _ => false
   end.
-Hint Resolve beq_pe.
-Definition beq_t := beq_path.
+Hint Resolve beq_t.
+Hint Unfold beq_t.
 
-Lemma beq_path_refl:
+Lemma beq_t_refl:
  forall (p : Path),
-   beq_path p p = true.
+   beq_t p p = true.
 Proof.
   induction p; crush.
 Qed.
-Hint Resolve beq_path_refl.
+Hint Resolve beq_t_refl.
 
-Lemma beq_path_sym : forall p p', beq_path p p' = beq_path p' p.
+Lemma beq_t_sym : forall p p', beq_t p p' = beq_t p' p.
 Proof.
   induction p; induction p'; try solve[crush].
-  unfold beq_path.
-  fold beq_path.
+  unfold beq_t.
+  fold beq_t.
   specialize (IHp p').
   rewrite IHp.
   rewrite beq_pe_sym.
   reflexivity.
 Qed.
-Hint Immediate beq_path_sym.
+Hint Immediate beq_t_sym.
 
-Lemma beq_path_eq:
+Lemma beq_t_eq:
   forall p p',
-    beq_path p p' = true ->
+    beq_t p p' = true ->
     p = p'.
 Proof.
   induction p; induction p'; try solve [crush].
-  unfold beq_path.
-  fold beq_path.
+  unfold beq_t.
+  fold beq_t.
   intros.
   apply andb_true_iff in H.
   inversion H.
@@ -184,31 +186,31 @@ Proof.
   subst.
   reflexivity.
 Qed.
-Hint Resolve beq_path_eq.
+Hint Resolve beq_t_eq.
 
-Lemma beq_path_trans:
+Lemma beq_t_trans:
   forall p p0 p1,
-    beq_path p p0 = true ->
-    beq_path p0 p1 = true ->
-    beq_path p p1 = true.
+    beq_t p p0 = true ->
+    beq_t p0 p1 = true ->
+    beq_t p p1 = true.
 Proof.
   intros.
   pose proof H as H'.
   pose proof H0 as H0'.
-  apply beq_path_eq in H.
-  apply beq_path_eq in H0.
+  apply beq_t_eq in H.
+  apply beq_t_eq in H0.
   subst.
-  apply beq_path_refl.
+  apply beq_t_refl.
 Qed.
 
-Lemma beq_path_neq:
+Lemma beq_t_neq:
   forall p p',
-    beq_path p p' = false ->
+    beq_t p p' = false ->
     p <> p'.
 Proof.
   induction p; induction p'; try solve [crush].
-  unfold beq_path.
-  fold beq_path.
+  unfold beq_t.
+  fold beq_t.
   intros.
   apply andb_false_iff in H.
   inversion H.
@@ -217,12 +219,31 @@ Proof.
   apply IHp in H0.
   crush.
 Qed.
-Hint Resolve beq_path_eq.
+Hint Resolve beq_t_eq.
 
-Definition beq_t_refl := beq_path_refl.
-Definition beq_t_sym := beq_path_sym.
-Definition beq_t_trans := beq_path_trans.
+Lemma beq_t_iff_eq:    forall a b, beq_t a b = true <-> a = b.
+Proof.
+  intros.
+  split.
+  apply beq_t_eq.
+  intros.
+  rewrite H.
+  apply beq_t_refl.
+Qed.
+Hint Resolve beq_t_iff_eq.
 
-Definition beq_t_eq := beq_path_eq.
-Definition beq_t_neq := beq_path_neq.
+Lemma beq_t_iff_neq:   forall a b, beq_t a b = false <-> a <> b.
+Proof.
+  intros.
+  split.
+  apply beq_t_neq.
+  intros.
+  induction a; induction b; try solve[crush].
+  unfold beq_t.
+  unfold beq_t.
+  fold beq_t.
+  apply andb_false_iff.
+  destruct a; destruct a1.
+Admitted.
+Hint Resolve beq_t_iff_neq.
 End PathModule.

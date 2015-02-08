@@ -27,46 +27,43 @@ Inductive Phi : Type :=
 
 Definition T := Phi.
 
-Function beq_phi (p p' : Phi) : bool :=
+Function beq_t (p p' : Phi) : bool :=
   match p, p' with
     | witnesschanges, witnesschanges => true
     | aliases, aliases => true
     | _, _ => false
   end.
+Hint Unfold  beq_t.
+Hint Resolve beq_t.
 
-Definition beq_t := beq_phi.
-
-Lemma beq_phi_refl:
+Lemma beq_t_refl:
   forall (k : Phi),
-    beq_phi k k = true.
+    beq_t k k = true.
 Proof.
   destruct k.
   reflexivity.
   reflexivity.
 Qed.
-Hint Resolve beq_phi_refl.
-Definition beq_t_refl := beq_phi_refl.
+Hint Resolve beq_t_refl.
 
-Lemma beq_phi_sym : forall x y : Phi, beq_phi x y = beq_phi y x.
+Lemma beq_t_sym : forall x y : Phi, beq_t x y = beq_t y x.
 Proof.
   intros.
   destruct x;  destruct y; crush.
 Qed.
-Hint Immediate beq_phi_sym.
-Definition beq_t_sym := beq_phi_sym.
+Hint Immediate beq_t_sym.
 
-Lemma beq_phi_trans : 
+Lemma beq_t_trans : 
   forall x y z,
-    beq_phi x y = true -> beq_phi y z = true -> beq_phi x z = true.
+    beq_t x y = true -> beq_t y z = true -> beq_t x z = true.
 Proof.
    destruct x; destruct y; destruct z; crush.
 Qed.
-Hint Resolve beq_phi_trans.
-Definition beq_t_trans := beq_phi_trans.
+Hint Resolve beq_t_trans.
 
-Lemma beq_phi_eq:
+Lemma beq_t_eq:
   forall (k k': Phi),
-    beq_phi k k' = true ->
+    beq_t k k' = true ->
     k = k'.
 Proof.
   intros.
@@ -76,12 +73,11 @@ Proof.
   inversion H.
   reflexivity.
 Qed.
-Hint Resolve beq_phi_eq.
-Definition beq_t_eq := beq_phi_eq.
+Hint Resolve beq_t_eq.
 
-Lemma beq_phi_neq:
+Lemma beq_t_neq:
   forall (k k': Phi),
-    beq_phi k k' = false ->
+    beq_t k k' = false ->
     k <> k'.
 Proof.
   intros.
@@ -91,7 +87,17 @@ Proof.
   discriminate.
   inversion H.
 Qed.
-Hint Resolve beq_phi_neq.
-Definition beq_t_neq := beq_phi_neq.
+Hint Resolve beq_t_neq.
 
+Lemma beq_t_iff_eq:    forall a b, beq_t a b = true <-> a = b.
+Proof.
+  destruct a; destruct b; crush.
+Qed.
+Hint Resolve beq_t_iff_eq.
+
+Lemma beq_t_iff_neq:   forall a b, beq_t a b = false <-> a <> b.
+Proof.
+  destruct a; destruct b; crush.
+Qed.
+Hint Resolve beq_t_iff_neq.
 End PhiModule.

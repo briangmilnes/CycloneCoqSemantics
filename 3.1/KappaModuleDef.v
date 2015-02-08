@@ -25,46 +25,43 @@ Inductive Kappa : Type :=
 
 Definition T := Kappa.
 
-Function beq_kappa (k k' : Kappa) : bool :=
+Function beq_t (k k' : Kappa) : bool :=
    match k, k' with
      |  A, A => true
      |  B, B => true
      |  _, _ => false
   end.
+Hint Unfold  beq_t.
+Hint Resolve beq_t.
 
-Definition beq_t := beq_kappa.
-
-Lemma beq_kappa_refl:
+Lemma beq_t_refl:
   forall (k : Kappa),
-    beq_kappa k k = true.
+    beq_t k k = true.
 Proof.
   destruct k.
   reflexivity.
   reflexivity.
 Qed.
-Hint Resolve beq_kappa_refl.
-Definition beq_t_refl := beq_kappa_refl.
+Hint Resolve beq_t_refl.
 
-Lemma beq_kappa_sym : forall x y : Kappa, beq_kappa x y = beq_kappa y x.
+Lemma beq_t_sym : forall x y : Kappa, beq_t x y = beq_t y x.
 Proof.
   intros.
   destruct x;  destruct y; crush.
 Qed.
-Hint Immediate beq_kappa_sym.
-Definition beq_t_sym := beq_kappa_sym.
+Hint Immediate beq_t_sym.
 
-Lemma beq_kappa_trans : 
+Lemma beq_t_trans : 
   forall x y z,
-    beq_kappa x y = true -> beq_kappa y z = true -> beq_kappa x z = true.
+    beq_t x y = true -> beq_t y z = true -> beq_t x z = true.
 Proof.
    destruct x; destruct y; destruct z; crush.
 Qed.
-Hint Resolve beq_kappa_trans.
-Definition beq_t_trans := beq_kappa_trans.
+Hint Resolve beq_t_trans.
 
-Lemma beq_kappa_eq:
+Lemma beq_t_eq:
   forall (k k': Kappa),
-    beq_kappa k k' = true ->
+    beq_t k k' = true ->
     k = k'.
 Proof.
   intros.
@@ -74,12 +71,11 @@ Proof.
   inversion H.
   reflexivity.
 Qed.
-Hint Resolve beq_kappa_eq.
-Definition beq_t_eq := beq_kappa_eq.
+Hint Resolve beq_t_eq.
 
-Lemma beq_kappa_neq:
+Lemma beq_t_neq:
   forall (k k': Kappa),
-    beq_kappa k k' = false ->
+    beq_t k k' = false ->
     k <> k'.
 Proof.
   intros.
@@ -89,7 +85,19 @@ Proof.
   discriminate.
   inversion H.
 Qed.
-Hint Resolve beq_kappa_neq.
-Definition beq_t_neq := beq_kappa_neq.
+Hint Resolve beq_t_neq.
+
+Lemma beq_t_iff_eq:    forall a b, beq_t a b = true <-> a = b.
+Proof.
+  destruct a; destruct b; crush.
+Qed.
+Hint Resolve beq_t_iff_eq.
+
+
+Lemma beq_t_iff_neq:   forall a b, beq_t a b = false <-> a <> b.
+Proof.
+  destruct a; destruct b; crush.
+Qed.
+Hint Resolve beq_t_iff_neq.
 
 End KappaModule.

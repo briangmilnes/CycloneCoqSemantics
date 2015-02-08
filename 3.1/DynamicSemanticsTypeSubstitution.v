@@ -66,7 +66,7 @@ end.
 
 Fixpoint subst_Gamma (g : Gamma) (tau : Tau) (alpha : TVar) : Gamma :=
   match g with
-   | Ctxt_dot => gdot
+   | cdot => gdot
    | (gctxt x tau' g') => 
      (gctxt x (subst_Tau tau' tau alpha) (subst_Gamma g' tau alpha))
 end.

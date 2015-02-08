@@ -79,27 +79,27 @@ Module LanguageModule.
   Export DeltaModule.
   Module DM := DeltaModule.
   Definition Delta    := (DeltaModule.Context  TVar Kappa).
-  Definition ddot     := (DeltaModule.Ctxt_dot TVar Kappa).
-  Definition dctxt    := DeltaModule.Ctxt.
+  Definition ddot     := (DeltaModule.cdot TVar Kappa).
+  Definition dctxt    := DeltaModule.ctxt.
 
   Export UpsilonModule.
   Module UM := UpsilonModule.
   Definition Upsilon  := (UpsilonModule.Context  HE Tau).
-  Definition udot     := (UpsilonModule.Ctxt_dot HE Tau).
-  Definition uctxt    := UpsilonModule.Ctxt.
+  Definition udot     := (UpsilonModule.cdot HE Tau).
+  Definition uctxt    := UpsilonModule.ctxt.
 
   Export HeapModule.
   Module HM := HeapModule.
   Definition Heap     := (HeapModule.Context  EVar E).
   Definition H        := Heap.
-  Definition hdot     := (HeapModule.Ctxt_dot EVar E).
-  Definition hctxt    := HeapModule.Ctxt.
+  Definition hdot     := (HeapModule.cdot EVar E).
+  Definition hctxt    := HeapModule.ctxt.
 
   Export GammaModule.
   Module GM := GammaModule.
   Definition Gamma    := (GammaModule.Context  EVar Tau).
-  Definition gdot     := (GammaModule.Ctxt_dot EVar Tau).
-  Definition gctxt    := GammaModule.Ctxt.
+  Definition gdot     := (GammaModule.cdot EVar Tau).
+  Definition gctxt    := GammaModule.ctxt.
 End LanguageModule.
 
 Export LanguageModule.

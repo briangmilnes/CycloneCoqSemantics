@@ -29,7 +29,7 @@ Module EVarPathModule <: BoolEqualitySig.
 
 Function beq_ue (u u' : UE) : bool := 
   match u, u' with
-    | (x,p), (x', p') => andb (E.beq_var x x') (P.beq_path p p')
+    | (x,p), (x', p') => andb (E.beq_t x x') (P.beq_t p p')
   end.
 Hint Resolve beq_ue.
 Definition beq_t := beq_ue.
@@ -47,8 +47,8 @@ Proof.
   induction u; induction u'; try solve[crush].
   unfold beq_ue.
   fold beq_ue.
-  rewrite E.beq_var_sym.
-  rewrite P.beq_path_sym.
+  rewrite E.beq_t_sym.
+  rewrite P.beq_t_sym.
   reflexivity.
 Qed.
 Hint Immediate beq_ue_sym.
@@ -64,8 +64,8 @@ Proof.
   intros.
   apply andb_true_iff in H.
   inversion H.
-  apply E.beq_var_eq in H0.
-  apply P.beq_path_eq in H1.
+  apply E.beq_t_eq in H0.
+  apply P.beq_t_eq in H1.
   subst.
   reflexivity.
 Qed.
@@ -97,12 +97,33 @@ Proof.
   intros.
   apply andb_false_iff in H.
   inversion H.
-  apply E.beq_var_neq in H0.
+  apply E.beq_t_neq in H0.
   crush.
-  apply P.beq_path_neq in H0.
+  apply P.beq_t_neq in H0.
   crush.
 Qed.
 Hint Resolve beq_ue_eq.
+
+Lemma beq_t_iff_eq:    forall a b, beq_t a b = true <-> a = b.
+Proof.
+  intros.
+  split.
+  apply beq_ue_eq.
+  intros.
+  rewrite H.
+  apply beq_ue_refl.
+Qed.
+Hint Resolve beq_t_iff_eq.
+
+Lemma beq_t_iff_neq:   forall a b, beq_t a b = false <-> a <> b.
+Proof.
+  intros.
+  split.
+  apply beq_ue_neq.
+  intros.
+  induction a; induction b; try solve[crush].
+Admitted.
+Hint Resolve beq_t_iff_neq.
 
 Definition beq_t_refl := beq_ue_refl.
 Definition beq_t_sym := beq_ue_sym.

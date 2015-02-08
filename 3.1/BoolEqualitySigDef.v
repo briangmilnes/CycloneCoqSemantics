@@ -33,5 +33,10 @@ Module Type BoolEqualitySig.
   Hint Resolve beq_t_eq.
   Axiom beq_t_neq:   forall a b, beq_t a b = false -> a <> b.
   Hint Resolve beq_t_neq.
-  
+
+  Axiom beq_t_iff_eq:    forall a b, beq_t a b = true <-> a = b.
+  Hint Resolve beq_t_iff_eq.
+
+  Axiom beq_t_iff_neq:   forall a b, beq_t a b = false <-> a <> b.
+  Hint Resolve beq_t_iff_neq.
 End BoolEqualitySig.

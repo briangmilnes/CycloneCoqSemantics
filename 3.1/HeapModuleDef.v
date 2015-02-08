@@ -19,7 +19,6 @@ Require Export Case.
 Require Export ContextSigDef.
 Require Export BoolEqualitySigDef.
 Require Export EVarModuleDef.
-Require Export TauModuleDef.
 Require Export ContextFunDef.
 Require Export TermModuleDef.
 

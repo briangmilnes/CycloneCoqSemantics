@@ -26,49 +26,49 @@ Module VariablesFun(n : NonceSig) <: VariablesSig.
  Inductive Var : Type :=
   | var   : nat -> Var.
 
- Function beq_var (x y : Var) : bool :=
+ Function beq_t (x y : Var) : bool :=
    match x, y with
      | (var x'), (var y') => beq_nat x' y'
   end.
- Hint Resolve beq_var.
+ Hint Resolve beq_t.
 
-Lemma beq_var_refl:
+Lemma beq_t_refl:
  forall (a : Var),
-   beq_var a a = true.
+   beq_t a a = true.
 Proof.
   intros.
   destruct a.
-  unfold beq_var.
+  unfold beq_t.
   apply eq_sym.
   apply beq_nat_refl.
 Qed.
-Hint Resolve beq_var_refl.
+Hint Resolve beq_t_refl.
 
-Lemma beq_var_sym : forall x y : Var, beq_var x y = beq_var y x.
+Lemma beq_t_sym : forall x y : Var, beq_t x y = beq_t y x.
 Proof.
   intros.
   destruct x.
   destruct y.
-  unfold beq_var.
+  unfold beq_t.
   rewrite beq_nat_sym.
   reflexivity.
 Qed.
-Hint Immediate beq_var_sym.
+Hint Immediate beq_t_sym.
 
-Lemma beq_var_trans : 
+Lemma beq_t_trans : 
   forall x y z,
-    beq_var x y = true -> beq_var y z = true -> beq_var x z = true.
+    beq_t x y = true -> beq_t y z = true -> beq_t x z = true.
 Proof.
    destruct x.
    destruct y.
    destruct z.
    apply beq_nat_trans.
 Qed.
-Hint Resolve beq_var_trans.
+Hint Resolve beq_t_trans.
 
-Lemma beq_var_eq:
+Lemma beq_t_eq:
   forall (alpha beta : Var),
-    beq_var alpha beta = true ->
+    beq_t alpha beta = true ->
     alpha = beta.
 Proof.
   destruct alpha. 
@@ -80,37 +80,46 @@ Proof.
   rewrite H.
   reflexivity.
 Qed.
-Hint Resolve beq_var_eq.
+Hint Resolve beq_t_eq.
 
-Lemma beq_var_neq:
+Lemma beq_t_neq:
   forall (alpha beta : Var),
-    beq_var alpha beta = false ->
+    beq_t alpha beta = false ->
     alpha <> beta.
 Proof.
   intros.
-  case_eq (beq_var alpha beta).
+  case_eq (beq_t alpha beta).
   intros.
   destruct alpha; destruct beta.
-  unfold beq_var in H.
-  unfold beq_var in H0.
+  unfold beq_t in H.
+  unfold beq_t in H0.
   apply beq_nat_false in H.
   congruence.
   intros.
   destruct alpha; destruct beta.  
-  unfold beq_var in H.
-  fold beq_var in H.
+  unfold beq_t in H.
+  fold beq_t in H.
   apply beq_nat_false in H.
   congruence.
 Qed.  
-Hint Resolve beq_var_neq.
+Hint Resolve beq_t_neq.
+
+Lemma beq_t_iff_eq:    forall a b, beq_t a b = true <-> a = b.
+Proof.
+  destruct a; destruct b; crush.
+  rewrite beq_nat_refl with (n:= n0).
+  reflexivity.
+Qed.
+Hint Resolve beq_t_iff_eq.
+
+Lemma beq_t_iff_neq:   forall a b, beq_t a b = false <-> a <> b.
+Proof.
+  destruct a; destruct b.
+  unfold beq_t.
+  rewrite beq_nat_false_iff.
+  crush.
+Qed.
+Hint Resolve beq_t_iff_neq.
 
  Definition T := Var.
- Definition beq_t := beq_var.
- Definition beq_t_refl := beq_var_refl.
- Definition beq_t_sym := beq_var_sym.
- Definition beq_t_trans := beq_var_trans.
-
- Definition beq_t_eq := beq_var_eq.
- Definition beq_t_neq := beq_var_neq.
-
 End VariablesFun.

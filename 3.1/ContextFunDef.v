@@ -7,6 +7,12 @@
 
 *)
 
+(* TODO:
+    a) signature matches lemmas
+    b) masking of symbols
+    c) clean usage of K_eq/T_eq in all such modules.
+*)
+
 Require Import List.
 Export ListNotations.
 Require Export ZArith.
@@ -18,6 +24,8 @@ Require Export Case.
 
 Require Export ContextSigDef.
 Require Export BoolEqualitySigDef.
+
+Require Export MoreTacticals.
 
 Set Implicit Arguments.
 
@@ -32,33 +40,33 @@ Module ContextFun(K : BoolEqualitySig) (T : BoolEqualitySig) <: ContextSig.
   Definition T_eq := T.beq_t.
 
 Inductive Context' (K : Type) (T : Type) : Type :=
-| Ctxt_dot  : Context' K T
-| Ctxt      : K -> T -> Context' K T -> Context' K T.
+| cdot  : Context' K T
+| ctxt : K -> T -> Context' K T -> Context' K T.
 
 Definition Context := Context'.
 Tactic Notation "Context_ind_cases" tactic(first) ident(c) :=
  first;
-[ Case_aux c "(Ctxt_dot K T)"
-| Case_aux c "(Ctxt k t c)"
+[ Case_aux c "(cdot K T)"
+| Case_aux c "(ctxt k t c)"
 ].
 
-Definition empty  := Ctxt_dot K T.
+Definition empty  := cdot K T.
 
 Function add (c : Context' K T) (k: K) (t : T)  : Context' K T :=
   match c with
-    | Ctxt_dot => (Ctxt k t (Ctxt_dot K T))
-    | (Ctxt k' t' c') =>
+    | cdot => (ctxt k t (cdot K T))
+    | (ctxt k' t' c') =>
       match K_eq k k' with
-        | true  => (Ctxt k  t  c')
-        | false => (Ctxt k' t' (add c' k t))
+        | true  => (ctxt k  t  c')
+        | false => (ctxt k' t' (add c' k t))
       end
   end.
 Hint Unfold add. 
 
 Function map (c : Context' K T) (k: K) : option T :=
   match c with
-    | Ctxt_dot => None
-    | (Ctxt k' t' c') =>
+    | cdot => None
+    | (ctxt k' t' c') =>
       match K_eq k k' with
         | true  => Some t'
         | false => (map c' k)
@@ -68,19 +76,19 @@ Hint Unfold map.
 
 Function delete (c : Context' K T) (k: K) : Context' K T :=
   match k, c with
-    | k, Ctxt_dot => empty
-    | k, (Ctxt k' t' c') =>
+    | k, cdot => empty
+    | k, (ctxt k' t' c') =>
       match K_eq k k' with
         | true  => c'
-        | false => (Ctxt k' t' (delete c' k))
+        | false => (ctxt k' t' (delete c' k))
       end
   end.
 Hint Unfold delete.
 
 Function nodup (c : (Context' K T)) : bool :=
   match c with
-    | Ctxt_dot => true
-    | (Ctxt k' t' c') =>
+    | cdot => true
+    | (ctxt k' t' c') =>
       match map c' k' with
         | Some t  => false
         | None  => nodup c'
@@ -90,8 +98,8 @@ Hint Unfold nodup.
 
 Function extends (c c' : Context' K T) : bool :=
   match c with 
-    | Ctxt_dot => true
-    | Ctxt k t c'' =>
+    | cdot => true
+    | ctxt k t c'' =>
       match map c' k with
        | Some t' => 
          match (T_eq t t') with
@@ -146,6 +154,49 @@ Proof.
   induction c; crush.
 Qed.
 
+Ltac expand_cases :=
+  repeat match goal with
+          | [ H : (if ?x then _ else _) = Some _ |- _ ] => 
+            destruct x ; try solve[inversion H]
+          | [ H : (if ?x then _ else _) = None   |- _ ] => 
+            destruct x ; try solve[inversion H]
+          end.
+
+Ltac invert_some_eq :=
+  repeat match goal with
+          | [ H : Some _ = Some _ |- _ ] => 
+            inversion H; subst; clear H
+         end.
+
+Lemma map_some_none_beq_t_false:
+  forall c k k', 
+    map c k  = None ->
+    forall t, 
+      map c k' = Some t ->
+      K.beq_t k k' = false.
+Proof.
+  intros.
+  induction c.
+  crush.
+  pose proof H as H'.
+  pose proof H0 as H0'.
+  unfold map in H.
+  fold map in H.
+  unfold map in H0.
+  fold map in H0.
+  unfold K_eq in H.
+  unfold K_eq in H0.
+  case_eq(K.beq_t k k0); case_eq(K.beq_t k' k0); intros; rewrite H1 in H0; rewrite H2 in H; try solve [inversion H].
+  inversion H0.
+  subst.
+  case_eq(K.beq_t k k'); intros; try reflexivity.
+  apply K.beq_t_eq in H3.
+  subst.
+  rewrite H1 in H2.
+  inversion H2.
+  apply IHc in H; try assumption.
+Qed.
+
 Lemma empty_extended_by_all:
   forall c, 
     extends empty c = true.
@@ -166,8 +217,8 @@ Lemma extends_r_strengthen:
   forall c c', 
     extends c c' = true -> 
     forall v t, 
-      nodup (Ctxt v t c') = true ->
-      extends c (Ctxt v t c') = true.
+      nodup (ctxt v t c') = true ->
+      extends c (ctxt v t c') = true.
 Proof.
   intros c c'.
   functional induction (extends c c'); try solve[crush].
@@ -175,7 +226,7 @@ Proof.
   apply IHb with (v:= v) (t:= t0) in H.
   unfold extends.
   fold extends.
-  case_eq(map (Ctxt v t0 c') k); intros.
+  case_eq(map (ctxt v t0 c') k); intros.
   case_eq(T_eq t t1); intros; try assumption.
   pose proof H0 as H0'.
   unfold map in H1.
@@ -227,7 +278,7 @@ Lemma extends_l_weaken:
     extends c c' = true -> 
     forall t,
       map c' k = Some t ->
-      extends (Ctxt k t c) c' = true.
+      extends (ctxt k t c) c' = true.
 Proof.
   intros.
   unfold extends.
@@ -245,7 +296,7 @@ Lemma extends_l_weaken_r_strengthen:
     map c' k = None  -> 
     forall t, 
       nodup c' = true ->
-      extends (Ctxt k t c) (Ctxt k t c') = true.
+      extends (ctxt k t c) (ctxt k t c') = true.
 Proof.
   intros.
   unfold extends.
@@ -264,7 +315,7 @@ Qed.
 
 Lemma extends_l_strengthen: 
   forall c c' k t, 
-    extends (Ctxt k t c) c' = true -> extends c c' = true.
+    extends (ctxt k t c) c' = true -> extends c c' = true.
 Proof.
   intros.
   induction c; try solve[crush].
@@ -313,7 +364,7 @@ Qed.
 
 Lemma map_r_strengthen_context:
   forall c k0 t0 k t,
-    map (Ctxt k0 t0 c) k = Some t -> 
+    map (ctxt k0 t0 c) k = Some t -> 
     K_eq k0 k = false -> 
     map c k = Some t.
 Proof.
@@ -474,8 +525,8 @@ Qed.
 
 Lemma extends_r_weaken:
   forall c c' k t, 
-    extends c (Ctxt k t c') = true -> 
-    nodup (Ctxt k t c') = true ->
+    extends c (ctxt k t c') = true -> 
+    nodup (ctxt k t c') = true ->
     map c k = None -> 
     extends c c' = true.
 Proof.
@@ -486,7 +537,7 @@ Proof.
   unfold extends.
   fold extends.
   case_eq(map c' k0); intros;
-  case_eq(map (Ctxt k t c') k0); intros; rewrite H3 in H; try solve[inversion H];
+  case_eq(map (ctxt k t c') k0); intros; rewrite H3 in H; try solve[inversion H];
   case_eq(T_eq t0 t1); intros; try rewrite H4 in *; try solve[inversion H].
   case_eq(T_eq t0 t2); intros; rewrite H5 in H; try solve[inversion H].
   unfold map in H1.
@@ -531,11 +582,11 @@ Lemma map_disagreement_absurd:
     nodup c = true -> 
     map c k = Some t ->
     forall k' t', 
-    map (Ctxt  k' t' c) k = None ->
+    map (ctxt  k' t' c) k = None ->
   False.
 Proof.  
   intros.
-  assert (Z: extends c (Ctxt k' t' c) = true).
+  assert (Z: extends c (ctxt k' t' c) = true).
   assert (Y: extends c c = true).
   apply extends_refl; try assumption.
   apply extends_r_strengthen with (v:= k') (t:= t') in Y; try assumption.
@@ -602,11 +653,6 @@ Lemma map_add_some_agreement:
       K_eq k k0 = false ->
       map (add c k0 t0) k = Some t.
 Proof.
-(*
-  intros.
-  functional induction (map c k); try solve[crush].
-*)
-
   intros.
   functional induction (add c k0 t0); try solve [crush].
   unfold map.
@@ -684,6 +730,31 @@ Proof.
   apply IHb in H; try assumption.
 Qed.
 
+Lemma map_none_r_strengthen:
+  forall c v v',
+   map c v  = None ->
+   map c v' = None ->
+   K_eq v' v = false ->
+   forall t, 
+     map (ctxt v t c) v' = None.
+Proof.
+  intros.
+  induction c.
+  refold map.
+  rewrite H1.
+  reflexivity.
+  refold map.
+  refold_in map H.
+  refold_in map H0.
+  case_eq(K_eq v k); intros; rewrite H2 in *;
+  case_eq(K_eq v' k); intros; rewrite H3 in *;
+  case_eq(K_eq v' v); intros; rewrite H4 in *;
+  try solve[inversion H];
+  try solve[inversion H0];
+  try solve[inversion H1].
+  apply IHc in H; try assumption.
+Qed.
+
 Lemma extends_trans:
   forall c c' c'',
     nodup c = true ->
@@ -714,7 +785,7 @@ Proof.
   rewrite <- H1 in extendsc'c''.
   rewrite <- H1 in H0.
   rewrite <- H1 in nodupc''.
-  assert (Z: map (Ctxt k t c) k = Some t).
+  assert (Z: map (ctxt k t c) k = Some t).
   simpl.
   rewrite K.beq_t_refl.
   reflexivity.
@@ -726,7 +797,7 @@ Proof.
   rewrite K.beq_t_refl in extendsc'c''.
   assumption.
 
-  assert (Z: map (Ctxt k t c) k = Some t).
+  assert (Z: map (ctxt k t c) k = Some t).
   unfold map.
   fold map.
   rewrite K.beq_t_refl.
@@ -789,17 +860,16 @@ Proof.
 Qed.
 
 (* It would be nice if these were true but they're not unless I cannonicalize. *)
+(*
 Lemma equal_eq:
   forall c c',
     equal c c' = true ->
     c = c'.
-Admitted.
-  
 Lemma equal_neq:
   forall c c',
     equal c c' = false ->
     c <> c'.
-Admitted.
+*)
 
 Lemma equal_empty_only_empty:
   forall c,

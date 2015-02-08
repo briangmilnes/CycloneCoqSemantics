@@ -7,7 +7,13 @@
 *)
  
 Set Implicit Arguments.
-Require Export LanguageModuleDef.
+Require Export List.
+Export ListNotations.
+Require Export ZArith.
+Require Export Init.Datatypes.
+Require Import Coq.Bool.Bool.
+Require Import Coq.Setoids.Setoid.
+
 Require Export DynamicSemanticsTypeSubstitution.
 Require Export DynamicSemanticsHeapObjects.
 Require Export DynamicSemantics.
@@ -97,3 +103,4 @@ Hint Extern 5 (_ = [] + _)  => try reflexivity.
 
 (* A sleazy way to work around this eauto requires my db bug. *)
 Ltac Crunch := eauto 20 with Chapter3; crush; eauto 20 with Chapter3.
+
