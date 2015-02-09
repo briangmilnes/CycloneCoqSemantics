@@ -18,11 +18,12 @@ Require Export EVarModuleDef.
 Require Export CpdtTactics. 
 Require Export Case.
 
-Module PathModule <: BoolEqualitySig.
+Module PathModule.
   Module E := EVarModule.
 
 (* Bug 45, should have made this just zero/one not an i to make the inductions
    work. *)
+Module Types.
 Inductive IPE: Type :=
  | zero_pe    
  | one_pe.
@@ -32,8 +33,10 @@ Inductive PE : Type :=
  | u_pe      : PE.
 
 Definition Path : Type := list PE.
-Definition T := Path.
- 
+Definition pdot := [] : Path.
+End Types.
+Include Types.
+
 Function beq_ipe (i i' : IPE) : bool := 
   match i, i' with
     | zero_pe, zero_pe => true
@@ -140,43 +143,43 @@ Proof.
 Qed.
 Hint Immediate beq_pe_neq.
 
-Function beq_t (p q : Path) : bool := 
+Function beq_path (p q : Path) : bool := 
   match p, q with
     | [], [] => true
-    | x :: p', y :: q' => andb (beq_pe x y) (beq_t p' q')
+    | x :: p', y :: q' => andb (beq_pe x y) (beq_path p' q')
     | _  , _ => false
   end.
-Hint Resolve beq_t.
-Hint Unfold beq_t.
+Hint Resolve beq_path.
+Hint Unfold beq_path.
 
-Lemma beq_t_refl:
+Lemma beq_path_refl:
  forall (p : Path),
-   beq_t p p = true.
+   beq_path p p = true.
 Proof.
   induction p; crush.
 Qed.
-Hint Resolve beq_t_refl.
+Hint Resolve beq_path_refl.
 
-Lemma beq_t_sym : forall p p', beq_t p p' = beq_t p' p.
+Lemma beq_path_sym : forall p p', beq_path p p' = beq_path p' p.
 Proof.
   induction p; induction p'; try solve[crush].
-  unfold beq_t.
-  fold beq_t.
+  unfold beq_path.
+  fold beq_path.
   specialize (IHp p').
   rewrite IHp.
   rewrite beq_pe_sym.
   reflexivity.
 Qed.
-Hint Immediate beq_t_sym.
+Hint Immediate beq_path_sym.
 
-Lemma beq_t_eq:
+Lemma beq_path_eq:
   forall p p',
-    beq_t p p' = true ->
+    beq_path p p' = true ->
     p = p'.
 Proof.
   induction p; induction p'; try solve [crush].
-  unfold beq_t.
-  fold beq_t.
+  unfold beq_path.
+  fold beq_path.
   intros.
   apply andb_true_iff in H.
   inversion H.
@@ -186,31 +189,31 @@ Proof.
   subst.
   reflexivity.
 Qed.
-Hint Resolve beq_t_eq.
+Hint Resolve beq_path_eq.
 
-Lemma beq_t_trans:
+Lemma beq_path_trans:
   forall p p0 p1,
-    beq_t p p0 = true ->
-    beq_t p0 p1 = true ->
-    beq_t p p1 = true.
+    beq_path p p0 = true ->
+    beq_path p0 p1 = true ->
+    beq_path p p1 = true.
 Proof.
   intros.
   pose proof H as H'.
   pose proof H0 as H0'.
-  apply beq_t_eq in H.
-  apply beq_t_eq in H0.
+  apply beq_path_eq in H.
+  apply beq_path_eq in H0.
   subst.
-  apply beq_t_refl.
+  apply beq_path_refl.
 Qed.
 
-Lemma beq_t_neq:
+Lemma beq_path_neq:
   forall p p',
-    beq_t p p' = false ->
+    beq_path p p' = false ->
     p <> p'.
 Proof.
   induction p; induction p'; try solve [crush].
-  unfold beq_t.
-  fold beq_t.
+  unfold beq_path.
+  fold beq_path.
   intros.
   apply andb_false_iff in H.
   inversion H.
@@ -219,31 +222,31 @@ Proof.
   apply IHp in H0.
   crush.
 Qed.
-Hint Resolve beq_t_eq.
+Hint Resolve beq_path_eq.
 
-Lemma beq_t_iff_eq:    forall a b, beq_t a b = true <-> a = b.
+Lemma beq_path_iff_eq:    forall a b, beq_path a b = true <-> a = b.
 Proof.
   intros.
   split.
-  apply beq_t_eq.
+  apply beq_path_eq.
   intros.
   rewrite H.
-  apply beq_t_refl.
+  apply beq_path_refl.
 Qed.
-Hint Resolve beq_t_iff_eq.
+Hint Resolve beq_path_iff_eq.
 
-Lemma beq_t_iff_neq:   forall a b, beq_t a b = false <-> a <> b.
+Lemma beq_path_iff_neq:   forall a b, beq_path a b = false <-> a <> b.
 Proof.
   intros.
   split.
-  apply beq_t_neq.
+  apply beq_path_neq.
   intros.
   induction a; induction b; try solve[crush].
-  unfold beq_t.
-  unfold beq_t.
-  fold beq_t.
+  unfold beq_path.
+  unfold beq_path.
+  fold beq_path.
   apply andb_false_iff.
   destruct a; destruct a1.
 Admitted.
-Hint Resolve beq_t_iff_neq.
+Hint Resolve beq_path_iff_neq.
 End PathModule.

@@ -21,7 +21,7 @@ Qed.
 Definition pnil : Path := [].
 
 Example getu_for_cint:
- UM.map (uctxt (x, pnil) cint udot) (x,pnil) = Some cint.
+ U.map (uctxt (x, pnil) cint udot) (x,pnil) = Some cint.
 Proof.
   eauto 20 with Chapter3.
 Qed.

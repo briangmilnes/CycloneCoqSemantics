@@ -20,7 +20,7 @@ Require Export CpdtTactics.
 Require Export TacticNotations.
 
 Lemma K_weakening:
-  forall (d : Delta) (tau : Tau) (k : Kappa),
+  forall (d : Delta) (tau : Tau) (k : K.T),
       WFD d ->
       K d tau k -> 
       forall (d' : Delta),
@@ -91,7 +91,7 @@ Proof.
 Qed.
 
 Lemma AK_weakening:
-  forall (d : Delta) (tau : Tau) (k : Kappa),
+  forall (d : Delta) (tau : Tau) (k : K.T),
       WFD d ->
       AK d tau k -> 
       forall (d' : Delta),

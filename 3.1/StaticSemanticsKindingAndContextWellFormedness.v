@@ -12,8 +12,8 @@ Require Export LanguageModuleDef.
       
 Inductive WFD : Delta -> Prop :=
   | WFD_nil    : WFD ddot
-  | WFD_xtau   : forall (d : Delta) (alpha : TVar) (k : Kappa),
-                 DM.map d alpha = None ->
+  | WFD_xtau   : forall (d : Delta) (alpha : TV.T) (k : Kappa),
+                 D.map d alpha = None ->
                  WFD  d ->
                  WFD (dctxt alpha k d).
 
@@ -22,12 +22,12 @@ Inductive K : Delta -> Tau -> Kappa -> Prop :=
  | K_int   : forall (d : Delta),
                   K d cint B
 
- | K_B     : forall (d : Delta) (alpha : TVar),
-               DM.map d alpha = Some B ->
+ | K_B     : forall (d : Delta) (alpha : TV.T),
+               D.map d alpha = Some B ->
                K d (tv_t alpha) B
 
- | K_star_A  : forall (d : Delta) (alpha : TVar),
-                 DM.map d alpha = Some A -> 
+ | K_star_A  : forall (d : Delta) (alpha : TV.T),
+                 D.map d alpha = Some A -> 
                  K  d (ptype (tv_t alpha)) B
 
  | K_B_A     : forall (d : Delta) (tau : Tau),
@@ -48,15 +48,15 @@ Inductive K : Delta -> Tau -> Kappa -> Prop :=
                     K d tau A ->
                     K d (ptype tau) B
 
- | K_utype  : forall (d : Delta) (alpha : TVar) (k : Kappa) (tau : Tau),
+ | K_utype  : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
                    WFD (dctxt alpha k d) ->
-                   DM.map d alpha = None -> 
+                   D.map d alpha = None -> 
                    K  (dctxt alpha k d) tau A ->
                    K d (utype alpha k tau) A
 
- | K_etype  : forall (d : Delta) (alpha : TVar) (k : Kappa) (tau : Tau) (p : Phi),
+ | K_etype  : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau) (p : Phi),
                    WFD (dctxt alpha k d) ->
-                   DM.map d alpha = None -> 
+                   D.map d alpha = None -> 
                    K (dctxt alpha k d) tau A ->
                    K d (etype p alpha k tau) A.
 
@@ -67,8 +67,8 @@ Inductive AK : Delta -> Tau -> Kappa -> Prop :=
                    K  d tau k ->
                    AK d tau k
 
- | AK_A     : forall (d : Delta) (alpha : TVar),
-                DM.map d alpha = Some A ->
+ | AK_A     : forall (d : Delta) (alpha : TV.T),
+                D.map d alpha = Some A ->
                 AK d (tv_t alpha) A.
                          
 Inductive ASGN : Delta -> Tau -> Prop :=
@@ -76,8 +76,8 @@ Inductive ASGN : Delta -> Tau -> Prop :=
   | ASGN_cint  : forall (d : Delta),
                       ASGN d cint
 
-  | ASGN_B     : forall (d : Delta) (alpha : TVar),
-                   DM.map d alpha = Some B ->
+  | ASGN_B     : forall (d : Delta) (alpha : TV.T),
+                   D.map d alpha = Some B ->
                    ASGN d (tv_t alpha)
 
   | ASGN_ptype : forall (d : Delta) (tau : Tau),
@@ -93,20 +93,20 @@ Inductive ASGN : Delta -> Tau -> Prop :=
                    ASGN d t1 -> 
                    ASGN d (arrow t0 t1)
 
-  | ASGN_utype : forall (d : Delta) (alpha : TVar) (k : Kappa) (tau : Tau),
-                   DM.map d alpha = None ->
+  | ASGN_utype : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
+                   D.map d alpha = None ->
                    ASGN (dctxt alpha k d) tau ->
                    ASGN d (utype alpha k tau)
 
-  | ASGN_etype : forall (d : Delta) (alpha : TVar) (k : Kappa) (tau : Tau),
-                   DM.map d alpha = None ->
+  | ASGN_etype : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
+                   D.map d alpha = None ->
                    ASGN (dctxt alpha k d) tau ->
                    ASGN d (etype witnesschanges alpha k tau).
 
 Inductive WFU : Upsilon -> Prop :=
   | WFU_nil : WFU udot
-  | WFU_A   : forall (u : Upsilon) (tau : Tau) (p : Path) (x : EVar),
-                 UM.map u (x,p) = None ->
+  | WFU_A   : forall (u : Upsilon) (tau : Tau) (p : Path) (x : EV.T),
+                 U.map u (x,p) = None ->
                  WFU  u ->
                  K ddot tau A ->
                  WFU (uctxt (x,p) tau u).
@@ -114,14 +114,14 @@ Inductive WFU : Upsilon -> Prop :=
 Inductive WFDG : Delta -> Gamma -> Prop :=
   | WFDG_d_nil : forall (d: Delta),
                      WFDG d gdot
-  | WFDG_xt      : forall (d: Delta) (g: Gamma) (x : EVar) (tau : Tau),
-                     GM.map g x = None -> 
+  | WFDG_xt      : forall (d: Delta) (g: Gamma) (x : EV.T) (tau : Tau),
+                     G.map g x = None -> 
                      K d tau A ->
                      WFDG d g ->
                      WFDG d (gctxt x tau g)
 (* Proposed Thesis bug, I have to be able to extend WFDG with a new type variable. *)                          
-  | WFDG_alphak   : forall (d: Delta) (g: Gamma) (alpha : TVar) (k : Kappa),
-                     DM.map d alpha = None -> 
+  | WFDG_alphak   : forall (d: Delta) (g: Gamma) (alpha : TV.T) (k : Kappa),
+                     D.map d alpha = None -> 
                      WFDG d g ->
                      WFDG (dctxt alpha k d) g.
 

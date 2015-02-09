@@ -6,9 +6,9 @@
 
 *)
 Set Implicit Arguments.
+Require Export LanguageModuleDef.
 Require Import TestUtilities. 
 Require Import DynamicSemanticsTypeSubstitution.
-
 
 (* Test substitution in types. *)
 Example subst_Tau_alpha: (subst_Tau (tv_t alpha) tau alpha) = tau.

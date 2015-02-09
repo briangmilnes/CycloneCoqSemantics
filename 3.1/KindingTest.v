@@ -22,7 +22,7 @@ Require Export Case.
 *)
 
 Example alpha_star_B :
-    K (dctxt (tvar 0) A ddot) (ptype (tv_t (tvar 0))) B.
+    K (dctxt (TV.var 0) A ddot) (ptype (tv_t (TV.var 0))) B.
 Proof.
   apply K_star_A. 
   eauto 20 with Chapter3.
@@ -32,11 +32,11 @@ Qed.
   restricted. This explains a lot. *)
 
 Lemma can_K_alpha :
-  exists (d : Delta) (alpha : TVar) (k1 k2 : Kappa),
+  exists (d : Delta) (alpha : TV.T) (k1 k2 : Kappa),
     K (dctxt alpha k1 d) (tv_t alpha) k2.
 Proof.
   apply ex_intro with (x:= ddot).
-  apply ex_intro with (x:= (tvar 0)).
+  apply ex_intro with (x:= (TV.var 0)).
   apply ex_intro with (x:= B).
   apply ex_intro with (x:= B).
   constructor.
@@ -44,11 +44,11 @@ Proof.
 Qed.
 
 Lemma can_K_alpha_A :
-  exists (d : Delta) (alpha : TVar) (k1 k2 : Kappa),
+  exists (d : Delta) (alpha : TV.T) (k1 k2 : Kappa),
     K (dctxt alpha k1 d) (tv_t alpha) k2.
 Proof.
   apply ex_intro with (x:= ddot).
-  apply ex_intro with (x:= (tvar 0)).
+  apply ex_intro with (x:= (TV.var 0)).
   apply ex_intro with (x:= B).
   apply ex_intro with (x:= A).
   constructor.
@@ -58,23 +58,23 @@ Qed.
 
 Lemma can_AK_alpha :
   ~ exists (k1 k2 : Kappa),
-      AK (dctxt (tvar 0) k1 ddot) (tv_t (tvar 0)) k2.
+      AK (dctxt (TV.var 0) k1 ddot) (tv_t (TV.var 0)) k2.
 Proof.
   unfold not.
   intros.
-  destruct H0 as [k1]; destruct H0 as [k2]; destruct k1; destruct k2; 
+  destruct H as [k1]; destruct H as [k2]; destruct k1; destruct k2; 
   try inversion H; try inversion H0; crush.
   admit.
-  inversion H1.
+  inversion H.
   simpl in H3.
 Admitted.
 
 Lemma can_AK_alpha_A :
-  exists (d : Delta) (alpha : TVar) (k1 k2 : Kappa),
+  exists (d : Delta) (alpha : TV.T) (k1 k2 : Kappa),
     K (dctxt alpha k1 ddot) (tv_t alpha) k2.
 Proof.
   apply ex_intro with (x:= ddot).
-  apply ex_intro with (x:= (tvar 0)).
+  apply ex_intro with (x:= (TV.var 0)).
   apply ex_intro with (x:= B).
   apply ex_intro with (x:= A).
   constructor.

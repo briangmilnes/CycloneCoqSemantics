@@ -12,21 +12,21 @@ Require Export LanguageModuleDef.
 Require Import TestUtilities.
 
 
-Check A : Kappa.
-Check B : Kappa.
+Check A : K.T.
+Check B : K.T.
 
-Check (tvar 0) : TVar.
+Check (TV.var 0) : TV.T.
 
 Check witnesschanges : Phi.
 Check aliases         : Phi.
 
-Check (tv_t (tvar 0)) : Tau.
+Check (tv_t (TV.var 0)) : Tau.
 Check cint : Tau.
 Check cross cint cint : Tau.
 Check arrow cint cint : Tau.
 Check ptype cint : Tau.
-Check utype (tvar 0) A cint : Tau.
-Check etype aliases (tvar 0) B cint : Tau.
+Check utype (TV.var 0) A cint : Tau.
+Check etype aliases (TV.var 0) B cint : Tau.
 
 Check evar 0 : EVar.
 
@@ -36,8 +36,8 @@ Check seq (e_s  (i_e (i_i Z0))) (retn (i_e (i_i Z0))) : St.
 Check if_s (i_e (i_i Z0)) (e_s  (i_e (i_i Z0))) (retn (i_e (i_i Z0))) : St.
 Check while (i_e (i_i Z0)) (retn (i_e (i_i Z0))) : St.
 Check letx  (evar 0) (i_e (i_i Z0)) (retn (p_e (evar 0) [])) : St.
-Check open (i_e (i_i Z0)) (tvar 0) (evar 0) (retn (p_e (evar 0) [])) : St.
-Check openstar (i_e (i_i Z0)) (tvar 0) (evar 0) (retn (p_e (evar 0) [])) : St.
+Check open (i_e (i_i Z0)) (TV.var 0) (evar 0) (retn (p_e (evar 0) [])) : St.
+Check openstar (i_e (i_i Z0)) (TV.var 0) (evar 0) (retn (p_e (evar 0) [])) : St.
 
 Example NumValue : Value (i_e (i_i Z0)).
 Proof.
@@ -59,7 +59,7 @@ Proof.
 Qed.
 
 Example PolymorphicFunctionValue : 
-  Value (f_e (ufun (tvar 0) A
+  Value (f_e (ufun (TV.var 0) A
                    (dfun cint (evar 0) cint (retn (p_e (evar 0) []))))).
 Proof.
   apply UfunIsAValue.
@@ -90,7 +90,7 @@ Proof.
 Qed.
 
 Example NotInDomDnil :
-  DM.map ddot (tvar 0) = None.
+  DM.map ddot (TV.var 0) = None.
 Proof.
   reflexivity.
 Qed.

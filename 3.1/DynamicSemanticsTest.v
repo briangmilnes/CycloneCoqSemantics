@@ -88,7 +88,7 @@ Qed.
 Definition etau := (etype aliases alpha A tau).
 Definition H38 := (hctxt x (pack etau v etau) hdot).
 Example pack_value:
-  HM.map H38 x = Some v' ->
+  H.map H38 x = Some v' ->
   Value v'.
 Proof.
   intros H.

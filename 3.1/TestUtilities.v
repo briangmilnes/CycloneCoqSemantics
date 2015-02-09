@@ -34,16 +34,16 @@ Definition s' := (retn (i_e (i_i 0))).
 Definition s1 := (retn (i_e (i_i 1))).
 Definition s2 := (retn (i_e (i_i 2))).
 
-Definition x     := (evar 0).
-Definition x'    := (evar 3).
-Definition y     := (evar 1).
-Definition y'    := (evar 4).
-Definition z     := (evar 2).
-Definition z'    := (evar 8).
+Definition x     := (EV.var 0).
+Definition x'    := (EV.var 3).
+Definition y     := (EV.var 1).
+Definition y'    := (EV.var 4).
+Definition z     := (EV.var 2).
+Definition z'    := (EV.var 8).
 
-Definition alpha := (tvar 0).
-Definition beta  := (tvar 1).
-Definition gamma := (tvar 2).
+Definition alpha := (TV.var 0).
+Definition beta  := (TV.var 1).
+Definition gamma := (TV.var 2).
 
 Definition i     := (i_i 0).
 Definition i1    := (i_i 1).
@@ -57,7 +57,6 @@ Definition t'   := cross cint cint.
 Definition t0   := cint.
 Definition t1   := cross cint cint.
 
-Definition pdot := [] : Path.
 Definition p0   := [(i_pe zero_pe)].
 Definition p1   := [(i_pe one_pe)].
 

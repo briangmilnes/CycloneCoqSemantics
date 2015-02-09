@@ -15,16 +15,16 @@ Require Export DynamicSemanticsTypeSubstitution.
 Require Export StaticSemanticsKindingAndContextWellFormedness.
 Require Export StaticSemantics.
 
-Inductive NotStuck : H -> St -> Prop :=
-  | NotStuck_return : forall (h : H) (v : E),
+Inductive NotStuck : Heap -> St -> Prop :=
+  | NotStuck_return : forall (h : Heap) (v : E),
                         Value v ->
                         NotStuck h (retn v)
   | NotStuck_progress :
-      forall (h: H) (s : St),
-      (exists (h' : H) (s' : St), Sstar h s h' s') ->
+      forall (h: Heap) (s : St),
+      (exists (h' : Heap) (s' : St), Sstar h s h' s') ->
       NotStuck h s.
 
-Definition Stuck : H -> St -> Prop := 
-  fun h: H => fun s: St => ~ (NotStuck h s).
+Definition Stuck : Heap -> St -> Prop := 
+  fun h: Heap => fun s: St => ~ (NotStuck h s).
 
 Hint Constructors NotStuck    : Chapter3.

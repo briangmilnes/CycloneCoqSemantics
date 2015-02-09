@@ -8,6 +8,7 @@
 
 Set Implicit Arguments.
 Require Export LanguageModuleDef.
+
 Require Export DynamicSemanticsTypeSubstitution.
 Require Export DynamicSemanticsHeapObjects.
 Require Export DynamicSemantics.
@@ -22,11 +23,9 @@ Require Export MoreTacticals.
 
 Require Export AlphaConversion.
 
-Print beq_tvar.
-
 Lemma substitution_with_different_type_variables:
-  forall (alpha beta: TVar),
-    beq_tvar beta alpha = false ->
+  forall (alpha beta: TV.T),
+    TV.beq_t beta alpha = false ->
     forall (tau : Tau),
       subst_Tau (tv_t alpha) tau beta = tv_t alpha.
 Proof.
@@ -37,8 +36,8 @@ Proof.
 Qed.
 
 Lemma substitution_with_different_type_variables_ptype:
-  forall (alpha beta: TVar),
-    beq_tvar beta alpha = false ->
+  forall (alpha beta: TV.T),
+    TV.beq_t beta alpha = false ->
     forall (tau : Tau),
       subst_Tau (ptype (tv_t alpha)) tau beta = (ptype (tv_t alpha)).
 Proof.
@@ -49,9 +48,9 @@ Proof.
 Qed.
 
 Lemma A_4_Useless_Substitutions_1:
-  forall (d : Delta) (tau' : Tau) (k : Kappa),
+  forall (d : Delta) (tau' : Tau) (k : K.T),
     K d tau' k ->
-    forall(alpha : TVar),
+    forall(alpha : TV.T),
       DM.map d alpha = None ->
       forall (tau : Tau),
         subst_Tau tau' tau alpha = tau'.
@@ -90,7 +89,7 @@ Proof.
   Case  "K d (utype alpha k tau) A".
    intros alpha0 AlphaNotInDomd tau0.
    (* Am I unfolding too soon ?  No same stuck point. *)
-   case_eq (beq_tvar alpha0 alpha).
+   case_eq (TV.beq_t alpha0 alpha).
    SCase "alpha0 = alpha".
     intros.
     simpl.
@@ -111,11 +110,11 @@ Proof.
    intros alpha0 AlphaNotInDomd tau0.
    unfold subst_Tau.
    fold subst_Tau.
-   case_eq (beq_tvar alpha0 alpha).
+   case_eq (TV.beq_t alpha0 alpha).
    SCase "alpha0 = alpha".
     intros.
     (* The induction hypothesis is false, to tau0 must be connected by? *)
-    apply beq_var_eq in H2.
+    apply TV.beq_t_eq in H2.
     (* Is this now AlphaConversion? *)
     AdmitAlphaConversion.
    SCase "alpha0 <> alpha".
@@ -129,7 +128,7 @@ Proof.
 Qed.
 
 Lemma A_4_Useless_Substitutions_2:
-  forall (d : Delta) (alpha : TVar),
+  forall (d : Delta) (alpha : TV.T),
     DM.map d alpha = None ->
     forall (g : Gamma), 
       WFDG d g ->
@@ -162,9 +161,9 @@ Proof.
 Qed.  
 
 Lemma A_4_Useless_Substitutions_3:
-  forall (d : Delta) (alpha : TVar),
+  forall (d : Delta) (alpha : TV.T),
     DM.map d alpha = None ->
-    forall (u: Upsilon) (x : EVar) (p : Path) (tau': Tau),
+    forall (u: Upsilon) (x : EV.T) (p : Path) (tau': Tau),
         WFU u ->
         UM.map u (x,p) = Some tau' ->
         forall (tau : Tau),
@@ -190,7 +189,7 @@ Proof.
 Qed.
 
 Lemma NotFreeIn_Tau_subst_useless:
-  forall (beta : TVar) (tau : Tau),
+  forall (beta : TV.T) (tau : Tau),
     NotFreeInTau beta tau ->
      forall (tau' : Tau),
        subst_Tau tau tau' beta = tau.
@@ -203,15 +202,17 @@ Proof.
     intros.
     unfold NotFreeInTau in H0.
     unfold DM.K_eq in H1.
-    unfold TVarModuleDef.TVarModule.beq_t in H1.
-    unfold beq_tvar in H0.
-    unfold TVarModule.beq_t in H0.
+    unfold TV.beq_t in H1.
+    unfold TV.beq_t in H0.
+    unfold TV.beq_t in H0.
     rewrite H1 in H0.
-    inversion H.
+    inversion H0.
    SCase "beta <> t".
     intros.
     unfold subst_Tau.
-    rewrite H0.
+    (* uneccesary unfolding! *)
+    unfold DM.K_eq in H1.
+    rewrite H1.
     reflexivity.
   Case "cint".
    crush.
@@ -262,9 +263,9 @@ Proof.
 Qed.    
 
 Lemma A_5_Commuting_Substitutions:
-  forall (beta : TVar) (t2 : Tau),
+  forall (beta : TV.T) (t2 : Tau),
     NotFreeInTau beta t2 ->
-    forall (alpha : TVar) (t0 t1 : Tau),
+    forall (alpha : TV.T) (t0 t1 : Tau),
       (subst_Tau (subst_Tau t0 t1 beta) t2 alpha) =
       (subst_Tau (subst_Tau t0 t2 alpha)
                  (subst_Tau t1 t2 alpha)
@@ -304,17 +305,17 @@ Qed.
 (* This is going to work but it requires new lemmas, can I use
   the more general extends more simply? *)
 
-Inductive Extends1D : TVar -> Kappa -> Delta -> Delta -> Prop := 
+Inductive Extends1D : TV.T -> K.T -> Delta -> Delta -> Prop := 
   | Extends1D_alpha_kappa : 
-      forall (alpha : TVar) (k : Kappa) (d : Delta) (d' : Delta), 
+      forall (alpha : TV.T) (k : K.T) (d : Delta) (d' : Delta), 
       d' = ([(alpha,k)] ++ d) ->
       WFD d' ->
       Extends1D alpha k d d'.
         
 Lemma A_6_Substitution_1_1:
-  forall (d : Delta) (tau : Tau) (k : Kappa),
+  forall (d : Delta) (tau : Tau) (k : K.T),
       AK d tau k -> 
-      forall (d' : Delta) (alpha : TVar) (k' : Kappa) (tau' : Tau), 
+      forall (d' : Delta) (alpha : TV.T) (k' : K.T) (tau' : Tau), 
         K ([(alpha,k)] ++ d) tau' k' ->
         K d (subst_Tau tau' tau alpha) k'.
 Proof.
@@ -343,10 +344,10 @@ Qed.
 
 (*
 Lemma A_6_Substitution_1_extends1D:
-  forall (d : Delta) (tau : Tau) (k : Kappa),
+  forall (d : Delta) (tau : Tau) (k : K.T),
       WFD d ->
       AK d tau k -> 
-      forall (d' : Delta) (alpha : TVar) (k' : Kappa) (tau' : Tau), 
+      forall (d' : Delta) (alpha : TV.T) (k' : K.T) (tau' : Tau), 
         K d' tau' k' ->
         WFD d' ->
         Extends1D alpha k d d' ->
@@ -448,9 +449,9 @@ Qed.
 
 
 Lemma A_6_Substitution_2:
-  forall (d : Delta) (tau : Tau) (k : Kappa),
+  forall (d : Delta) (tau : Tau) (k : K.T),
        AK d tau k -> 
-       forall  (alpha : TVar)  (tau' : Tau)  (k' : Kappa) (d' : Delta),
+       forall  (alpha : TV.T)  (tau' : Tau)  (k' : K.T) (d' : Delta),
          AK ([(alpha,k)] ++ d) tau' k' ->
         d = ([(alpha,k)] ++ d') ->
 
@@ -458,8 +459,8 @@ Lemma A_6_Substitution_2:
 Proof.
   intros d tau k AKder.
   apply (AK_ind 
-           (fun (d : Delta) (tau : Tau) (k : Kappa) =>
-              forall  (alpha : TVar)  (tau' : Tau)  (k' : Kappa),
+           (fun (d : Delta) (tau : Tau) (k : K.T) =>
+              forall  (alpha : TV.T)  (tau' : Tau)  (k' : K.T),
                 AK ([(alpha,k)] ++ d) tau' k' ->
                 AK d (subst_Tau tau' tau alpha) k')).
 
@@ -480,9 +481,9 @@ Proof.
 Qed.
 
 Lemma A_6_Substitution_3:
-  forall (d : Delta) (tau : Tau) (k : Kappa),
+  forall (d : Delta) (tau : Tau) (k : K.T),
     AK d tau k -> 
-    forall (alpha : TVar) (tau' : Tau),
+    forall (alpha : TV.T) (tau' : Tau),
       ASGN ([(alpha, k)] ++ d) tau' ->
       ASGN d (subst_Tau tau' tau alpha).
 Proof.
@@ -538,7 +539,7 @@ Qed.
 
 (* Do I have to move the inductive definition to the top? *)
 Lemma A_6_Substitution_4:
-  forall (alpha : TVar) (k : Kappa) (d : Delta) (g : Gamma),
+  forall (alpha : TV.T) (k : K.T) (d : Delta) (g : Gamma),
     WFDG ([(alpha,k)] ++ d) g ->
       forall (tau : Tau), 
         AK d tau k -> 
@@ -566,7 +567,7 @@ Proof.
 Qed.
 
 Lemma A_6_Substitution_5:
-  forall (alpha : TVar) (k : Kappa) (d : Delta) (u : Upsilon)  (g : Gamma),
+  forall (alpha : TV.T) (k : K.T) (d : Delta) (u : Upsilon)  (g : Gamma),
     WFC ( [(alpha,k)] ++ d) u g ->
     forall (tau : Tau) ,
       AK d tau k -> 
@@ -584,7 +585,7 @@ Qed.
 Lemma A_6_Substitution_6: 
   forall (s : St),
       ret s ->
-      forall (alpha : TVar) (tau : Tau),
+      forall (alpha : TV.T) (tau : Tau),
         ret (subst_St s tau alpha).
 Proof.
   intros s retder.
@@ -641,17 +642,17 @@ Qed.
 
 
 Lemma A_6_Substitution_7:
-  forall (u : Upsilon) (x : EVar) (p p': Path) (t1 t2: Tau),
+  forall (u : Upsilon) (x : EV.T) (p p': Path) (t1 t2: Tau),
     gettype u x p t1 p' t2 ->
-    forall (d: Delta) (tau : Tau) (k : Kappa) (beta : TVar),
+    forall (d: Delta) (tau : Tau) (k : K.T) (beta : TV.T),
       AK d tau k -> 
       WFU u ->
         gettype u x p (subst_Tau t1 tau beta) p' (subst_Tau t2 tau beta).
 Proof.
   intros u x p p' t1 t2 gettypder.
   apply (gettype_ind 
-           (fun (u : Upsilon) (x : EVar) (p : Path) (t1 : Tau) (p' : Path) (t2 : Tau) =>
-              forall (d: Delta) (tau : Tau) (k : Kappa) (beta : TVar),
+           (fun (u : Upsilon) (x : EV.T) (p : Path) (t1 : Tau) (p' : Path) (t2 : Tau) =>
+              forall (d: Delta) (tau : Tau) (k : K.T) (beta : TV.T),
                 AK d tau k -> 
                 WFU u ->
                 gettype u x p (subst_Tau t1 tau beta) p' (subst_Tau t2 tau beta))).
@@ -693,9 +694,9 @@ Qed.
 
 (* Need three of these. *)
 Lemma A_6_Substitution_8_1_2_3:
-  forall (d : Delta) (tau : Tau) (k : Kappa),
+  forall (d : Delta) (tau : Tau) (k : K.T),
     AK d tau k ->
-    forall (alpha : TVar) (u : Upsilon) (g : Gamma) (e : E) (tau' : Tau) 
+    forall (alpha : TV.T) (u : Upsilon) (g : Gamma) (e : E) (tau' : Tau) 
             (d' : Delta),
       ltyp d u g e tau' ->
       d = ([(alpha,k)] ++ d') ->

@@ -15,32 +15,32 @@ Require Export Tacticals.
 Lemma WFU_implies_nodup:
   forall (u : Upsilon),
     WFU u ->
-    UM.nodup u = true.
+    U.nodup u = true.
 Proof.
   intros u.
   induction u.
   Crunch.
   intros.
-  inversion H0.
-  unfold UM.nodup.
-  fold UM.nodup.
-  rewrite H4.
+  inversion H.
+  unfold U.nodup.
+  fold U.nodup.
+  rewrite H3.
   crush.
 Qed.
 
 Lemma WFD_implies_nodup:
   forall (d : Delta),
     WFD d ->
-    DM.nodup d = true.
+    D.nodup d = true.
 Proof.
   intros d.
   induction d.
   Crunch.
   intros.
-  inversion H0.
-  unfold DM.nodup.
-  fold DM.nodup.
-  rewrite H3.
+  inversion H.
+  unfold D.nodup.
+  fold D.nodup.
+  rewrite H2.
   crush.
 Qed.
 

@@ -48,13 +48,13 @@ Hint Constructors WFD : Chapter3.
 Hint Extern 4 => discriminate. (* For ifs. *)
 
 (* Getting eauto to evaluate functions requires some of this. *)
-Hint Extern 0 ((HM.map _ _) = Some _) => try reflexivity : Chapter3.
-Hint Extern 0 ((HM.add _ _) = _) => try reflexivity : Chapter3.
-Hint Extern 0 ((HM.delete _ _) = _) => try reflexivity : Chapter3.
+Hint Extern 0 ((H.map _ _) = Some _) => try reflexivity : Chapter3.
+Hint Extern 0 ((H.add _ _) = _) => try reflexivity : Chapter3.
+Hint Extern 0 ((H.delete _ _) = _) => try reflexivity : Chapter3.
 
-Hint Extern 0 ((DM.map _ _) = Some _) => try reflexivity : Chapter3.
-Hint Extern 0 ((GM.map _ _) = Some _) => try reflexivity : Chapter3.
-Hint Extern 0 (UM.map _ _ _ = None) => try reflexivity : Chapter3.
+Hint Extern 0 ((D.map _ _) = Some _) => try reflexivity : Chapter3.
+Hint Extern 0 ((G.map _ _) = Some _) => try reflexivity : Chapter3.
+Hint Extern 0 (U.map _ _ _ = None) => try reflexivity : Chapter3.
 
 (* Now the judgements work by popping of the left most element of their lists. *)
 
@@ -65,19 +65,19 @@ Proof.
 Admitted.
 
 Ltac left_list_recurse_gamma m :=
-  rewrite app_removefirst_first with (l:= m) (d:=(evar(1000),cint));
+  rewrite app_removefirst_first with (l:= m) (d:=(EV.var(1000),cint));
   try simpl hd;
   try simpl tail;
   try discriminate.
 
 Ltac left_list_recurse_delta m :=
-  rewrite app_removefirst_first with (l:= m) (d:=(tvar(1000),A));
+  rewrite app_removefirst_first with (l:= m) (d:=(TV.var(1000),A));
   try simpl hd;
   try simpl tail;
   try discriminate.
  
 Ltac left_list_recurse_upsilon m :=
-  rewrite app_removefirst_first with (l:= m) (d:= ( ((evar 1000), []), cint));
+  rewrite app_removefirst_first with (l:= m) (d:= ( ((EV.var 1000), []), cint));
   try simpl hd;
   try simpl tail;
   try discriminate.

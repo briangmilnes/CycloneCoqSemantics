@@ -6,8 +6,8 @@
 
 *)
 
-
 Require Export LanguageModuleDef.
+Import LanguageModule.T.
 
 Inductive get : E -> Path -> E -> Prop := 
  | get_pdot: forall (v : E),
@@ -25,7 +25,8 @@ Inductive get : E -> Path -> E -> Prop :=
                Value v1 ->
                get v1 p v ->
                get (cpair v0 v1) ((i_pe one_pe) :: p) v
- | get_pack: forall (v v1 : E) (p : Path) (tau tau' : Tau) (alpha : TVar) (k : Kappa),
+ | get_pack: forall (v v1 : E) (p : Path) (tau tau' : Tau) (alpha : TV.T) 
+                    (k : Kappa),
                Value v  ->
                Value v1 ->
                get v1 p v ->
@@ -52,7 +53,7 @@ Inductive set : E -> Path -> E -> E -> Prop :=
                 set (cpair v0 v1)  ((i_pe one_pe) :: p) v (cpair v0 v')
 
   | set_pack: forall (v v' v1 : E) (p : Path) (tau tau' : Tau) 
-                     (q : Phi) (alpha : TVar) (k : Kappa),
+                     (q : Phi) (alpha : TV.T) (k : Kappa),
                 Value v  ->
                 Value v' ->
                 Value v1 ->

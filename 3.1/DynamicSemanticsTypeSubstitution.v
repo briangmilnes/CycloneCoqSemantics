@@ -9,22 +9,22 @@
 Set Implicit Arguments.
 Require Export LanguageModuleDef.
 
-Fixpoint subst_Tau (t : Tau) (tau : Tau) (alpha : TVar) {struct t} : Tau :=
+Fixpoint subst_Tau (t : Tau) (tau : Tau) (alpha : TV.T) {struct t} : Tau :=
   match t with
     | tv_t beta  => 
-       if beq_tvar alpha beta then tau else tv_t beta
-    | cint               => cint
-    | cross t0 t1        => cross (subst_Tau t0 tau alpha) (subst_Tau t1 tau alpha)
-    | arrow t0 t1        => arrow (subst_Tau t0 tau alpha) (subst_Tau t1 tau alpha)
-    | ptype t0           => ptype (subst_Tau t0 tau alpha)
+       if TV.beq_t alpha beta then tau else T.tv_t beta
+    | T.cint               => T.cint
+    | T.cross t0 t1        => T.cross (subst_Tau t0 tau alpha) (subst_Tau t1 tau alpha)
+    | T.arrow t0 t1        => T.arrow (subst_Tau t0 tau alpha) (subst_Tau t1 tau alpha)
+    | T.ptype t0           => T.ptype (subst_Tau t0 tau alpha)
 (* Bug 41, assuming beta != alpha ! Block not alpha convert.*)
-    | utype   beta k t'  => 
-       if beq_tvar alpha beta then t else utype beta k (subst_Tau t' tau alpha)
-    | etype p beta k t'  => 
-       if beq_tvar alpha beta then t else etype p beta k (subst_Tau t' tau alpha)
+    | T.utype   beta k t'  => 
+       if TV.beq_t alpha beta then t else T.utype beta k (subst_Tau t' tau alpha)
+    | T.etype p beta k t'  => 
+       if TV.beq_t alpha beta then t else T.etype p beta k (subst_Tau t' tau alpha)
 end.
 
-Fixpoint subst_E (e : E) (tau : Tau) (alpha : TVar) {struct e} : E :=
+Fixpoint subst_E (e : E) (tau : Tau) (alpha : TV.T) {struct e} : E :=
  match e with 
    | i_e i        => i_e i    
    | p_e x p      => p_e x p  
@@ -39,7 +39,7 @@ Fixpoint subst_E (e : E) (tau : Tau) (alpha : TVar) {struct e} : E :=
    | inst e' t    => inst   (subst_E   e'     tau alpha) (subst_Tau t tau alpha)
    | pack t e' t' => pack   (subst_Tau t tau alpha) (subst_E e' tau alpha) (subst_Tau t' tau alpha)
  end 
-with subst_St (s: St) (tau : Tau) (alpha : TVar) {struct s} : St :=
+with subst_St (s: St) (tau : Tau) (alpha : TV.T) {struct s} : St :=
   match s with
     | e_s e                => e_s      (subst_E e tau alpha)
     | retn e                => retn      (subst_E e tau alpha)
@@ -50,33 +50,33 @@ with subst_St (s: St) (tau : Tau) (alpha : TVar) {struct s} : St :=
     | open     e beta x s  => open     (subst_E e tau alpha) beta x (subst_St s tau alpha)
     | openstar e beta x s  => openstar (subst_E e tau alpha) beta x (subst_St s tau alpha)
 end
-with subst_F (f : F) (tau : Tau) (alpha : TVar) {struct f} : F  := 
+with subst_F (f : F) (tau : Tau) (alpha : TV.T) {struct f} : F  := 
  match f with 
    | (dfun tau1 x tau2 s) => 
      (dfun (subst_Tau tau1 tau alpha) x (subst_Tau tau2 tau alpha) (subst_St s tau alpha))
    (* Bug 7 from test. *)
-   | ufun (tvar b) k f => 
+   | ufun (TV.var b) k f => 
      match alpha with
-         (tvar a) => 
+         (TV.var a) => 
          if (beq_nat a b)
          then (ufun alpha k f)
-         else  (ufun (tvar b) k (subst_F f tau alpha))
+         else  (ufun (TV.var b) k (subst_F f tau alpha))
      end
 end.
 
-Fixpoint subst_Gamma (g : Gamma) (tau : Tau) (alpha : TVar) : Gamma :=
+Fixpoint subst_Gamma (g : Gamma) (tau : Tau) (alpha : TV.T) : Gamma :=
   match g with
-   | cdot => gdot
+   | G.cdot => gdot
    | (gctxt x tau' g') => 
      (gctxt x (subst_Tau tau' tau alpha) (subst_Gamma g' tau alpha))
 end.
 Functional Scheme subst_Gamma_ind := Induction for subst_Gamma Sort Prop.
 
 (* Probably should be in the tau module. *)
-Function NotFreeInTau (beta : TVar) (tau : Tau) : Prop :=
+Function NotFreeInTau (beta : TV.T) (tau : Tau) : Prop :=
   match tau with 
-    | tv_t alpha => 
-      if beq_tvar beta alpha then False else True
+    | T.tv_t alpha => 
+      if TV.beq_t beta alpha then False else True
     | cint        => True 
     | cross t0 t1 => 
        (NotFreeInTau beta t0) /\ (NotFreeInTau beta t1)
@@ -84,9 +84,7 @@ Function NotFreeInTau (beta : TVar) (tau : Tau) : Prop :=
         (NotFreeInTau beta t0) /\ (NotFreeInTau beta t1)
     | ptype t     => NotFreeInTau beta t
     | utype alpha _ t =>
-      if beq_tvar beta alpha then True else NotFreeInTau beta t
+      if TV.beq_t beta alpha then True else NotFreeInTau beta t
     | etype _ alpha _ t =>  
-      if beq_tvar beta alpha then True else NotFreeInTau beta t
+      if TV.beq_t beta alpha then True else NotFreeInTau beta t
   end.
-
-

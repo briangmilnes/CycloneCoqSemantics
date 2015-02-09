@@ -29,13 +29,15 @@ Require Export MoreTacticals.
 
 Set Implicit Arguments.
 
-Module ContextFun(K : BoolEqualitySig) (T : BoolEqualitySig) <: ContextSig.
 
-  Module K := K.
+Module ContextFun(KM : BoolEqualitySig) (TM : BoolEqualitySig) <: ContextSig.
+  Module K := KM.
   Definition K    := K.T.
   Definition K_eq := K.beq_t.
+  Hint Unfold K_eq.
+
   
-  Module T := T.
+  Module T := TM.
   Definition T    := T.T.
   Definition T_eq := T.beq_t.
 

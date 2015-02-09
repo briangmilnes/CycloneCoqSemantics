@@ -21,18 +21,17 @@ Require Export CpdtTactics.
 Require Export Case.
 
 Module EVarPathModule <: BoolEqualitySig.
-  Module E := EVarModule.
-  Module P := PathModule.
+  Include PathModule.
 
-  Definition UE := prod E.Var P.Path.
-  Definition T := UE.
+Module Base.
+
+Definition UE := prod E.Var Path.
 
 Function beq_ue (u u' : UE) : bool := 
   match u, u' with
-    | (x,p), (x', p') => andb (E.beq_t x x') (P.beq_t p p')
+    | (x,p), (x', p') => andb (E.beq_t x x') (beq_path p p')
   end.
 Hint Resolve beq_ue.
-Definition beq_t := beq_ue.
 
 Lemma beq_ue_refl:
  forall (u : UE),
@@ -48,7 +47,7 @@ Proof.
   unfold beq_ue.
   fold beq_ue.
   rewrite E.beq_t_sym.
-  rewrite P.beq_t_sym.
+  rewrite beq_path_sym.
   reflexivity.
 Qed.
 Hint Immediate beq_ue_sym.
@@ -65,7 +64,7 @@ Proof.
   apply andb_true_iff in H.
   inversion H.
   apply E.beq_t_eq in H0.
-  apply P.beq_t_eq in H1.
+  apply beq_path_eq in H1.
   subst.
   reflexivity.
 Qed.
@@ -99,12 +98,12 @@ Proof.
   inversion H.
   apply E.beq_t_neq in H0.
   crush.
-  apply P.beq_t_neq in H0.
+  apply beq_path_neq in H0.
   crush.
 Qed.
 Hint Resolve beq_ue_eq.
 
-Lemma beq_t_iff_eq:    forall a b, beq_t a b = true <-> a = b.
+Lemma beq_ue_iff_eq:    forall a b, beq_ue a b = true <-> a = b.
 Proof.
   intros.
   split.
@@ -113,9 +112,9 @@ Proof.
   rewrite H.
   apply beq_ue_refl.
 Qed.
-Hint Resolve beq_t_iff_eq.
+Hint Resolve beq_ue_iff_eq.
 
-Lemma beq_t_iff_neq:   forall a b, beq_t a b = false <-> a <> b.
+Lemma beq_ue_iff_neq:   forall a b, beq_ue a b = false <-> a <> b.
 Proof.
   intros.
   split.
@@ -123,12 +122,18 @@ Proof.
   intros.
   induction a; induction b; try solve[crush].
 Admitted.
-Hint Resolve beq_t_iff_neq.
+Hint Resolve beq_ue_iff_neq.
 
+End Base.
+Include Base.
+
+Definition T := UE.
+Definition beq_t := beq_ue.
 Definition beq_t_refl := beq_ue_refl.
 Definition beq_t_sym := beq_ue_sym.
 Definition beq_t_trans := beq_ue_trans.
-
 Definition beq_t_eq := beq_ue_eq.
 Definition beq_t_neq := beq_ue_neq.
+Definition beq_t_iff_eq := beq_ue_iff_eq.
+Definition beq_t_iff_neq := beq_ue_iff_neq.
 End EVarPathModule.

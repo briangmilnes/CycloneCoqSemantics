@@ -1,4 +1,4 @@
-(* 
+(*
  This is the definition of formal syntax for Dan Grossman's Thesis, 
   "SAFE PROGRAMMING AT THE C LEVEL OF ABSTRACTION". 
 
@@ -18,12 +18,10 @@ Require Export CpdtTactics.
 Require Export Case.
 
 Require Import EVarModuleDef.
-Require Import TVarModuleDef.
 Require Import EVarPathModuleDef.
-Require Import KappaModuleDef.
+Require Import TauModuleDef.
 Require Import PathModuleDef.
 Require Import PhiModuleDef.
-Require Import TauModuleDef.
 Require Import TermModuleDef.
 Require Import DeltaModuleDef.
 Require Import GammaModuleDef.
@@ -31,75 +29,33 @@ Require Import HeapModuleDef.
 Require Import UpsilonModuleDef.
 
 Module LanguageModule.
-  Export EVarModule.
-  Module EVarModule  := EVarModule.
-  Definition EVar    := EVarModule.Var.
-  Definition evar    := EVarModule.var.
-  Definition beq_evar := EVarModule.beq_t.
+  Module T   := TauModule.
+  (* Paths come from terms. *)
+  Module Pth := PathModule.   
 
-  Export TVarModule.
-  Module TVarModule := TVarModule.
-  Definition TVar := TVarModule.Var.
-  Definition tvar := TVarModule.var.
-  Definition beq_tvar := TVarModule.beq_t.
-  
-  Export EVarPathModule.
-  Module EVarPathModule := EVarPathModule.
-  Definition HE := EVarPathModule.T.
-
-  Export KappaModule.
-  Module KappaModule := KappaModule.
-  Definition Kappa     := KappaModule.T.
-  Definition beq_kappa := KappaModule.beq_t.
-
-  Export PathModule.
-  Module PathModule := PathModule.
-  Definition Path     := PathModule.T.
-  Definition beq_path := PathModule.beq_t.
-
-  Export PhiModule.
-  Module PhiModule := PhiModule.
-  Definition Phi     := PhiModule.T.
-  Definition beq_phi := PhiModule.beq_t.
-
-  Export TauModule.
-  Module TauModule := TauModuleDef.TauModule.
-  Definition Tau     := TauModuleDef.TauModule.T.
-  Definition beq_tau := TauModuleDef.TauModule.beq_t.
-  
   Export TermModule.
-  Module TermModule := TermModule.
-  Definition St := TermModule.St.
-  Definition E  := TermModule.E.
-  Definition F  := TermModule.F.
+  Module TM := TermModule.
+  Module EVP := EVarPathModule.
 
-(* I might have to rename these all two letters to shorten the context 
-  printing. *)
+  Module D := DeltaModule.
+  Definition Delta    := (D.Context  D.K D.T).
+  Definition ddot     := (D.cdot D.K D.T).
+  Definition dctxt    := D.ctxt.
 
-  Export DeltaModule.
-  Module DM := DeltaModule.
-  Definition Delta    := (DeltaModule.Context  TVar Kappa).
-  Definition ddot     := (DeltaModule.cdot TVar Kappa).
-  Definition dctxt    := DeltaModule.ctxt.
+  Module U := UpsilonModule.
+  Definition Upsilon  := (U.Context U.K U.T).
+  Definition udot     := (U.cdot U.K U.T).
+  Definition uctxt    := U.ctxt.
 
-  Export UpsilonModule.
-  Module UM := UpsilonModule.
-  Definition Upsilon  := (UpsilonModule.Context  HE Tau).
-  Definition udot     := (UpsilonModule.cdot HE Tau).
-  Definition uctxt    := UpsilonModule.ctxt.
+  Module H := HeapModule.
+  Definition Heap     := (H.Context H.K H.T).
+  Definition hdot     := (H.cdot H.K H.T).
+  Definition hctxt    := H.ctxt.
 
-  Export HeapModule.
-  Module HM := HeapModule.
-  Definition Heap     := (HeapModule.Context  EVar E).
-  Definition H        := Heap.
-  Definition hdot     := (HeapModule.cdot EVar E).
-  Definition hctxt    := HeapModule.ctxt.
-
-  Export GammaModule.
-  Module GM := GammaModule.
-  Definition Gamma    := (GammaModule.Context  EVar Tau).
-  Definition gdot     := (GammaModule.cdot EVar Tau).
-  Definition gctxt    := GammaModule.ctxt.
+  Module G := GammaModule.
+  Definition Gamma    := (G.Context G.K G.T).
+  Definition gdot     := (G.cdot G.K G.T).
+  Definition gctxt    := G.ctxt.
 End LanguageModule.
 
 Export LanguageModule.

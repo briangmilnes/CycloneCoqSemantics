@@ -20,11 +20,11 @@ Require Export TacticNotations.
 Require Export Tacticals.
 
 Lemma gettype_weakening:
-  forall (u : Upsilon) (x : EVar) (tau' tau : Tau) (p : Path),
+  forall (u : Upsilon) (x : EV.T) (tau' tau : Tau) (p : Path),
     WFU u ->
     gettype u x [] tau' p tau ->
     forall (u' : Upsilon), 
-      UM.extends u u' = true ->
+      U.extends u u' = true ->
       WFU u' ->
       gettype u' x [] tau' p tau.
 Proof.
@@ -45,18 +45,18 @@ Proof.
    pose proof WFUder as WFUder'.
    apply IHgettypeder with (u':=u') in WFUder; try assumption.
    apply gettype_etype with (tau'':= tau''); try assumption.
-   apply UM.map_extends_some_agreement with (c:= u); try assumption.
+   apply U.map_extends_some_agreement with (c:= u); try assumption.
    apply WFU_implies_nodup; try assumption.
    apply WFU_implies_nodup; try assumption.   
 Qed.
 
 Lemma refp_weakening:
-  forall (h : H) (u : Upsilon),
-    HM.nodup h = true ->
+  forall (h : Heap) (u : Upsilon),
+    H.nodup h = true ->
     refp h u ->
-    forall (h' : H),
-      HM.nodup h' = true ->
-      HM.extends h h' = true ->
+    forall (h' : Heap),
+      H.nodup h' = true ->
+      H.extends h h' = true ->
       refp h' u.
 Proof.
   intros h u noduph refpder.
@@ -69,7 +69,7 @@ Proof.
    intros.
    apply refp_pack with (tau:= tau) (alpha:= alpha) (k:= k) (v:= v) (v':= v');
      try assumption.
-   apply HM.map_extends_some_agreement with (c:= h); try assumption.
+   apply H.map_extends_some_agreement with (c:= h); try assumption.
    apply IHrefpder; try assumption.
    (* Scotch Whiskey society wierd but wonderful. *)
 Qed.
