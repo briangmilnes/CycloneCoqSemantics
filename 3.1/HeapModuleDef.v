@@ -22,4 +22,5 @@ Require Export EVarModuleDef.
 Require Export ContextFunDef.
 Require Export TermModuleDef.
 
+(* TODO Delete. *)
 Module HeapModule := ContextFun EVarModule TermModule.

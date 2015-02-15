@@ -21,7 +21,7 @@ Require Export Case.
 Lemma A_8_Return_Preservation:
   forall (s : St),
     ret s ->
-    forall (h h' : H) (s' : St),
+    forall (h h' : Heap) (s' : St),
       S h s h' s' ->
       ret s'.
 Proof.

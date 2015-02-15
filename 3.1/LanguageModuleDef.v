@@ -35,26 +35,29 @@ Module LanguageModule.
 
   Export TermModule.
   Module TM := TermModule.
+  (* I'd have to functorize this to show the dependencies to TM.EV and Path and so on. *)
   Module EVP := EVarPathModule.
 
-  Module D := DeltaModule.
-  Definition Delta    := (D.Context  D.K D.T).
-  Definition ddot     := (D.cdot D.K D.T).
+  Module D := ContextFun T.TV T.K.
+  (* Now what happens here if I use D.K/D.T vs TV.T T.K ? *)
+  Definition Delta    := (D.Context  T.TV.Var Kappa).
+  Definition ddot     := (D.cdot     T.TV.Var Kappa).
+  (* Can I just drop these and get rid of some unfolding? Seems likely. *)
   Definition dctxt    := D.ctxt.
 
-  Module U := UpsilonModule.
-  Definition Upsilon  := (U.Context U.K U.T).
-  Definition udot     := (U.cdot U.K U.T).
+  Module U := ContextFun EVarPathModule T.
+  Definition Upsilon  := (U.Context U.K Tau).
+  Definition udot     := (U.cdot U.K Tau).
   Definition uctxt    := U.ctxt.
 
-  Module H := HeapModule.
-  Definition Heap     := (H.Context H.K H.T).
-  Definition hdot     := (H.cdot H.K H.T).
+  Module H := ContextFun TM.EV TM.
+  Definition Heap     := (H.Context TM.EV.T TM.E).
+  Definition hdot     := (H.cdot    TM.EV.T TM.E).
   Definition hctxt    := H.ctxt.
 
-  Module G := GammaModule.
-  Definition Gamma    := (G.Context G.K G.T).
-  Definition gdot     := (G.cdot G.K G.T).
+  Module G := ContextFun TM.EV T.
+  Definition Gamma    := (G.Context TM.EV.T Tau).
+  Definition gdot     := (G.cdot    TM.EV.T Tau).
   Definition gctxt    := G.ctxt.
 End LanguageModule.
 

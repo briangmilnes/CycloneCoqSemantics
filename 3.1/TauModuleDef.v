@@ -24,6 +24,8 @@ Require Export MoreTacticals.
 Module TauModule <: BoolEqualitySig.
 Module Base.
  Module TV  := TVarModule. (* So terms can expose it in language module. *)
+ Module K := KappaModule.
+
  Include KappaModule.Base.
  Include PhiModule.
 

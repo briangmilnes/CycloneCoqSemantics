@@ -21,4 +21,5 @@ Require Export EVarModuleDef.
 Require Export TauModuleDef.
 Require Export ContextFunDef.
 
+(* TODO Delete. *)
 Module DeltaModule := ContextFun TVarModule KappaModule.

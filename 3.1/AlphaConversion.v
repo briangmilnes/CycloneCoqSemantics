@@ -10,3 +10,4 @@
 Tactic Notation "AdmitAlphaConversion" :=
   admit.
 
+(* I should be able to make this either a beq_t or a map only. *)

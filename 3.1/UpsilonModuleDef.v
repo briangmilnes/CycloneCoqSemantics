@@ -21,4 +21,5 @@ Require Export EVarPathModuleDef.
 Require Export TauModuleDef.
 Require Export ContextFunDef.
 
+(* TODO Delete. *)
 Module UpsilonModule := ContextFun EVarPathModule TauModule.

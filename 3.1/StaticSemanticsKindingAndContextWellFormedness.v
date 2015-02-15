@@ -61,6 +61,65 @@ Inductive K : Delta -> Tau -> Kappa -> Prop :=
                    K d (etype p alpha k tau) A.
 
 
+(* This unproven lemma is used to do induction on terms of the form K
+ (dctxt alpha k d) tau k' as higher order unification is undecidable
+ and Coq thusly can't do this. Hopefully, this does it and correctly. *)
+
+Lemma K_context_dependent_induction:
+  forall P : TV.T -> Kappa -> Delta -> Tau -> Kappa -> Prop,
+    (* K_int *)
+    (forall alpha k d, P alpha k d cint B) ->
+    (* K_B *)
+    (forall (alpha a': TV.T) (k k': Kappa) (d : Delta) (tau : Tau),
+        D.map (D.ctxt alpha k d) a' = Some B -> 
+        P alpha k d (tv_t a') B) ->
+    (* K_star *) 
+    (forall (d : Delta) (alpha : TV.T) (k : Kappa),
+        D.map (D.ctxt alpha k d) alpha = Some A -> 
+        P alpha k d (ptype (tv_t alpha)) B) -> 
+    (* K_B_A ? *)
+    (forall alpha k (d : Delta) (tau : Tau), 
+            K (D.ctxt alpha k d) tau B -> 
+            P alpha k d tau B ->
+            P alpha k d tau A) ->
+    (* K_cross *)
+    (forall (alpha : TV.T) (k : Kappa) (d : Delta) (t0 t1 : Tau),
+        K (D.ctxt alpha k d) t0 A -> 
+        P alpha k d t0 A -> 
+        K (D.ctxt alpha k d) t1 A -> 
+        P alpha k d t1 A -> 
+        P alpha k d (cross t0 t1) A) -> 
+    (* K_arrow *)
+    (forall (alpha : TV.T) (k : Kappa) (d : Delta) (t0 t1 : Tau),
+        K (D.ctxt alpha k d) t0 A -> 
+        P alpha k d t0 A -> 
+        K (D.ctxt alpha k d) t1 A -> 
+        P alpha k d t1 A -> 
+        P alpha k d (arrow t0 t1) A) -> 
+    (* K_ptype *)
+    (forall (alpha : TV.T) (k : Kappa) (d : Delta) (tau : Tau),
+        K (D.ctxt alpha k d) tau A ->
+        P alpha k d tau A -> 
+        P alpha k d (ptype tau) B) ->
+    (* K_utype *)
+    (forall (d : Delta) (alpha a' : TV.T) (k k': Kappa) (tau : Tau),
+        D.map d alpha = None ->
+        K (D.ctxt alpha k d) tau A ->
+        P alpha k d tau A -> 
+        P alpha k d (utype a' k tau) A) ->
+    (* K_etype *)
+    (forall (d : Delta) (alpha a' : TV.T) (k : Kappa) (tau : Tau) (p : Phi),
+        WFD (D.ctxt alpha k d) ->
+        D.map d alpha = None ->
+        K (D.ctxt alpha k d) tau A ->
+        P alpha k d tau A -> 
+        P alpha k d (etype p a' k tau) A) ->
+    (forall (alpha : TV.T) (k : Kappa) (d : Delta) (tau : Tau) (k' : Kappa),
+      P alpha k d tau k').
+Proof.
+Admitted.
+
+
 Inductive AK : Delta -> Tau -> Kappa -> Prop :=
 
  | AK_AK_K  : forall (d : Delta) (tau : Tau) (k : Kappa),
@@ -70,7 +129,19 @@ Inductive AK : Delta -> Tau -> Kappa -> Prop :=
  | AK_A     : forall (d : Delta) (alpha : TV.T),
                 D.map d alpha = Some A ->
                 AK d (tv_t alpha) A.
-                         
+
+Lemma AK_context_induction_dependent:
+  forall P: TV.T -> Kappa -> Delta -> Tau -> Kappa -> Prop,
+    (forall (alpha : TV.T) (d : Delta) (tau : Tau) (k k': Kappa), 
+           K d tau k -> P alpha k' d tau k) ->
+  (forall (d : Delta) (alpha a': TV.T) (k : Kappa),
+     D.map (D.ctxt alpha k d) a' = Some A -> 
+     P alpha k d (tv_t a') A) ->
+  (forall (alpha : TV.T) (k : Kappa) (d : Delta) (tau : Tau) (k' : Kappa),
+      P alpha k d tau k').
+Proof.
+Admitted.
+
 Inductive ASGN : Delta -> Tau -> Prop :=
 
   | ASGN_cint  : forall (d : Delta),
@@ -95,13 +166,56 @@ Inductive ASGN : Delta -> Tau -> Prop :=
 
   | ASGN_utype : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
                    D.map d alpha = None ->
-                   ASGN (dctxt alpha k d) tau ->
+                   ASGN (D.ctxt alpha k d) tau ->
                    ASGN d (utype alpha k tau)
 
   | ASGN_etype : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
                    D.map d alpha = None ->
-                   ASGN (dctxt alpha k d) tau ->
+                   ASGN (D.ctxt alpha k d) tau ->
                    ASGN d (etype witnesschanges alpha k tau).
+
+Lemma ASGN_context_induction_dependent:
+  forall P : TV.T -> Kappa -> Delta -> Tau -> Prop,
+  (* ASGN_cint *)
+  (forall (beta : TV.T) (k : Kappa) (d : Delta), 
+     P beta k d cint) ->
+  (* ASGN_B *)
+  ( forall (beta : TV.T) (k : Kappa) (d : Delta) (alpha : TV.T),
+      D.map d alpha = Some B -> 
+      P beta k d (tv_t alpha)) ->
+  (* ASGN_ptype *)
+  (forall (beta : TV.T) (k : Kappa) (d : Delta) (tau : Tau), 
+     P beta k d (ptype tau)) ->
+  (* ASGN_cross *)
+  (forall (beta : TV.T) (k : Kappa) (d : Delta) (t0 t1 : Tau),
+     ASGN d t0 -> 
+     P beta k d t0 -> 
+     ASGN d t1 -> 
+     P beta k d t1 -> 
+     P beta k d (cross t0 t1)) ->
+  (* ASGN_arrow *)
+  ( forall (beta : TV.T) (k : Kappa) (d : Delta) (t0 t1 : Tau),
+      ASGN d t0 -> 
+      P beta k d t0 -> 
+      ASGN d t1 -> 
+      P beta k d t1 -> 
+      P beta k d (arrow t0 t1)) ->
+  (* ASGN_utype *)
+  (forall (beta : TV.T) (k : Kappa) (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
+     D.map d alpha = None ->
+     ASGN (D.ctxt alpha k d) tau ->
+     P beta k (D.ctxt alpha k d) tau -> 
+     P beta k d (utype alpha k tau)) ->
+  (* ASGN_etype *)
+  (forall (beta : TV.T) (k: Kappa) (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
+     D.map d alpha = None ->
+     ASGN (D.ctxt alpha k d) tau ->
+     P beta k (D.ctxt alpha k d) tau -> 
+     P beta k d (etype witnesschanges alpha k tau)) ->
+  (forall (beta : TV.T) (k: Kappa) (d : Delta) (tau : Tau),
+         P beta k d tau).
+Proof.
+Admitted.
 
 Inductive WFU : Upsilon -> Prop :=
   | WFU_nil : WFU udot
@@ -123,7 +237,30 @@ Inductive WFDG : Delta -> Gamma -> Prop :=
   | WFDG_alphak   : forall (d: Delta) (g: Gamma) (alpha : TV.T) (k : Kappa),
                      D.map d alpha = None -> 
                      WFDG d g ->
-                     WFDG (dctxt alpha k d) g.
+                     WFDG (D.ctxt alpha k d) g.
+
+Lemma WFDG_context_dependent_induction:
+  forall P : TV.T -> Kappa -> Delta -> Gamma -> Prop, 
+    (* WFDG_d_nil *)
+    (forall  (beta : TV.T) (k : Kappa) (d : Delta), 
+       P beta k d gdot) -> 
+    (* WFDG_xt *)
+    (forall (beta : TV.T) (k : Kappa) (d : Delta) (g : Gamma) (x : EV.T) (tau : Tau),
+        G.map g x = None ->
+        K (dctxt beta k d) tau A -> 
+        WFDG (dctxt beta k d) g -> 
+        P beta k d g -> 
+        P beta k d (gctxt x tau g)) ->
+    (* WFDG_alphak *)
+    (forall  (beta : TV.T) (k : Kappa) (d : Delta) (g : Gamma) (alpha : TV.T) (k : Kappa),
+        D.map (dctxt beta k d) alpha = None -> 
+        WFDG (dctxt beta k d) g -> 
+        P beta k d g -> 
+        P beta k (D.ctxt alpha k d) g) ->
+    (forall (beta : TV.T) (k : Kappa) (d : Delta) (g: Gamma) (tau : Tau),
+         P beta k d g).
+Proof.
+Admitted.
 
 (* Thesis change, we really need to know that kinding contexts are unique,
    so we're adding it here. Another option is to add it inside WFDG. *)

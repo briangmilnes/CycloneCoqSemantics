@@ -33,11 +33,9 @@ Module Type ContextSig.
   Parameter nodup   : Context K T -> bool.
   Parameter equal   : Context K T -> Context K T -> bool.
   Parameter extends  : Context K T -> Context K T -> bool.
-
-(*
-  Parameter extends1 : Context K T -> K -> T -> Context K T -> Prop.
-  Parameter remove  : Context K T -> K -> Context K T.
-*)
+  (* Can I add k t into c' and extend c? *)
+  Parameter extends1 : Context K T -> K -> T -> Context K T -> bool.
+(* Parameter remove  : Context K T -> K -> Context K T. *)
   Axiom map_empty_none: forall k, map empty k = None.
 
 End ContextSig.

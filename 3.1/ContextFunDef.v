@@ -11,6 +11,7 @@
     a) signature matches lemmas
     b) masking of symbols
     c) clean usage of K_eq/T_eq in all such modules.
+    d) work on map/none/some naming. 
 *)
 
 Require Import List.
@@ -117,6 +118,29 @@ Function equal (c c' : Context' K T) : bool :=
   andb (extends c c') (extends c' c).
 Hint Unfold equal.
 
+(* Can I add k t to the front of c'? *)
+Function extends1 (c : Context' K T) (k : K ) (t : T) (c' : Context' K T) : bool :=
+  match map c' k with
+   | Some _ => false
+   | None =>
+     match map c k with
+      | Some _ => false
+      | None   => (equal (ctxt k t c) c')
+     end
+end.
+Hint Unfold extends1.
+
+Function extends1' (c : Context' K T) (k : K ) (t : T) (c' : Context' K T) : bool :=
+  match map c' k with
+   | Some _ => false
+   | None =>
+     match map c k with
+      | Some _ => false
+      | None   => extends (ctxt k t c) c'
+     end
+end.
+Hint Unfold extends1'.
+
 Lemma map_empty_none: forall k, map empty k = None.
 Proof.
    crush.
@@ -215,7 +239,7 @@ Proof.
   induction c; crush.
 Qed.
 
-Lemma extends_r_strengthen:
+Lemma extends_r_str:
   forall c c', 
     extends c c' = true -> 
     forall v t, 
@@ -254,6 +278,59 @@ Proof.
   assumption.
 Qed.
 
+Lemma extends1_to_equality:
+  forall c v t c', 
+    extends1 c v t c' = true -> 
+    equal (ctxt v t c) c' = true.
+Proof.
+  intros.
+  pose proof H as H'.
+  unfold extends1 in H.
+  case_eq(map c' v); intros; rewrite H0 in H; try solve[inversion H];
+  case_eq(map c v); intros; try rewrite H1 in H; try solve[inversion H].
+  assumption.
+Qed.
+
+Lemma extends1_r_str:
+  forall c v t c', 
+    extends1 c v t c' = true -> 
+    forall v' t', 
+      nodup (ctxt v t (ctxt v' t' c')) = true ->
+      extends1 c v t (ctxt v' t' c') = true.
+Proof.
+  intros c v t c'.
+  induction c'; intros.
+  admit.
+(* Stuck.
+  intros c v t c'.
+  functional induction (extends1 c v t c'); try solve[crush].
+  intros.
+  unfold extends1.
+  case_eq(map (ctxt v' t' c') v); intros.
+  unfold nodup in H0.
+  fold nodup in H0.
+  unfold map in H0.
+  fold map in H0.
+  case_eq(K_eq v v'); intros; rewrite H2 in H0.
+  inversion H0.
+  rewrite e in H0.
+  case_eq(map c' v'); intros; rewrite H3 in H0.
+  inversion H0.
+  unfold map in H1.
+  fold map in H1.
+  rewrite H2 in H1.
+  rewrite H1 in e.
+  inversion e.
+  rewrite e0.
+  unfold map in H1.
+  case_eq(K_eq v v'); intros; rewrite H2 in H1.
+  inversion H1.
+  fold map in H1.
+  (* stuck *)
+*)
+Admitted.
+
+
 Lemma extends_refl:
   forall c, 
     nodup c = true ->
@@ -266,7 +343,7 @@ Proof.
   simpl.
   rewrite K.beq_t_refl.
   rewrite T.beq_t_refl.
-  apply extends_r_strengthen; try assumption.
+  apply extends_r_str; try assumption.
   unfold nodup in H.
   fold nodup in H.
   case_eq(map c k); intros; rewrite H0 in H.
@@ -275,7 +352,7 @@ Proof.
   assumption.
 Qed.
 
-Lemma extends_l_weaken:
+Lemma extends_l_weak:
   forall c c' k,
     extends c c' = true -> 
     forall t,
@@ -292,7 +369,7 @@ Proof.
   assumption.
 Qed.
 
-Lemma extends_l_weaken_r_strengthen:
+Lemma extends_l_weak_r_str:
   forall c c' k,
     extends c c' = true -> 
     map c' k = None  -> 
@@ -308,14 +385,14 @@ Proof.
   rewrite K.beq_t_refl.
   rewrite T.beq_t_refl.
   
-  apply extends_r_strengthen; try assumption.
+  apply extends_r_str; try assumption.
   unfold nodup.
   fold nodup.
   rewrite H0.
   assumption.
 Qed.
 
-Lemma extends_l_strengthen: 
+Lemma extends_l_str: 
   forall c c' k t, 
     extends (ctxt k t c) c' = true -> extends c c' = true.
 Proof.
@@ -364,7 +441,7 @@ Proof.
   apply K.beq_t_sym.
 Qed.  
 
-Lemma map_r_strengthen_context:
+Lemma map_r_str:
   forall c k0 t0 k t,
     map (ctxt k0 t0 c) k = Some t -> 
     K_eq k0 k = false -> 
@@ -378,7 +455,7 @@ Proof.
   assumption.
 Qed.
 
-Lemma map_r_strengthen_add:
+Lemma map_r_str_add:
   forall c k0 t0 k t,
     map (add c k0 t0) k = Some t ->
     K_eq k k0 = false -> 
@@ -447,12 +524,23 @@ Proof.
   fold nodup.
   rewrite H3.  
   case_eq (map (add c k0 t0) k); intros.
-  apply map_r_strengthen_add in H4; try assumption.
+  apply map_r_str_add in H4; try assumption.
   rewrite H4 in H1.
   inversion H1.
   apply IHc with (k:= k0) (t:= t0) in H; try assumption.
   rewrite K.beq_t_sym in H2; try assumption.
   apply IHc with (k:= k0) (t:= t0) in H; try assumption.
+Qed.
+
+Lemma nodup_r_str:
+  forall c,
+    nodup c = true ->
+    forall k,
+     map c k = None  ->
+    forall t, 
+      nodup (ctxt k t c) = true.
+Proof.
+  induction c; try solve [crush].
 Qed.
 
 (* Perhaps I want this someday too. *)
@@ -465,6 +553,33 @@ Lemma nodup_add_some:
     forall t', 
       nodup (add c k t') = true.
 *)
+
+Lemma nodup_map_some_context_absurd:
+  forall c k t t',
+    map c k = Some t ->
+    nodup (ctxt k t' c) = true
+     -> False.
+Proof.
+  intros.
+  induction c; try solve[crush].
+  unfold map in H.
+  fold map in H.
+  case_eq(K_eq k k0); intros; rewrite H1 in H.
+  inversion H; subst.
+  apply K.beq_t_eq in H1.
+  rewrite H1 in H0.
+  unfold nodup in H0.
+  fold nodup in H0.
+  simpl in H0.
+  rewrite K.beq_t_refl in H0.
+  inversion H0.
+  unfold nodup in H0.
+  fold nodup in H0.
+  simpl in H0.
+  rewrite H1 in H0.
+  rewrite H in H0.
+  inversion H0.
+Qed.  
 
 Lemma map_extension_disagreement_absurd:
   forall c c',
@@ -525,7 +640,7 @@ Proof.
   assumption.
 Qed.
 
-Lemma extends_r_weaken:
+Lemma extends_r_weak:
   forall c c' k t, 
     extends c (ctxt k t c') = true -> 
     nodup (ctxt k t c') = true ->
@@ -591,7 +706,7 @@ Proof.
   assert (Z: extends c (ctxt k' t' c) = true).
   assert (Y: extends c c = true).
   apply extends_refl; try assumption.
-  apply extends_r_strengthen with (v:= k') (t:= t') in Y; try assumption.
+  apply extends_r_str with (v:= k') (t:= t') in Y; try assumption.
   unfold nodup.
   fold nodup.
   case_eq(map c k'); intros; try assumption.
@@ -677,7 +792,7 @@ Proof.
   apply IHc0 in H; try assumption.
 Qed.
 
-Lemma extends_r_strengthen_add:
+Lemma extends_r_str_add:
   forall c c', 
     extends c c' = true -> 
     forall k t, 
@@ -696,7 +811,7 @@ Proof.
   case_eq(K_eq k0 k); intros; rewrite H1 in H0.
   inversion H0.
   apply IHb with (k:= k0) (t:= t0) in H; try assumption.
-  apply extends_l_weaken; try assumption.
+  apply extends_l_weak; try assumption.
   apply map_add_some_agreement; try assumption.
   rewrite K.beq_t_sym in H1.
   assumption.
@@ -732,7 +847,7 @@ Proof.
   apply IHb in H; try assumption.
 Qed.
 
-Lemma map_none_r_strengthen:
+Lemma map_none_r_str:
   forall c v v',
    map c v  = None ->
    map c v' = None ->
@@ -757,6 +872,14 @@ Proof.
   apply IHc in H; try assumption.
 Qed.
 
+Lemma map_none_r_weak:
+  forall k k' t c,
+    map (ctxt k t c) k' = None ->
+    K_eq k' k = false ->
+    map c k = None.
+Proof.
+Admitted.
+
 Lemma extends_trans:
   forall c c' c'',
     nodup c = true ->
@@ -772,12 +895,12 @@ Proof.
   move extendscc' after IHc''.
   move extendsc'c'' after extendscc'.
   pose proof extendscc' as H'.
-  apply extends_l_strengthen in extendscc'.
+  apply extends_l_str in extendscc'.
   inversion nodupc.
   case_eq (map c k); intros; rewrite H in H0; try solve[inversion H0].
   rewrite H0.
   apply IHc in H0; try assumption.
-  apply extends_l_weaken with (k:= k) (t:= t).
+  apply extends_l_weak with (k:= k) (t:= t).
   assumption.
 
   unfold map.
@@ -861,17 +984,30 @@ Proof.
   apply extends_trans with (c:= c'') (c':= c') (c'':= c) in H0; try assumption.
 Qed.
 
+Lemma equal_implies_extends:
+  forall d d',
+    equal d d' = true ->
+    extends d d' = true.
+Proof.
+  unfold equal.
+  intros.
+  apply andb_true_iff in H.
+  inversion H.
+  assumption.
+Qed.
+
 (* It would be nice if these were true but they're not unless I cannonicalize. *)
-(*
 Lemma equal_eq:
   forall c c',
     equal c c' = true ->
     c = c'.
+Admitted.
+
 Lemma equal_neq:
   forall c c',
     equal c c' = false ->
     c <> c'.
-*)
+Admitted.
 
 Lemma equal_empty_only_empty:
   forall c,

@@ -25,7 +25,7 @@ Lemma K_weakening:
       K d tau k -> 
       forall (d' : Delta),
         WFD d' ->
-        DM.extends d d' = true ->
+        D.extends d d' = true ->
         K d' tau k.
 Proof.
  intros d tau k WFDder Kder.
@@ -37,13 +37,13 @@ Proof.
   constructor.
  Case "K d (tv_t alpha) B".
   intros.
-  apply DM.map_extends_some_agreement with (c:= d) (c':= d') in H0; try assumption.
   apply K_B; try assumption.
+  apply D.map_extends_some_agreement with (c:= d) (c':= d') in H; try assumption.
   apply WFD_implies_nodup; try assumption.
  Case "K d (ptype (tv_t alpha)) B".
   intros.
   constructor.
-  apply DM.map_extends_some_agreement with (c:= d) (c':= d') in H0; try assumption.
+  apply D.map_extends_some_agreement with (c:= d) (c':= d') in H; try assumption.
   apply WFD_implies_nodup; try assumption.
  Case "K d tau A".
   intros.
@@ -68,25 +68,25 @@ Proof.
   assumption.
  Case "K d (utype alpha k tau) A".
   intros.
-  assert (Z: DM.map d' alpha = None).
+  assert (Z: D.map d' alpha = None).
   AdmitAlphaConversion.
-  apply IHKder with (d':= (dctxt alpha k d')) in H0; try assumption.
+  apply IHKder with (d':= (dctxt alpha k d')) in H; try assumption.
   apply K_utype; try assumption.
   constructor; try  assumption.
   apply WFD_implies_nodup; try assumption.
   constructor; try assumption.
-  apply DM.extends_l_weaken_r_strengthen; try assumption.
+  apply D.extends_l_weak_r_str; try assumption.
   apply WFD_implies_nodup; try assumption.
  Case "K d (etype p alpha k tau) A)".
   intros.
-  assert (Z: DM.map d' alpha = None).
+  assert (Z: D.map d' alpha = None).
   AdmitAlphaConversion.
-  apply IHKder with (d':= (dctxt alpha k d')) in H0; try assumption.
+  apply IHKder with (d':= (dctxt alpha k d')) in H; try assumption.
   apply K_etype; try assumption.
   constructor; try  assumption.
   apply WFD_implies_nodup; try assumption.
   constructor; try assumption.
-  apply DM.extends_l_weaken_r_strengthen; try assumption.
+  apply D.extends_l_weak_r_str; try assumption.
   apply WFD_implies_nodup; try assumption.  
 Qed.
 
@@ -96,7 +96,7 @@ Lemma AK_weakening:
       AK d tau k -> 
       forall (d' : Delta),
         WFD d' ->
-        DM.extends d d' = true ->
+        D.extends d d' = true ->
         AK d' tau k.
 Proof.
  intros d tau k WFDder AKder.
@@ -107,8 +107,43 @@ Proof.
  intros.
  rewrite <- H2 in *.
  rewrite <- H1 in *.
- assert (Z: DM.map d' alpha = Some A).
- apply DM.map_extends_some_agreement with (c:= d0) (c':= d') in H0; try assumption;
+ assert (Z: D.map d' alpha = Some A).
+ apply D.map_extends_some_agreement with (c':= d') in H; try assumption;
  try apply WFD_implies_nodup; try assumption.  
  apply AK_A; try assumption.
 Qed.
+
+Lemma ASGN_weakening:
+  forall (d : Delta) (tau : Tau),
+      WFD d ->
+      ASGN d tau -> 
+      forall (d' : Delta),
+        WFD d' ->
+        D.extends d d' = true ->
+        ASGN d' tau.
+Proof.
+  intros d tau WFDd ASGNder d' WFDd' extder.
+  functional induction (D.extends d d'); try inversion extder.
+  (* asgn strengthening *)
+  admit.
+  inversion WFDd; subst.
+  apply IHb in H4; try assumption.
+  (* untrue asgn str theorem. *)
+(*
+  intros d tau WFDd ASGNder.
+  ASGN_ind_cases(induction ASGNder) Case; intros;
+  try solve[crush].
+ Case "ASGN d (tv_t alpha)".
+  constructor.
+  apply WFD_implies_nodup in WFDd.
+  apply WFD_implies_nodup in H0.
+  apply D.map_extends_some_agreement 
+    with (c':= d') in H; try assumption.
+ Case "ASGN d (utype alpha k tau)".
+ (* IH is broken. *)
+  admit.
+ Case "ASGN d (etype witnesschanges alpha k tau))".
+  admit.
+
+*)
+Admitted.
