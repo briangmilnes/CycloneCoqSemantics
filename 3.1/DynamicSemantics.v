@@ -17,7 +17,7 @@ Inductive S : Heap -> St -> Heap -> St -> Prop :=
  | S_let_3_1 : forall (x : EV.T) (v : E) (h : Heap) (s: St),
                  Value v ->
                  H.map h x = None -> 
-                 S h (letx x v s) (hctxt x v h) s
+                 S h (letx x v s) (H.ctxt x v h) s
 
  | S_seq_3_2 : forall (v : E) (h : Heap) (s: St),
                   Value v ->

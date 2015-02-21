@@ -78,13 +78,13 @@ Proof.
 Qed.
 
 Example NotInDomHdifferent :
-  H.map (hctxt x v0 hdot) y = None. 
+  H.map (H.ctxt x v0 hdot) y = None. 
 Proof.
   reflexivity.
 Qed.
 
 Example NotInDomHsecond :
-  H.map (hctxt x v0 (hctxt z v0 hdot)) y = None.
+  H.map (H.ctxt x v0 (H.ctxt z v0 hdot)) y = None.
 Proof.
   reflexivity.
 Qed.
@@ -96,19 +96,19 @@ Proof.
 Qed.
 
 Example NotInDomDsingle :
-  D.map (dctxt alpha A ddot) alpha = Some A.
+  D.map (D.ctxt alpha A ddot) alpha = Some A.
 Proof.
   reflexivity.
 Qed.
 
 Example NotInDomDdifferent :
-   D.map (dctxt alpha B ddot) beta = None.
+   D.map (D.ctxt alpha B ddot) beta = None.
 Proof.
   reflexivity.
 Qed.
 
 Example NotInDomDsecond :
-   D.map (dctxt alpha A (dctxt gamma B ddot)) beta = None.
+   D.map (D.ctxt alpha A (D.ctxt gamma B ddot)) beta = None.
 Proof.
   reflexivity.
 Qed.
@@ -122,72 +122,72 @@ Proof.
 Qed.
 
 Example deleteH_test_x :
-  H.delete (hctxt x (i_e (i_i 0)) hdot) x = hdot.
+  H.delete (H.ctxt x (i_e (i_i 0)) hdot) x = hdot.
 Proof.
   reflexivity.
 Qed.
 
 Example delete_test_xy :
-  H.delete (hctxt y (i_e (i_i 0)) (hctxt x (i_e (i_i 0)) hdot)) x = 
-            (hctxt y (i_e (i_i 0)) hdot).
+  H.delete (H.ctxt y (i_e (i_i 0)) (H.ctxt x (i_e (i_i 0)) hdot)) x = 
+            (H.ctxt y (i_e (i_i 0)) hdot).
 Proof.
   reflexivity.
 Qed.
 
 Example delete_test_yx :
-  H.delete (hctxt y (i_e (i_i 0)) (hctxt x (i_e (i_i 0)) hdot)) y = 
-            (hctxt x (i_e (i_i 0)) hdot).
+  H.delete (H.ctxt y (i_e (i_i 0)) (H.ctxt x (i_e (i_i 0)) hdot)) y = 
+            (H.ctxt x (i_e (i_i 0)) hdot).
 Proof.
  reflexivity.
 Qed.
 
 Example delete_test_z :
-  H.delete (hctxt y (i_e (i_i 0)) (hctxt x (i_e (i_i 0)) hdot)) z = 
-            (hctxt y (i_e (i_i 0)) (hctxt x (i_e (i_i 0)) hdot)).
+  H.delete (H.ctxt y (i_e (i_i 0)) (H.ctxt x (i_e (i_i 0)) hdot)) z = 
+            (H.ctxt y (i_e (i_i 0)) (H.ctxt x (i_e (i_i 0)) hdot)).
 Proof.
  reflexivity.
 Qed.
 
 Example DMadd_nil :
-  D.add ddot alpha A = (dctxt alpha A ddot).
+  D.add ddot alpha A = (D.ctxt alpha A ddot).
 Proof.
   reflexivity.
 Qed.
 
 Example DMadd_exists :
-  D.add (dctxt alpha B ddot) alpha A = (dctxt alpha A ddot).
+  D.add (D.ctxt alpha B ddot) alpha A = (D.ctxt alpha A ddot).
 Proof.
   reflexivity.
 Qed.
 
 Example DMadd_add_to_end :
-  D.add (dctxt alpha B ddot) beta A = (dctxt alpha B (dctxt beta A ddot)).
+  D.add (D.ctxt alpha B ddot) beta A = (D.ctxt alpha B (D.ctxt beta A ddot)).
 Proof.
   reflexivity.
 Qed.
 
 Example DMadd_overwrite_at_end :
-  D.add (dctxt alpha B (dctxt beta B ddot)) beta A = 
-  (dctxt alpha B (dctxt beta A ddot)).
+  D.add (D.ctxt alpha B (D.ctxt beta B ddot)) beta A = 
+  (D.ctxt alpha B (D.ctxt beta A ddot)).
 Proof.
   reflexivity.
 Qed.
 
 Example DMadd_overwrite_at_start :
-  D.add (dctxt alpha B (dctxt beta B ddot)) alpha A = 
-         (dctxt alpha A (dctxt beta B ddot)).
+  D.add (D.ctxt alpha B (D.ctxt beta B ddot)) alpha A = 
+         (D.ctxt alpha A (D.ctxt beta B ddot)).
 Proof.
   reflexivity.
 Qed.
 
 Example GMmapx : 
-  G.map (gctxt x tau gdot) x = Some tau.
+  G.map (G.ctxt x tau gdot) x = Some tau.
 Proof.
   reflexivity.
 Qed.
 
 Example GMmapyx : 
-  G.map (gctxt y tau (gctxt x tau' gdot)) x = Some tau'.
+  G.map (G.ctxt y tau (G.ctxt x tau' gdot)) x = Some tau'.
 Proof.
   reflexivity.
 Qed.
@@ -199,19 +199,19 @@ Proof.
 Qed.
 
 Example NotInDomGsingle :
-  G.map (gctxt x tau gdot) x = Some tau.
+  G.map (G.ctxt x tau gdot) x = Some tau.
 Proof.
   reflexivity.
 Qed.
 
 Example NotInDomGdifferent :
-   G.map  (gctxt x tau gdot) y = None.
+   G.map  (G.ctxt x tau gdot) y = None.
 Proof.
   reflexivity.
 Qed.
 
 Example NotInDomGsecond :
-  G.map (gctxt x tau (gctxt z tau' gdot)) y = None.
+  G.map (G.ctxt x tau (G.ctxt z tau' gdot)) y = None.
 Proof.
   reflexivity.
 Qed.
@@ -233,7 +233,7 @@ Proof.
 Qed.
 
 Example getUx : 
-  U.map (uctxt (x, p0) tau udot) (x,p0) = Some tau.
+  U.map (U.ctxt (x, p0) tau udot) (x,p0) = Some tau.
 Proof.
   compute.
   constructor.
@@ -241,7 +241,7 @@ Qed.
 
 (* Bug 6 in defintion x <>y \/ [] = nil. *)
 Example UMmapyx : 
-  U.map (uctxt (y,nil) tau (uctxt (x, nil) tau' udot)) (x,[]) = Some tau'.
+  U.map (U.ctxt (y,nil) tau (U.ctxt (x, nil) tau' udot)) (x,[]) = Some tau'.
 Proof.
   reflexivity.
 Qed.

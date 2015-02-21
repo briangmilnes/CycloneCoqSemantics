@@ -44,4 +44,14 @@ Proof.
   crush.
 Qed.
 
+(* Just ain't true but should be. Thesis bug or I must strengthen 
+lots of theorems. *)
+
+Lemma WFDG_implies_nodup:
+  forall (d : Delta) (g : Gamma),
+    WFDG d g ->
+    G.nodup g = true.
+Proof.
+Admitted.
+
 

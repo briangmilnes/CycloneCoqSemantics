@@ -4,145 +4,44 @@
 
    Lemmas about static semantics context well formedness.
 *)
-
+Set Implicit Arguments.
 Require Export LanguageModuleDef.
-Require Export DynamicSemanticsTypeSubstitution.
-Require Export DynamicSemanticsHeapObjects.
-Require Export DynamicSemantics.
-Require Export DynamicSemanticsTypeSubstitution.
-Require Export StaticSemanticsKindingAndContextWellFormedness.
-Require Export StaticSemantics.
-Require Export TypeSafety.
 Require Export CpdtTactics.
 Require Export TacticNotations.
+Require Export Tacticals.
 Require Export AlphaConversion.
+Require Export StaticSemanticsKindingAndContextWellFormednessLemmas.
 
 Lemma WFU_t_implies_K_nil_A:
-  forall t e p u',
-    WFU (uctxt (e, p) t u') -> 
+  forall (t : Tau) (e : EVP.E.Var) (p : Path)  (u' : Upsilon),
+    WFU (U.ctxt (e, p) t u') -> 
     K ddot t A.
 Proof.
-  destruct t; intros.
-  Case "K [] (tv_t t) A".
-   inversion H0.
-   assumption.
-   constructor.
-  Case "K [] cint B".
-   apply K_int.
-  Case "K [] (cross t1 t2) A".
-   apply K_cross.
-   inversion H0.
-   inversion H7.
-   inversion H8.
-   assumption.
-   inversion H0.
-   inversion H7.
-   inversion H8.
-   assumption.
-  Case "K [] (arrow t1 t2) A".
-   apply K_arrow.
-   inversion H0.
-   inversion H7.
-   inversion H8.
-   assumption.
-   inversion H0.
-   inversion H7.
-   inversion H8.
-   assumption.
-  Case "K [] (ptype t) A".
-   constructor.
-   apply K_ptype.
-   inversion H0.
-   inversion H7.
-   inversion H8.
-   inversion H13.
-   assumption.
-  Case "K [] (utype t k t0) A".
-   apply K_utype.
-   constructor; try assumption.
-   simpl.
-   reflexivity.
-   constructor.
-   simpl.
-   reflexivity.
-   inversion H0.
-   inversion H7; try assumption.
-   inversion H8.
-  Case "K [] (etype p0 t k t0) A".
-   apply K_etype.
-   constructor; try assumption.
-   simpl.
-   reflexivity.
-   constructor.
-   simpl.
-   reflexivity.
-   inversion H0.
-   inversion H7; try assumption.
-   inversion H8.
+  destruct t; intros; try solve[inversion H; try assumption].
 Qed.
 
 Lemma WFU_strengthening:
  forall (u u' : Upsilon),
-   UM.extends u u' = true ->
+   U.extends u u' = true ->
    WFU u' ->
    WFU u.
 Proof.
-(*
-  intros u u'.
-  functional induction (UM.extends u u'); try solve [crush].
-  intros.
+  intros u u' ext WFUu'.
+  induction WFUu'; intros; try solve[crush].
+  apply U.empty_extends_only_empty in ext; subst.
   constructor.
-  intros.
-  apply IHb in H0; try assumption.
-  apply UM.T.beq_t_eq in e1.
-  subst.
-  destruct k.
+  assert (Z: WFU (U.ctxt (x, p) tau u0)).
   constructor; try assumption.
-  admit. (* unprovable *)
-  (* need to strengthen this to just have t in WFU and i'm good. *)
-  apply WFU_t_implies_K_nil_A with (e:= v) (p:= p) (u':= ?); try assumption.
-*)
+  assert (Y: U.nodup (U.ctxt (x, p) tau u0) = true).
+  unfold U.nodup.
+  fold U.nodup.
+  rewrite H.
+  apply WFU_implies_nodup in WFUu'; try assumption.
+  apply U.extends_r_weak in ext; try assumption.
+  pose proof ext as ext'.
+  apply IHWFUu' in ext; try assumption.
 
-
-(*
-  intros u u' extends WFUder.
-  induction WFUder.
-  apply UM.empty_extends_only_empty in extends.
-  rewrite extends.
-  constructor.
-  apply UM.extends_r_weaken in extends; try assumption.
-  apply IHWFUder in extends; try assumption.
-  admit.
-  (* Looks doable but somewhat annoying with the map. *)
-*)
-
-(* Looks broken. 
-  intros u.
-  induction u.
-  intros.
-  constructor.
-  intros.
-  unfold UM.extends in H0.
-  fold UM.extends in H0.
-  case_eq(UM.map u' k); intros; rewrite H2 in H0; try solve[inversion H0].
-  case_eq(UM.T_eq t t0); intros; rewrite H3 in H0; try solve[inversion H0].
-  apply IHu in H0; try assumption.
-  destruct k.
-  constructor; try assumption.
-*)
-
-  intros.
-  induction u.
-  constructor.
-  destruct k.
-  apply WFU_A; try assumption.
-  inversion H1; try assumption.
-  subst.
-  inversion H0.
-  admit.
-  admit.
-  admit.
-Qed.
+Admitted.
 
 Lemma WFDG_g_strengthening:
   forall (d : Delta) (g g' : Gamma),

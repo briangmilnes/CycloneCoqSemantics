@@ -61,7 +61,7 @@ Definition p0   := [(i_pe zero_pe)].
 Definition p1   := [(i_pe one_pe)].
 
 
-Definition h    := (hctxt x e hdot).
+Definition h    := (H.ctxt x e hdot).
 
 Definition q := aliases.
 

@@ -41,7 +41,7 @@ Inductive K : Delta -> Tau -> Kappa -> Prop :=
 
  | K_utype  : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
                    D.map d alpha = None -> 
-                   K  (dctxt alpha k d) tau A ->
+                   K  (D.ctxt alpha k d) tau A ->
                    K d (utype alpha k tau) A.
 
 (* Put in the context destructuring dependent term and drop AK so I use
@@ -51,14 +51,14 @@ Lemma A_6_Substitution_1:
       D.nodup d = true ->
       K d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        D.nodup (dctxt alpha k d) = true ->
-        K (dctxt alpha k d) tau' k' ->
+        D.nodup (D.ctxt alpha k d) = true ->
+        K (D.ctxt alpha k d) tau' k' ->
         K d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k nodupd Kderd alpha k' tau' nodupd' Kderctxt.
   induction Kderctxt; intros.
   Case "K_int".
-   assert (Z: d0 = (dctxt alpha k d)).
+   assert (Z: d0 = (D.ctxt alpha k d)).
    admit.
    subst.
    (* K d (subst_Tau cint tau alpha) B *)
@@ -66,14 +66,14 @@ Proof.
    simpl.
    apply K_int.
   Case "K_B".
-   assert (Z: d0 = (dctxt alpha k d)).
+   assert (Z: d0 = (D.ctxt alpha k d)).
    admit.
    subst.
    (* 
-      D.map (dctxt alpha k d) alpha0 = Some B
+      D.map (D.ctxt alpha k d) alpha0 = Some B
       K d (subst_Tau (tv_t alpha0) tau alpha) B
    *)
-   unfold dctxt in H.
+   unfold D.ctxt in H.
    unfold D.map in H.
    fold D.map in H.
    case_eq(D.K_eq alpha0 alpha); intros; rewrite H0 in H; inversion H; subst.
@@ -89,12 +89,12 @@ Proof.
    rewrite H0.
    constructor; try assumption.
   Case "K_cross".
-   assert (Z: d0 = (dctxt alpha k d)).
+   assert (Z: d0 = (D.ctxt alpha k d)).
    admit.
    subst.
    (* IH D.nodup d0 = true -> K d (subst_Tau t0 tau alpha) A *)
    (* 
-      K (dctxt alpha k d) t0 A -> 
+      K (D.ctxt alpha k d) t0 A -> 
       K d (subst_Tau (cross t0 t1) tau alpha) A 
     *)
    unfold subst_Tau.
@@ -104,7 +104,7 @@ Proof.
    apply IHKderctxt2 in nodupd'; try assumption.
    apply K_cross; try assumption.   
   Case "K_utype".
-   assert (Z: d0 = (dctxt alpha k d)).
+   assert (Z: d0 = (D.ctxt alpha k d)).
    admit.
    subst.
    unfold subst_Tau.
@@ -116,7 +116,7 @@ Proof.
    unfold D.K_eq in H1.
    rewrite D.K.beq_t_refl in H1.
    inversion H1.
-   assert (Z: D.nodup (dctxt alpha0 k0 (dctxt alpha k d)) = true).
+   assert (Z: D.nodup (D.ctxt alpha0 k0 (D.ctxt alpha k d)) = true).
    apply D.nodup_r_str; try assumption.
    apply IHKderctxt in Z.
    constructor; try assumption.
@@ -133,8 +133,8 @@ fun (P : Delta -> Tau -> Kappa -> Prop) (f : forall d : Delta, P d cint B)
         K d t0 A -> P d t0 A -> K d t1 A -> P d t1 A -> P d (cross t0 t1) A)
   (f2 : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
         D.map d alpha = None ->
-        K (dctxt alpha k d) tau A ->
-        P (dctxt alpha k d) tau A -> P d (utype alpha k tau) A) =>
+        K (D.ctxt alpha k d) tau A ->
+        P (D.ctxt alpha k d) tau A -> P d (utype alpha k tau) A) =>
 fix F (d : Delta) (t : Tau) (k : Kappa) (k0 : K d t k) {struct k0} :
   P d t k :=
   match k0 in (K d0 t0 k1) return (P d0 t0 k1) with
@@ -142,7 +142,7 @@ fix F (d : Delta) (t : Tau) (k : Kappa) (k0 : K d t k) {struct k0} :
   | K_B d0 alpha e => f0 d0 alpha e
   | K_cross d0 t0 t1 k1 k2 => f1 d0 t0 t1 k1 (F d0 t0 A k1) k2 (F d0 t1 A k2)
   | K_utype d0 alpha k1 tau e k2 =>
-      f2 d0 alpha k1 tau e k2 (F (dctxt alpha k1 d0) tau A k2)
+      f2 d0 alpha k1 tau e k2 (F (D.ctxt alpha k1 d0) tau A k2)
   end.
 
 Check K_ind2
@@ -154,8 +154,8 @@ Check K_ind2
         K d t0 A -> P d t0 A -> K d t1 A -> P d t1 A -> P d (cross t0 t1) A) ->
        (forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
         D.map d alpha = None ->
-        K (dctxt alpha k d) tau A ->
-        P (dctxt alpha k d) tau A -> P d (utype alpha k tau) A) ->
+        K (D.ctxt alpha k d) tau A ->
+        P (D.ctxt alpha k d) tau A -> P d (utype alpha k tau) A) ->
        forall (d : Delta) (t : Tau) (k : Kappa), K d t k -> P d t k.
 
 Definition K_ind_dep := 
@@ -180,8 +180,8 @@ fun (P : TV.T -> Kappa -> Delta -> Tau -> Kappa -> Prop)
         D.map d alpha = None ->
         forall alpha0 : TV.T,
         forall k' : Kappa, 
-          K (dctxt alpha k d) tau A ->
-          P alpha0 k' (dctxt alpha k d) tau A -> 
+          K (D.ctxt alpha k d) tau A ->
+          P alpha0 k' (D.ctxt alpha k d) tau A -> 
           P alpha0 k' d (utype alpha k tau) A) =>
 fix F (alpha0 : TV.T) (k' : Kappa)
     (d : Delta) (t : Tau) (k : Kappa) 
@@ -194,7 +194,7 @@ fix F (alpha0 : TV.T) (k' : Kappa)
     f1 d0 t0 t1 alpha0 k' k1 (F alpha0 k' d0 t0 A k1) k2 (F alpha0 k' d0 t1 A k2)
   | K_utype d0 alpha k1 tau e k2 =>
       f2 d0 alpha k1 tau e alpha0 k' k2 
-         (F alpha0 k' (dctxt alpha k1 d0) tau A k2)
+         (F alpha0 k' (D.ctxt alpha k1 d0) tau A k2)
   end.
 
 Check K_ind_dep 
@@ -209,8 +209,8 @@ Check K_ind_dep
        (forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
         D.map d alpha = None ->
         forall (alpha0 : TV.T) (k' : Kappa),
-        K (dctxt alpha k d) tau A ->
-        P alpha0 k' (dctxt alpha k d) tau A ->
+        K (D.ctxt alpha k d) tau A ->
+        P alpha0 k' (D.ctxt alpha k d) tau A ->
         P alpha0 k' d (utype alpha k tau) A) ->
        forall (alpha0 : TV.T) (k' : Kappa) (d : Delta) (t : Tau) (k : Kappa),
        K d t k -> P alpha0 k' d t k.
@@ -220,15 +220,15 @@ Lemma A_6_Substitution_1_apply_no_dep_ind:
       D.nodup d = true ->
       K d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        K (dctxt alpha k d) tau' k' ->
-        D.nodup (dctxt alpha k d) = true ->
+        K (D.ctxt alpha k d) tau' k' ->
+        D.nodup (D.ctxt alpha k d) = true ->
         K d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k nodupd Kderd alpha k' tau' nodupd' Kderctxt.
   apply (K_ind
            (fun (d : Delta) (tau : Tau) (k : Kappa) =>
-              K (dctxt alpha k d) tau' k' ->
-              D.nodup (dctxt alpha k d) = true ->
+              K (D.ctxt alpha k d) tau' k' ->
+              D.nodup (D.ctxt alpha k d) = true ->
               K d (subst_Tau tau' tau alpha) k'))
         with (k:= k); intros.
   admit.
@@ -239,13 +239,13 @@ Lemma A_6_Substitution_1_apply_dep_ind:
   forall (d : Delta) (tau : Tau) (k : Kappa),
       K d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        K (dctxt alpha k d) tau' k' ->
+        K (D.ctxt alpha k d) tau' k' ->
         K d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k Kderd alpha k' tau' Kderctxt.
   apply (K_ind_dep
            (fun (alpha0 : TV.T) (k' : Kappa) (d0 : Delta) (tau : Tau) (k : Kappa) =>
-              K (dctxt alpha0 k' d) tau' k' ->
+              K (D.ctxt alpha0 k' d) tau' k' ->
               K d (subst_Tau tau' tau alpha) k'))
         with (k:= k) (alpha0:=alpha) (d0:=d).
   intros.
@@ -278,13 +278,13 @@ Lemma A_6_Substitution_1_K1_dep:
   forall (d : Delta) (tau : Tau) (k : Kappa),
       K1 d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        K1 (dctxt alpha k d) tau' k' ->
+        K1 (D.ctxt alpha k d) tau' k' ->
         K1 d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k Kderd alpha k' tau' Kderctxt.
   apply (K1_ind_dep
            (fun (tau : Tau) (k : Kappa) =>
-              K1 (dctxt alpha k d) tau' k' ->
+              K1 (D.ctxt alpha k d) tau' k' ->
               K1 d (subst_Tau tau' tau alpha) k'))
         with (d0:= d) (k:= k); intros.
   admit. (* Looks OK, can't really tell. *)
@@ -321,13 +321,13 @@ Lemma A_6_Substitution_1_K2_dep:
   forall (d : Delta) (tau : Tau) (k : Kappa),
       K2 d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        K2 (dctxt alpha k d) tau' k' ->
+        K2 (D.ctxt alpha k d) tau' k' ->
         K2 d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k Kderd alpha k' tau' Kderctxt.
   apply (K2_ind_dep
            (fun (tau : Tau) (k : Kappa) =>
-              K2 (dctxt alpha k d) tau' k' ->
+              K2 (D.ctxt alpha k d) tau' k' ->
               K2 d (subst_Tau tau' tau alpha) k'))
         with (d0:= d) (k:= k); intros.
   admit. (* Looks OK, can't really tell. *)
@@ -336,12 +336,12 @@ Proof.
 Qed.
 *)
 
-(* Try and write d0 = (dctxt alpha k d)) through. *)
-Definition J := (fun a0 k2 x x0 => D.map (dctxt a0 k2 x) x0 = Some B).
+(* Try and write d0 = (D.ctxt alpha k d)) through. *)
+Definition J := (fun a0 k2 x x0 => D.map (D.ctxt a0 k2 x) x0 = Some B).
 Lemma transform:
   forall c k a0,
     D.map c k = Some B ->
-    D.map (dctxt a0 B c) k = Some B.
+    D.map (D.ctxt a0 B c) k = Some B.
 Proof.
   induction c; crush.
   case_eq(D.K_eq k0 k); intros; rewrite H0 in *.
@@ -356,17 +356,17 @@ fun
   (P : TV.T -> Kappa -> Delta -> Tau -> Kappa -> Prop) 
   (f : forall a0 k2 d, P a0 k2 d cint B)
   (f0 : forall a0 k2 (d : Delta) (alpha : TV.T),
-        D.map (dctxt a0 k2 d) alpha = Some B -> P a0 k2 d (tv_t alpha) B) 
+        D.map (D.ctxt a0 k2 d) alpha = Some B -> P a0 k2 d (tv_t alpha) B) 
   (a0 : TV.T) (k2 : Kappa) (d : Delta) (t : Tau) (k : Kappa) (k0 : K2 d t k) =>
 match k0 in (K2 d0 t0 k1) return (P a0 k2 d0 t0 k1) with
 | K2_int x => f a0 k2 x
-(* | K2_B x x0 (= d0 (dctxt a0 k2 d)) => f0 a0 k2 x x0 (dctxt a0 k2 d) *)
+(* | K2_B x x0 (= d0 (D.ctxt a0 k2 d)) => f0 a0 k2 x x0 (D.ctxt a0 k2 d) *)
 | K2_B x x0 x2 => f0 a0 k2 x x0 x2
 end.
 
-(* (D.map (dctxt a0 k2 x) x0 = Some B) *)
+(* (D.map (D.ctxt a0 k2 x) x0 = Some B) *)
 
-Check (fun (x1 : (forall a0 k2 x x0, D.map (dctxt a0 k2 x) x0 = Some B))
+Check (fun (x1 : (forall a0 k2 x x0, D.map (D.ctxt a0 k2 x) x0 = Some B))
        => x1).
 
 (* map x1 to the right type. *)
@@ -375,13 +375,13 @@ Lemma A_6_Substitution_1_apply_dep_ind2:
   forall (d : Delta) (tau : Tau) (k : Kappa),
       K2 d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        K2 (dctxt alpha k d) tau' k' ->
+        K2 (D.ctxt alpha k d) tau' k' ->
         K2 d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k Kderd alpha k' tau' Kderctxt.
   apply (K2_ind_dep2
            (fun (alpha : TV.T) (k' : Kappa) (d : Delta) (tau : Tau) (k : Kappa) =>
-              K2 (dctxt alpha k d) tau' k' ->
+              K2 (D.ctxt alpha k d) tau' k' ->
               K2 d (subst_Tau tau' tau alpha) k'))
         with (k:= k); intros.
   admit. (* right *)
@@ -412,13 +412,13 @@ Lemma A_6_Substitution_1_apply_K2_induction_dependent:
   forall (d : Delta) (tau : Tau) (k : Kappa),
       K2 d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        K2 (dctxt alpha k d) tau' k' ->
+        K2 (D.ctxt alpha k d) tau' k' ->
         K2 d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k Kderd alpha k' tau' Kderctxt.
   apply (K2_induction_dependent
            (fun (d : Delta) (tau : Tau) (k : Kappa) =>
-              K2 (dctxt alpha k d) tau' k' ->
+              K2 (D.ctxt alpha k d) tau' k' ->
               K2 d (subst_Tau tau' tau alpha) k')).
 
   admit. (* right *)
@@ -444,7 +444,7 @@ Lemma A_6_Substitution_1_apply_K2_induction_dependent_2:
   forall (d : Delta) (tau : Tau) (k : Kappa),
       K2 d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        K2 (dctxt alpha k d) tau' k' ->
+        K2 (D.ctxt alpha k d) tau' k' ->
         K2 d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k Kderd alpha k' tau' Kderctxt.
@@ -452,7 +452,7 @@ Proof.
   apply (K2_induction_dependent_2
            (fun (alpha : TV.T) (k : Kappa) (d : Delta) (tau' : Tau) (k' : Kappa) =>
               K2 d tau k ->
-              K2 (dctxt alpha k d) tau' k' ->
+              K2 (D.ctxt alpha k d) tau' k' ->
               K2 d (subst_Tau tau' tau alpha) k'))
         with (k:= k).
   intros.
@@ -462,7 +462,7 @@ Proof.
   intros.
 (* Want.
   Kderd : K d tau k
-  H : D.map (dctxt alpha k d) alpha0 = Some B
+  H : D.map (D.ctxt alpha k d) alpha0 = Some B
   ============================
    K d (subst_Tau (tv_t alpha0) tau alpha) B
 *)
@@ -470,7 +470,7 @@ Proof.
 (*
   H : D.map (D.ctxt alpha0 k0 d0) a' = Some B
   H0 : K2 d0 tau k0
-  H1 : K2 (dctxt alpha0 k0 d0) (tv_t a') B
+  H1 : K2 (D.ctxt alpha0 k0 d0) (tv_t a') B
  And they are disconntexted from extra d terms so they can't be used to
  foul the proof.
 *)
@@ -492,7 +492,7 @@ Inductive K3 : Delta -> Tau -> Kappa -> Prop :=
 
  | K3_utype  : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
                    D.map d alpha = None -> 
-                   K3  (dctxt alpha k d) tau A ->
+                   K3  (D.ctxt alpha k d) tau A ->
                    K3 d (utype alpha k tau) A.
 
 Print K3_ind.
@@ -503,15 +503,15 @@ fun (P : Delta -> Tau -> Kappa -> Prop) (f : forall d : Delta, P d cint B)
         P d (tv_t alpha) B)
   (f1 : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
         D.map d alpha = None ->
-        K3 (dctxt alpha k d) tau A ->
-        P (dctxt alpha k d) tau A -> P d (utype alpha k tau) A) =>
+        K3 (D.ctxt alpha k d) tau A ->
+        P (D.ctxt alpha k d) tau A -> P d (utype alpha k tau) A) =>
 fix F (d : Delta) (t : Tau) (k : Kappa) (k0 : K3 d t k) {struct k0} :
   P d t k :=
   match k0 in (K3 d0 t0 k1) return (P d0 t0 k1) with
   | K3_int d0 => f d0
   | K3_B d0 alpha e => f0 d0 alpha e
   | K3_utype d0 alpha k1 tau e k2 =>
-      f1 d0 alpha k1 tau e k2 (F (dctxt alpha k1 d0) tau A k2)
+      f1 d0 alpha k1 tau e k2 (F (D.ctxt alpha k1 d0) tau A k2)
 end.
 
 Lemma K3_induction_dependent:
@@ -522,7 +522,7 @@ Lemma K3_induction_dependent:
         P alpha k d (tv_t a') B) ->
     (forall (d : Delta) (alpha a' : TV.T) (k k': Kappa) (tau : Tau),
         D.map d alpha = None ->
-        K3 (dctxt alpha k d) tau A ->
+        K3 (D.ctxt alpha k d) tau A ->
         P alpha k d tau A -> 
         P alpha k d (utype a' k tau) A) ->
     (forall (alpha : TV.T) (k : Kappa) (d : Delta) (tau : Tau) (k' : Kappa),
@@ -535,7 +535,7 @@ Lemma A_6_Substitution_1_apply_K3_induction_dependent:
   forall (d : Delta) (tau : Tau) (k : Kappa),
       K3 d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        K3 (dctxt alpha k d) tau' k' ->
+        K3 (D.ctxt alpha k d) tau' k' ->
         K3 d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k Kderd alpha k' tau' Kderctxt.
@@ -543,7 +543,7 @@ Proof.
   apply (K3_induction_dependent
            (fun (alpha : TV.T) (k : Kappa) (d : Delta) (tau' : Tau) (k' : Kappa) =>
               K3 d tau k ->
-              K3 (dctxt alpha k d) tau' k' ->
+              K3 (D.ctxt alpha k d) tau' k' ->
               K3 d (subst_Tau tau' tau alpha) k'))
         with (k:= k); try assumption.
   intros.
@@ -553,7 +553,7 @@ Proof.
   intros.
 (* Want.
   Kderd : K d tau k
-  H : D.map (dctxt alpha k d) alpha0 = Some B
+  H : D.map (D.ctxt alpha k d) alpha0 = Some B
   ============================
    K d (subst_Tau (tv_t alpha0) tau alpha) B
 *)
@@ -561,7 +561,7 @@ Proof.
 (*
   H : D.map (D.ctxt alpha0 k0 d0) a' = Some B
   H0 : K3 d0 tau k0
-  H1 : K3 (dctxt alpha0 k0 d0) (tv_t a') B
+  H1 : K3 (D.ctxt alpha0 k0 d0) (tv_t a') B
  And they are disconntexted from extra d terms so they can't be used to
  foul the proof.
 *)
@@ -571,16 +571,16 @@ Proof.
   Kderctxt2 : K d0 t1 A
   IHKderctxt1 : D.nodup d0 = true -> K d (subst_Tau t0 tau alpha) A
   IHKderctxt2 : D.nodup d0 = true -> K d (subst_Tau t1 tau alpha) A
-  Z : d0 = dctxt alpha k d
+  Z : d0 = D.ctxt alpha k d
   ============================
    K d (subst_Tau (cross t0 t1) tau alpha) A
 *)
   intros.
 (*  Want and I have it!!!!!
-  nodupd' : D.nodup (dctxt alpha k d) = true
-  H : D.map (dctxt alpha k d) alpha0 = None
-  Kderctxt : K (dctxt alpha0 k0 (dctxt alpha k d)) tau0 A
-  IHKderctxt : D.nodup (dctxt alpha0 k0 (dctxt alpha k d)) = true ->
+  nodupd' : D.nodup (D.ctxt alpha k d) = true
+  H : D.map (D.ctxt alpha k d) alpha0 = None
+  Kderctxt : K (D.ctxt alpha0 k0 (D.ctxt alpha k d)) tau0 A
+  IHKderctxt : D.nodup (D.ctxt alpha0 k0 (D.ctxt alpha k d)) = true ->
                K d (subst_Tau tau0 tau alpha) A
   ============================
    K d (subst_Tau (utype alpha0 k0 tau0) tau alpha) A
@@ -606,7 +606,7 @@ Inductive K4 : Delta -> Tau -> Kappa -> Prop :=
 
  | K4_utype  : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
                    D.map d alpha = None -> 
-                   K4  (dctxt alpha k d) tau A ->
+                   K4  (D.ctxt alpha k d) tau A ->
                    K4 d (utype alpha k tau) A.
 
 Print K4_ind.
@@ -618,8 +618,8 @@ fun (P : Delta -> Tau -> Kappa -> Prop) (f : forall d : Delta, P d cint B)
         K4 d t0 A -> P d t0 A -> K4 d t1 A -> P d t1 A -> P d (cross t0 t1) A)
   (f2 : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
         D.map d alpha = None ->
-        K4 (dctxt alpha k d) tau A ->
-        P (dctxt alpha k d) tau A -> P d (utype alpha k tau) A) =>
+        K4 (D.ctxt alpha k d) tau A ->
+        P (D.ctxt alpha k d) tau A -> P d (utype alpha k tau) A) =>
 fix F (d : Delta) (t : Tau) (k : Kappa) (k0 : K4 d t k) {struct k0} :
   P d t k :=
   match k0 in (K4 d0 t0 k1) return (P d0 t0 k1) with
@@ -628,7 +628,7 @@ fix F (d : Delta) (t : Tau) (k : Kappa) (k0 : K4 d t k) {struct k0} :
   | K4_cross d0 t0 t1 k1 k2 =>
       f1 d0 t0 t1 k1 (F d0 t0 A k1) k2 (F d0 t1 A k2)
   | K4_utype d0 alpha k1 tau e k2 =>
-      f2 d0 alpha k1 tau e k2 (F (dctxt alpha k1 d0) tau A k2)
+      f2 d0 alpha k1 tau e k2 (F (D.ctxt alpha k1 d0) tau A k2)
   end.
 
 Lemma K4_induction_dependent:
@@ -638,14 +638,14 @@ Lemma K4_induction_dependent:
         D.map (D.ctxt alpha k d) a' = Some B -> 
         P alpha k d (tv_t a') B) ->
   (forall (alpha : TV.T) (k : Kappa) (d : Delta) (t0 t1 : Tau),
-        K4 (dctxt alpha k d) t0 A -> 
+        K4 (D.ctxt alpha k d) t0 A -> 
         P alpha k d t0 A -> 
-        K4 (dctxt alpha k d) t1 A -> 
+        K4 (D.ctxt alpha k d) t1 A -> 
         P alpha k d t1 A -> 
         P alpha k d (cross t0 t1) A) -> 
     (forall (d : Delta) (alpha a' : TV.T) (k k': Kappa) (tau : Tau),
         D.map d alpha = None ->
-        K4 (dctxt alpha k d) tau A ->
+        K4 (D.ctxt alpha k d) tau A ->
         P alpha k d tau A -> 
         P alpha k d (utype a' k tau) A) ->
     (forall (alpha : TV.T) (k : Kappa) (d : Delta) (tau : Tau) (k' : Kappa),
@@ -658,7 +658,7 @@ Lemma A_6_Substitution_1_apply_K4_induction_dependent:
   forall (d : Delta) (tau : Tau) (k : Kappa),
       K4 d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        K4 (dctxt alpha k d) tau' k' ->
+        K4 (D.ctxt alpha k d) tau' k' ->
         K4 d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k Kderd alpha k' tau' Kderctxt.
@@ -666,7 +666,7 @@ Proof.
   apply (K4_induction_dependent
            (fun (alpha : TV.T) (k : Kappa) (d : Delta) (tau' : Tau) (k' : Kappa) =>
               K4 d tau k ->
-              K4 (dctxt alpha k d) tau' k' ->
+              K4 (D.ctxt alpha k d) tau' k' ->
               K4 d (subst_Tau tau' tau alpha) k'))
         with (k:= k); try assumption.
   intros.
@@ -676,7 +676,7 @@ Proof.
   intros.
 (* Want.
   Kderd : K d tau k
-  H : D.map (dctxt alpha k d) alpha0 = Some B
+  H : D.map (D.ctxt alpha k d) alpha0 = Some B
   ============================
    K d (subst_Tau (tv_t alpha0) tau alpha) B
 *)
@@ -684,7 +684,7 @@ Proof.
 (*
   H : D.map (D.ctxt alpha0 k0 d0) a' = Some B
   H0 : K4 d0 tau k0
-  H1 : K4 (dctxt alpha0 k0 d0) (tv_t a') B
+  H1 : K4 (D.ctxt alpha0 k0 d0) (tv_t a') B
  And they are disconntexted from extra d terms so they can't be used to
  foul the proof.
 *)
@@ -692,12 +692,12 @@ Proof.
 (* Want
   nodupd : D.nodup d = true
   Kderd : K d tau k
-  nodupd' : D.nodup (dctxt alpha k d) = true
-  Kderctxt1 : K (dctxt alpha k d) t0 A
-  Kderctxt2 : K (dctxt alpha k d) t1 A
-  IHKderctxt1 : D.nodup (dctxt alpha k d) = true ->
+  nodupd' : D.nodup (D.ctxt alpha k d) = true
+  Kderctxt1 : K (D.ctxt alpha k d) t0 A
+  Kderctxt2 : K (D.ctxt alpha k d) t1 A
+  IHKderctxt1 : D.nodup (D.ctxt alpha k d) = true ->
                 K d (subst_Tau t0 tau alpha) A
-  IHKderctxt2 : D.nodup (dctxt alpha k d) = true ->
+  IHKderctxt2 : D.nodup (D.ctxt alpha k d) = true ->
                 K d (subst_Tau t1 tau alpha) A
   ============================
    K d (subst_Tau (cross t0 t1) tau alpha) A
@@ -710,7 +710,7 @@ Proof.
   Kderctxt2 : K d0 t1 A
   IHKderctxt1 : D.nodup d0 = true -> K d (subst_Tau t0 tau alpha) A
   IHKderctxt2 : D.nodup d0 = true -> K d (subst_Tau t1 tau alpha) A
-  Z : d0 = dctxt alpha k d
+  Z : d0 = D.ctxt alpha k d
   ============================
    K d (subst_Tau (cross t0 t1) tau alpha) A
 *)
@@ -718,10 +718,10 @@ Proof.
 
   intros.
 (*  Want and I have it!!!!!
-  nodupd' : D.nodup (dctxt alpha k d) = true
-  H : D.map (dctxt alpha k d) alpha0 = None
-  Kderctxt : K (dctxt alpha0 k0 (dctxt alpha k d)) tau0 A
-  IHKderctxt : D.nodup (dctxt alpha0 k0 (dctxt alpha k d)) = true ->
+  nodupd' : D.nodup (D.ctxt alpha k d) = true
+  H : D.map (D.ctxt alpha k d) alpha0 = None
+  Kderctxt : K (D.ctxt alpha0 k0 (D.ctxt alpha k d)) tau0 A
+  IHKderctxt : D.nodup (D.ctxt alpha0 k0 (D.ctxt alpha k d)) = true ->
                K d (subst_Tau tau0 tau alpha) A
   ============================
    K d (subst_Tau (utype alpha0 k0 tau0) tau alpha) A

@@ -104,7 +104,7 @@ Proof.
     fold subst_Tau.
     rewrite H1.
     specialize (IHkder alpha0).
-    assert (Z: D.map (dctxt alpha k d) alpha0 = None).
+    assert (Z: D.map (D.ctxt alpha k d) alpha0 = None).
     apply D.map_none_r_str; try assumption.
     apply IHkder with (tau0:= tau0) in Z.
     rewrite Z.
@@ -123,7 +123,7 @@ Proof.
    SCase "alpha0 <> alpha".
     intros.
     specialize (IHkder alpha0).
-    assert (Z: D.map (dctxt alpha k d) alpha0 = None).
+    assert (Z: D.map (D.ctxt alpha k d) alpha0 = None).
     apply D.map_none_r_str; try assumption.
     apply IHkder with (tau0:= tau0) in Z.
     rewrite Z.
@@ -179,7 +179,6 @@ Proof.
    inversion H.
   Case "WFU ([(x, p, tau)] ++ u)".
    intros.
-   unfold uctxt in H1.
    unfold U.map in H1.
    fold U.map in H1.
    case_eq(U.K_eq (x,p) (x0,p0)); intros; rewrite H2 in *.
@@ -314,23 +313,22 @@ Lemma A_6_Substitution_1:
       WFD d ->
       AK d tau k ->
       forall (alpha : TV.T) (k' : Kappa) (tau' : Tau), 
-        WFD (dctxt alpha k d) ->
-        K (dctxt alpha k d) tau' k' ->
+        WFD (D.ctxt alpha k d) ->
+        K (D.ctxt alpha k d) tau' k' ->
         K d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k WFDder AKderd alpha k' tau' WFDder' Kderctxt.
   apply (K_context_dependent_induction
            (fun (alpha : TV.T) (k : Kappa) (d : Delta) (tau' : Tau) (k' : Kappa) =>
               AK d tau k ->
-              WFD (dctxt alpha k d) ->
-              K (dctxt alpha k d) tau' k' ->
+              WFD (D.ctxt alpha k d) ->
+              K (D.ctxt alpha k d) tau' k' ->
               K d (subst_Tau tau' tau alpha) k'))
         with (k:= k); try assumption; intros; clear AKderd; clear Kderctxt.
  Case "K d cint B".
    simpl.
    apply K_int.
  Case "K d (tv_t alpha) B".
-   unfold dctxt in H1.
    unfold D.map in H.
    fold D.map in H.
    case_eq(D.K_eq a' alpha0); intros; rewrite H3 in H; inversion H; subst.
@@ -359,7 +357,6 @@ Proof.
   constructor; try assumption.
   constructor; try assumption.
  Case "K d tau A".
-  unfold dctxt in H0.
   apply H0 in H1; try assumption.
   constructor; try assumption.
  Case "K d (cross t0 t1) A".
@@ -394,7 +391,7 @@ Proof.
    AdmitAlphaConversion.
    AdmitAlphaConversion.
    inversion H3; subst.
-   assert(Z: D.extends d0 (dctxt a' k0 d0) = true); try assumption.
+   assert(Z: D.extends d0 (D.ctxt a' k0 d0) = true); try assumption.
    apply D.extends_r_str; try assumption.
    apply D.extends_refl.
    apply WFD_implies_nodup; assumption.
@@ -404,7 +401,7 @@ Proof.
    AdmitAlphaConversion.
    apply WFD_implies_nodup; try assumption.
    apply K_weakening with 
-    (d:= d0) (d':= (dctxt a' k0 d0))
+    (d:= d0) (d':= (D.ctxt a' k0 d0))
     (tau:=(subst_Tau tau0 tau alpha0)) (k:= A) in H10;
      try assumption.
    constructor; try assumption.
@@ -421,7 +418,7 @@ Proof.
    AdmitAlphaConversion.
    AdmitAlphaConversion.
    inversion H4; subst.
-   assert(Z: D.extends d0 (dctxt a' k0 d0) = true); try assumption.
+   assert(Z: D.extends d0 (D.ctxt a' k0 d0) = true); try assumption.
    apply D.extends_r_str; try assumption.
    apply D.extends_refl.
    apply WFD_implies_nodup; assumption.
@@ -431,7 +428,7 @@ Proof.
    AdmitAlphaConversion.
    apply WFD_implies_nodup; try assumption.
    apply K_weakening with 
-    (d:= d0) (d':= (dctxt a' k0 d0))
+    (d:= d0) (d':= (D.ctxt a' k0 d0))
     (tau:=(subst_Tau tau0 tau alpha0)) (k:= A) in H11;
      try assumption.
    constructor; try assumption.
@@ -444,16 +441,16 @@ Lemma A_6_Substitution_2:
        WFD d ->
        AK d tau k -> 
        forall  (alpha : TV.T)  (tau' : Tau)  (k' : Kappa),
-         WFD (dctxt alpha k d) ->
-         AK (dctxt alpha k d) tau' k' ->
+         WFD (D.ctxt alpha k d) ->
+         AK (D.ctxt alpha k d) tau' k' ->
          AK d (subst_Tau tau' tau alpha) k'.
 Proof.
   intros d tau k AKderd alpha tau' k' AKdctextder.
   apply (AK_context_induction_dependent
            (fun (alpha : TV.T) (k : Kappa) (d : Delta) (tau' : Tau) (k' : Kappa) =>
               AK d tau k -> 
-              WFD (dctxt alpha k d) ->
-              AK (dctxt alpha k d) tau' k' ->
+              WFD (D.ctxt alpha k d) ->
+              AK (D.ctxt alpha k d) tau' k' ->
               AK d (subst_Tau tau' tau alpha) k'))
         with (k:= k); try assumption; intros; clear AKderd; clear AKdctextder.
  Case "AK d (tv_t alpha) A".
@@ -463,7 +460,6 @@ Proof.
   apply A_6_Substitution_1 with (k:= k'0); try assumption.
 
   unfold subst_Tau.
-  unfold dctxt in H3.
   unfold D.map in H3.
   fold D.map in H3.
   unfold D.K_eq in H3.
@@ -555,7 +551,6 @@ Proof.
    apply H1 in H2; try assumption.
    assert (G: D.K_eq beta alpha0 = false).
    admit. (* had this from wfd *)
-   unfold dctxt.
    unfold D.map.
    fold D.map.
    rewrite G; assumption.
@@ -598,11 +593,11 @@ Proof.
   Case "WFDG ([(alpha, k)] ++ d) g".
    intros.
    admit.
-Qed.
+Admitted.
 
 Lemma A_6_Substitution_5:
   forall (alpha : TV.T) (k : Kappa) (d : Delta) (u : Upsilon)  (g : Gamma),
-    WFC (dctxt alpha k d) u g ->
+    WFC (D.ctxt alpha k d) u g ->
     forall (tau : Tau) ,
       AK d tau k -> 
       WFC d u (subst_Gamma g tau alpha).
@@ -682,7 +677,7 @@ Lemma A_6_Substitution_7:
     forall (d: Delta) (tau : Tau) (k : Kappa) (beta : TV.T),
       AK d tau k -> 
       WFU u ->
-        gettype u x p (subst_Tau t1 tau beta) p' (subst_Tau t2 tau beta).
+      gettype u x p (subst_Tau t1 tau beta) p' (subst_Tau t2 tau beta).
 Proof.
   intros u x p p' t1 t2 gettypder.
   apply (gettype_ind 
@@ -735,13 +730,13 @@ Lemma A_6_Substitution_8_1_2_3_bad:
     AK d tau k ->
     forall (alpha : TV.T) (u : Upsilon) (g : Gamma) (e : E) (tau' : Tau) 
             (d : Delta),
-      ltyp (dctxt alpha k d) u g e tau' ->
+      ltyp (D.ctxt alpha k d) u g e tau' ->
       ltyp d u (subst_Gamma g tau alpha)
            (subst_E e tau alpha)
            (subst_Tau tau' tau alpha).
 Proof.
   intros d tau k AKder alpha u g e tau' d' ltypder.
-  Ltac fixit d0 alpha k d':=  assert (Z: d0 = (dctxt alpha k d')).
+  Ltac fixit d0 alpha k d':=  assert (Z: d0 = (D.ctxt alpha k d')).
   induction ltypder; intros.
   fixit d0 alpha k d'.
   admit.
@@ -768,6 +763,54 @@ Proof.
 Admitted.
 *)
 
+(*  Try setting up with a totally different d to substitute in. *)
+
+Lemma A_6_Substitution_8_1_2_3_different_d:
+  forall (d : Delta) (tau : Tau) (k : Kappa),
+    AK d tau k ->
+    forall (alpha : TV.T) (u : Upsilon) (g : Gamma) (e : E) (tau' : Tau) 
+            (dnot: Delta),
+      ltyp dnot u g e tau' ->
+      ltyp d u (subst_Gamma g tau alpha)
+           (subst_E e tau alpha)
+           (subst_Tau tau' tau alpha).
+Proof.
+  intros d tau k AKder alpha u g e tau' dnot ltypder.
+  induction ltypder; intros.
+  Case "ltyp d u g (p_e x p) tau".
+   unfold subst_E.
+   fold subst_E.
+   admit.
+  Case "ltyp d u g (star e) tau".
+   admit.
+  Case "ltyp d u g (dot e zero_pe) t0".
+   admit.
+  Case "ltyp d u g (dot e one_pe) t1".
+   admit.
+Admitted.
+
+
+Lemma map_subst_Gamma_none_agreement:
+  forall (g : Gamma) (x : EV.T),
+    G.map g x= None ->
+    forall tau alpha,
+    G.map (subst_Gamma g tau alpha) x = None.
+Proof.
+  intros g.
+  induction g; try solve[crush].
+  intros.
+  unfold G.map in H.
+  fold G.map in H.
+  case_eq(G.K_eq x k); intros; rewrite H0 in H.
+  inversion H.
+  apply IHg with (tau:= tau) (alpha:= alpha) in H.
+  unfold subst_Gamma.
+  fold subst_Gamma.
+  unfold G.map.
+  fold G.map.
+  rewrite H0.
+  assumption.
+Qed.
 
 Lemma A_6_Substitution_8_1_2_3:
   forall (d : Delta),
@@ -781,7 +824,7 @@ Lemma A_6_Substitution_8_1_2_3:
            (subst_Tau tau' tau alpha).
 Proof.
   intros d alpha u g e tau' d' ltypder.
-  Ltac fixit d0 alpha k d':=  assert (Z: d0 = (dctxt alpha k d')).
+  Ltac fixit d0 alpha k d':=  assert (Z: d0 = (D.ctxt alpha k d')).
   (apply (ltyp_ind_mutual
            (fun (d : Delta) (u : Upsilon) (g : Gamma) (tau' : Tau) (s : St)
                 (st : styp d u g tau' s) => 
@@ -809,60 +852,187 @@ Proof.
                      (subst_Tau tau' tau alpha)))); try assumption; intros.
   (* 26 goals, each one must be hand repaired. *)
   (* After a lot of manipulation, this should be the right context to prove. *)
-  fixit d0 alpha k d'.
-  admit.
-  rewrite Z in r.
-  rewrite Z in H at 1.
-  rewrite Z in H0.
-  clear Z.
 
-  apply H with (tau:= tau0) (k:= k) in r; try assumption.
-  
+  Case "styp_e_3_1".
+   fixit d0 alpha k d'.
+   admit.
+   rewrite Z in r.
+   rewrite Z in H at 1.
+   rewrite Z in H0.
+   clear Z.
+   apply H with (tau:= tau0) (k:= k) in r; try assumption.
+   admit.
+  (* This is that any type rule for returns, so let's do another first. *)
+  Case "styp_return_3_2".
+   fixit d0 alpha k d'.
+   admit.
+   rewrite Z in r.
+   rewrite Z in H at 1.
+   rewrite Z in H0.
+   clear Z.
+   apply H with (tau0:= tau0) (k:= k) in r; try assumption.
+   unfold subst_St.
+   fold subst_E.
+   constructor.
+   inversion H0; subst.
+   apply H with (tau0:= tau0) (k:= k) in H7; try assumption.
+  Case "styp_seq_3_3".
+   fixit d0 alpha k d'.
+   admit.
+   rewrite Z in s.
+   rewrite Z in s0.
+   rewrite Z in H at 1.
+   rewrite Z in H0 at 1.
+   rewrite Z in H1.
+   clear Z.
+   unfold subst_St.
+   fold subst_St.
+   constructor.
+   apply H with (tau0:= tau0) (k:= k) in s; try assumption.
+   apply H0 with (tau0:= tau0) (k:= k) in s0; try assumption.
+  Case "styp_while_3_4".
+   admit.
+  Case "styp_if_3_5".
+   admit.
+  Case "styp_let_3_6".
+   fixit d0 alpha k0 d'.
+   admit.
+   rewrite Z in s0.
+   rewrite Z in r.
+   rewrite Z in H at 1.
+   rewrite Z in H0 at 1.
+   rewrite Z in H1.
+   clear Z.
+   unfold subst_St.
+   fold subst_St.
+   fold subst_E.
+   apply styp_let_3_6 with (tau':= tau'0); try assumption.
+   apply map_subst_Gamma_none_agreement with (tau:= tau0) (alpha:= alpha) in e1;
+     try assumption.
+   apply H with (tau0:= tau0) (k:= k0) in s0; try assumption.
+   unfold subst_Gamma in s0.
+   fold subst_Gamma in s0.
+   assert (Z: (subst_Tau tau'0 tau0 alpha) = tau'0).
+   admit. (* This is not alpha conversion, why is the true?  
+             Why is alpha not tau'0?  *)
+   rewrite Z in s0.
+   assumption.
+   apply H0 with (tau:= tau0) (k:= k0) in r; try assumption.
+   assert (Z: (subst_Tau tau'0 tau0 alpha) = tau'0).
+   admit. (* This is not alpha conversion, why is the true?  *)
+   rewrite Z in r.
+   assumption.
+  Case "styp_open_3_7".
+   fixit d0 alpha k1 d'.  
+   admit.
+   rewrite Z in e1.
+   rewrite Z in r.
+   rewrite Z in H at 1.
+   rewrite Z in s0 at 1.
+   rewrite Z in H0 at 1.
+   rewrite Z in H1.
+   clear Z.
+   unfold subst_St.
+   fold subst_St.
+   fold subst_E.
+   apply styp_open_3_7 
+     with (p:= p) (k:= k1) (tau':= tau'0); try assumption.
+(*
+   apply map_subst_Gamma_none_agreement with (tau:= tau0) (alpha:= alpha) in e1;
+     try assumption.
+   apply H with (tau0:= tau0) (k:= k0) in s0; try assumption.
+   unfold G.ctxt in s0.
+   unfold subst_Gamma in s0.
+   fold subst_Gamma in s0.
+   assert (Z: (subst_Tau tau'0 tau0 alpha) = tau'0).
+   admit. (* This is not alpha conversion, why is the true?  
+             Why is alpha not tau'0?  *)
+   rewrite Z in s0.
+   assumption.
+   apply H0 with (tau:= tau0) (k:= k0) in r; try assumption.
+   assert (Z: (subst_Tau tau'0 tau0 alpha) = tau'0).
+   admit. (* This is not alpha conversion, why is the true?  *)
+   rewrite Z in r.
+   assumption.
 
 
 
+  Case "styp_openstar_3_8".
+   admit.
+  Case "SL_3_1".
+   admit.
+  Case "SL_3_2".
+   admit.
+  Case "SL_3_3".
+   admit.
+  Case "SL_3_4".
+   admit.
+  Case "SR_3_1".
+   admit.
+  | Case_aux c "SR_3_2"Case  "SR_3_3".
+   admit.
+  | Case_aux c "SR_3_4"Case  "SR_3_5".
+   admit.
+  | Case_aux c "SR_3_6"Case  "SR_3_7".
+   admit.
+  | Case_aux c "SR_3_8"Case  "SR_3_9".
+   admit.
+  Case "SR_3_10".
+   admit.
+  Case "SR_3_11".
+   admit.
+  Case "SR_3_12".
+   admit.
+  Case "SR_3_13".
+   admit.
+  Case "SR_3_14".
+   admit.
+  Case "base"].
+   admit.
 
+*)
 Admitted.
 
 
 
 (* Need three of these. *)
 (* I have no idea how to make the dependent induction mutual schema. *)
-Lemma A_6_Substitution_8_1_2_3:
+(*
+Lemma A_6_Substitution_8_1_2_3_old:
   forall (d : Delta) (tau : Tau) (k : Kappa),
     AK d tau k ->
     forall (alpha : TV.T) (u : Upsilon) (g : Gamma) (e : E) (tau' : Tau) 
             (d : Delta),
-      ltyp (dctxt alpha k d) u g e tau' ->
+      ltyp (D.ctxt alpha k d) u g e tau' ->
       ltyp d u (subst_Gamma g tau alpha)
            (subst_E e tau alpha)
            (subst_Tau tau' tau alpha).
 Proof.
   intros d tau k AKder.
   intros alpha u g e tau' d' ltypder.
-  Ltac fixit d0 alpha k d':=  assert (Z: d0 = (dctxt alpha k d')).
+  Ltac fixit d0 alpha k d':=  assert (Z: d0 = (D.ctxt alpha k d')).
   ltyp_ind_mutual_cases 
   (apply (ltyp_context_dependent_induction_mutual
            (fun (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) (t : Tau) (s : St)
                 (st : styp d u g t s) => 
-              styp (dctxt alpha k d) u g tau' s ->
+              styp (D.ctxt alpha k d) u g tau' s ->
               styp d u (subst_Gamma g tau alpha)
                    (subst_Tau tau' tau alpha)
-                   (subst_St s tau alpha))
+                   (subst_St s tau alpha)
            (fun (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) (e : E) (tau' : Tau) 
                 (lt : ltyp d u g  e tau') =>
-              ltyp (dctxt alpha k d) u g e tau' ->
+              ltyp (D.ctxt alpha k d) u g e tau' ->
               ltyp d u (subst_Gamma g tau alpha)
                    (subst_E e tau alpha)
                    (subst_Tau tau' tau alpha))
            (fun (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) (e : E) (t : Tau) 
                 (rt : rtyp d u g e t) =>
-              rtyp (dctxt alpha k d) u g e tau' ->
+              rtyp (D.ctxt alpha k d) u g e tau' ->
               rtyp d u (subst_Gamma g tau alpha)
                    (subst_E e tau alpha)
                    (subst_Tau tau' tau alpha))); try assumption) Case; intros;
   clear AKder; clear ltypder.
   
   
+*)
 
-Admitted.    

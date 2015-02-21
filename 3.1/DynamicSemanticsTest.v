@@ -29,10 +29,10 @@ Definition s' := (e_s (i_e (i_i 0))).
 Definition e  := (dot (cpair (i_e (i_i 0)) (i_e (i_i 1))) zero_pe).
 Definition e' := (i_e (i_i 0)).
 
-Definition hxv := (hctxt x v hdot).
+Definition hxv := (H.ctxt x v hdot).
 
 Example S_Let_3_1_test :
-  S hdot (letx x v s) (hctxt x v hdot) s.
+  S hdot (letx x v s) (H.ctxt x v hdot) s.
 Proof.
   apply S_let_3_1;
   eauto 20 with Chapter3.
@@ -86,7 +86,7 @@ Qed.
 
 (* TODO Questionable test? *)
 Definition etau := (etype aliases alpha A tau).
-Definition H38 := (hctxt x (pack etau v etau) hdot).
+Definition H38 := (H.ctxt x (pack etau v etau) hdot).
 Example pack_value:
   H.map H38 x = Some v' ->
   Value v'.
@@ -170,7 +170,7 @@ Qed.
 
 (* Test R. *)
 
-Definition h703 := (hctxt x v hdot).
+Definition h703 := (H.ctxt x v hdot).
 Example R_get_3_1_test:
   R h703  (e_s (p_e x nil)) 
     h703  (e_s v).
@@ -181,8 +181,8 @@ Proof.
 Qed.
 
 Example R_assign_3_2_test:
-  R (hctxt x (i_e (i_i 2)) hdot) (e_s (assign (p_e x []) (i_e (i_i 3))))
-    (hctxt x (i_e (i_i 3)) hdot) (e_s (i_e (i_i 3))).
+  R (H.ctxt x (i_e (i_i 2)) hdot) (e_s (assign (p_e x []) (i_e (i_i 3))))
+    (H.ctxt x (i_e (i_i 3)) hdot) (e_s (i_e (i_i 3))).
 Proof.
  (* eauto 20 with Chapter3. works. *)
   eapply R_assign_3_2; try reflexivity;
@@ -191,7 +191,7 @@ Qed.
 
 Example R_initial_assign_3_2_test:
   R hdot (e_s (assign (p_e x []) (i_e (i_i 3))))
-    (hctxt x (i_e (i_i 3)) hdot) (e_s (i_e (i_i 3))).
+    (H.ctxt x (i_e (i_i 3)) hdot) (e_s (i_e (i_i 3))).
 Proof.
  apply R_initial_assign_3_2;
  eauto 20 with Chapter3.

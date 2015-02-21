@@ -21,13 +21,13 @@ Qed.
 Definition pnil : Path := [].
 
 Example getu_for_cint:
- U.map (uctxt (x, pnil) cint udot) (x,pnil) = Some cint.
+ U.map (U.ctxt (x, pnil) cint udot) (x,pnil) = Some cint.
 Proof.
   eauto 20 with Chapter3.
 Qed.
 
 Example gettype_etype_test2:
-  gettype (uctxt (x, pnil) cint udot) x pnil 
+  gettype (U.ctxt (x, pnil) cint udot) x pnil 
           (etype aliases alpha k cint) [u_pe] cint.
 Proof.
   eapply gettype_etype;  eauto 20 with Chapter3.

@@ -1054,4 +1054,18 @@ Proof.
   rewrite equal_sym in H1.
   apply equal_if_map_some with (c:= c') (c':= c) (k:= k) (t:= t) in H; try assumption.
 Qed.
+
+(* Admitting alpha conversion in the most specific ways:
+    that x is not in a context and that
+    x is not equal to x'. *)
+Lemma admit_alpha_conversion_context:
+  forall v c,
+    map v c = None.
+Admitted.
+
+Lemma admit_alpha_conversion_beq_t:
+  forall k k',
+    K.beq_t k k' = false.
+Admitted.
+
 End ContextFun.

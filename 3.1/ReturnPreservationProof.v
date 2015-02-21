@@ -7,12 +7,14 @@
 *)
 Set Implicit Arguments.
 Require Export LanguageModuleDef.
+Require Export Tacticals.
 Require Export DynamicSemanticsTypeSubstitution.
 Require Export DynamicSemanticsHeapObjects.
 Require Export DynamicSemantics.
 Require Export DynamicSemanticsTypeSubstitution.
 Require Export StaticSemanticsKindingAndContextWellFormedness.
 Require Export StaticSemantics.
+Require Export SubstitutionsProof.
 Require Export TypeSafety.
 Require Export CpdtTactics.
 Require Export Case.
@@ -31,6 +33,7 @@ Proof.
   Case "retn e".
    intros h h' s' H.
    inversion H.
+   subst.
    constructor.
   Case "if".
    intros h h' s' H.
@@ -67,9 +70,6 @@ Proof.
    crush.
    constructor.
    crush.
-   (* Oh this is the we don't care that s1 does not have a return, s does case.*)
-   apply ret_seq_2 with (s:= s'1) (s':= s') in retder. 
-   assumption.
   Case "let".
    intros h h' s' H.
    inversion H.
@@ -88,7 +88,7 @@ Proof.
    assumption.
 
    SCase "ret (open e' alpha x s)".
-   crush.
+   intros.
    constructor.
    assumption.
 
@@ -101,7 +101,5 @@ Proof.
    assumption.
    SCase "ret (open e' alpha x s)".
    crush.
-   constructor.
-   assumption.
 Qed.
 

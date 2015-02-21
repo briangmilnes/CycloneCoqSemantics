@@ -42,23 +42,25 @@ Module LanguageModule.
   (* Now what happens here if I use D.K/D.T vs TV.T T.K ? *)
   Definition Delta    := (D.Context  T.TV.Var Kappa).
   Definition ddot     := (D.cdot     T.TV.Var Kappa).
+  Definition dctxt    := (D.ctxt     T.TV.Var Kappa).
   (* Can I just drop these and get rid of some unfolding? Seems likely. *)
-  Definition dctxt    := D.ctxt.
 
   Module U := ContextFun EVarPathModule T.
-  Definition Upsilon  := (U.Context U.K Tau).
-  Definition udot     := (U.cdot U.K Tau).
-  Definition uctxt    := U.ctxt.
+  Definition Upsilon  := (U.Context EVP.T Tau).
+  Definition udot     := (U.cdot EVP.T Tau).
+  Definition uctxt    := (U.ctxt EVP.T Tau).
 
   Module H := ContextFun TM.EV TM.
   Definition Heap     := (H.Context TM.EV.T TM.E).
   Definition hdot     := (H.cdot    TM.EV.T TM.E).
-  Definition hctxt    := H.ctxt.
+  Definition hctxt    := (H.ctxt    TM.EV.T TM.E).
+  
 
   Module G := ContextFun TM.EV T.
   Definition Gamma    := (G.Context TM.EV.T Tau).
   Definition gdot     := (G.cdot    TM.EV.T Tau).
-  Definition gctxt    := G.ctxt.
+  Definition gctxt    := (G.ctxt    TM.EV.T Tau).
+
 End LanguageModule.
 
 Export LanguageModule.

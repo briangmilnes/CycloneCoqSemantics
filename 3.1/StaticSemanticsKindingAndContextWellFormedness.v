@@ -15,7 +15,7 @@ Inductive WFD : Delta -> Prop :=
   | WFD_xtau   : forall (d : Delta) (alpha : TV.T) (k : Kappa),
                  D.map d alpha = None ->
                  WFD  d ->
-                 WFD (dctxt alpha k d).
+                 WFD (D.ctxt alpha k d).
 
 Inductive K : Delta -> Tau -> Kappa -> Prop :=
 
@@ -49,20 +49,20 @@ Inductive K : Delta -> Tau -> Kappa -> Prop :=
                     K d (ptype tau) B
 
  | K_utype  : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
-                   WFD (dctxt alpha k d) ->
+                   WFD (D.ctxt alpha k d) ->
                    D.map d alpha = None -> 
-                   K  (dctxt alpha k d) tau A ->
+                   K  (D.ctxt alpha k d) tau A ->
                    K d (utype alpha k tau) A
 
  | K_etype  : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau) (p : Phi),
-                   WFD (dctxt alpha k d) ->
+                   WFD (D.ctxt alpha k d) ->
                    D.map d alpha = None -> 
-                   K (dctxt alpha k d) tau A ->
+                   K (D.ctxt alpha k d) tau A ->
                    K d (etype p alpha k tau) A.
 
 
 (* This unproven lemma is used to do induction on terms of the form K
- (dctxt alpha k d) tau k' as higher order unification is undecidable
+ (D.ctxt alpha k d) tau k' as higher order unification is undecidable
  and Coq thusly can't do this. Hopefully, this does it and correctly. *)
 
 Lemma K_context_dependent_induction:
@@ -223,7 +223,7 @@ Inductive WFU : Upsilon -> Prop :=
                  U.map u (x,p) = None ->
                  WFU  u ->
                  K ddot tau A ->
-                 WFU (uctxt (x,p) tau u).
+                 WFU (U.ctxt (x,p) tau u).
 
 Inductive WFDG : Delta -> Gamma -> Prop :=
   | WFDG_d_nil : forall (d: Delta),
@@ -232,7 +232,7 @@ Inductive WFDG : Delta -> Gamma -> Prop :=
                      G.map g x = None -> 
                      K d tau A ->
                      WFDG d g ->
-                     WFDG d (gctxt x tau g)
+                     WFDG d (G.ctxt x tau g)
 (* Proposed Thesis bug, I have to be able to extend WFDG with a new type variable. *)                          
   | WFDG_alphak   : forall (d: Delta) (g: Gamma) (alpha : TV.T) (k : Kappa),
                      D.map d alpha = None -> 
@@ -247,14 +247,14 @@ Lemma WFDG_context_dependent_induction:
     (* WFDG_xt *)
     (forall (beta : TV.T) (k : Kappa) (d : Delta) (g : Gamma) (x : EV.T) (tau : Tau),
         G.map g x = None ->
-        K (dctxt beta k d) tau A -> 
-        WFDG (dctxt beta k d) g -> 
+        K (D.ctxt beta k d) tau A -> 
+        WFDG (D.ctxt beta k d) g -> 
         P beta k d g -> 
-        P beta k d (gctxt x tau g)) ->
+        P beta k d (G.ctxt x tau g)) ->
     (* WFDG_alphak *)
     (forall  (beta : TV.T) (k : Kappa) (d : Delta) (g : Gamma) (alpha : TV.T) (k : Kappa),
-        D.map (dctxt beta k d) alpha = None -> 
-        WFDG (dctxt beta k d) g -> 
+        D.map (D.ctxt beta k d) alpha = None -> 
+        WFDG (D.ctxt beta k d) g -> 
         P beta k d g -> 
         P beta k (D.ctxt alpha k d) g) ->
     (forall (beta : TV.T) (k : Kappa) (d : Delta) (g: Gamma) (tau : Tau),

@@ -18,7 +18,7 @@ Require Import Tacticals.
   go down to cint. I'd guess so. *)
 
 Example K_int_test:
-  K [] cint B.
+  K ddot cint B.
 Proof.
  apply K_int.
 Qed.
@@ -38,42 +38,42 @@ Proof.
 Qed.
 
 Example K_B_A_test:
-  K [] tau A.
+  K ddot tau A.
 Proof.
  apply K_B_A.
  eauto 20 with Chapter3.
 Qed.
 
 Example K_cross_test:
-  K [] (cross t0 t1) A.
+  K ddot (cross t0 t1) A.
 Proof.
  apply K_cross;
  eauto 20 with Chapter3.
 Qed.
 
 Example K_arrow_test:
- K [] (arrow t0 t1) A.
+ K ddot (arrow t0 t1) A.
 Proof.
  apply K_arrow;
  eauto 20 with Chapter3.
 Qed.
 
 Example K_ptype_test:
-  K [] (ptype tau) B.
+  K ddot (ptype tau) B.
 Proof.
  apply K_ptype.
  eauto 20 with Chapter3.
 Qed.
 
 Example K_utype_test:
-  K [] (utype alpha k tau) A.
+  K ddot (utype alpha k tau) A.
 Proof.
  apply K_utype;
  eauto 20 with Chapter3.
 Qed.
 
 Example K_etype_test:
-  K [] (etype witnesschanges alpha k tau) A.
+  K ddot (etype witnesschanges alpha k tau) A.
 Proof.
  apply K_etype;  eauto 20 with Chapter3.
 Qed.
@@ -81,7 +81,7 @@ Qed.
 (* Test AK *)
 
 Example AK_K_AK_test:
-  AK [] tau k.
+  AK ddot tau k.
 Proof.
  apply AK_AK_K.
  eauto 20 with Chapter3.

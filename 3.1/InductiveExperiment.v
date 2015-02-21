@@ -14,14 +14,14 @@ Inductive K : Delta -> Tau -> Kappa -> Prop :=
 
  | K_utype  : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
                    D.map d alpha = None -> 
-                   K  (dctxt alpha k d) tau A ->
+                   K  (D.ctxt alpha k d) tau A ->
                    K d (utype alpha k tau) A.
 
 Print K_ind.
 
 Lemma first:
   forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau), 
-        K (dctxt alpha k d) tau k ->
+        K (D.ctxt alpha k d) tau k ->
         K d tau k.
 Proof.
   intros d alpha k tau Kder.
@@ -33,7 +33,7 @@ Admitted.
 
 Lemma second:
   forall (alpha : TV.T) (k : Kappa) (tau : Tau) (d : Delta),
-        K (dctxt alpha k d) tau k ->
+        K (D.ctxt alpha k d) tau k ->
         K d tau k.
 Proof.
   intros d alpha k tau Kder.
@@ -56,8 +56,8 @@ fun (P : Delta -> Tau -> Kappa -> Prop)
         D.map d alpha = Some B -> P d (tv_t alpha) B)
     (f1 : forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
         D.map d alpha = None ->
-        K (dctxt alpha k d) tau A ->
-        P (dctxt alpha k d) tau A -> P d (utype alpha k tau) A) =>
+        K (D.ctxt alpha k d) tau A ->
+        P (D.ctxt alpha k d) tau A -> P d (utype alpha k tau) A) =>
 
 fix F (d : Delta) (t : Tau) (k : Kappa) (k0 : K d t k) {struct k0} :
   P d t k :=
@@ -65,7 +65,7 @@ fix F (d : Delta) (t : Tau) (k : Kappa) (k0 : K d t k) {struct k0} :
   | K_int d0 => f d0
   | K_B d0 alpha e => f0 d0 alpha e
   | K_utype d0 alpha k1 tau e k2 =>
-      f1 d0 alpha k1 tau e k2 (F (dctxt alpha k1 d0) tau A k2)
+      f1 d0 alpha k1 tau e k2 (F (D.ctxt alpha k1 d0) tau A k2)
   end.
 
 Check K_ind2
@@ -75,8 +75,8 @@ Check K_ind2
         D.map d alpha = Some B -> P d (tv_t alpha) B) ->
        (forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
         D.map d alpha = None ->
-        K (dctxt alpha k d) tau A ->
-        P (dctxt alpha k d) tau A -> P d (utype alpha k tau) A) ->
+        K (D.ctxt alpha k d) tau A ->
+        P (D.ctxt alpha k d) tau A -> P d (utype alpha k tau) A) ->
        forall (d : Delta) (t : Tau) (k : Kappa), K d t k -> P d t k.
 
 
@@ -85,7 +85,7 @@ Require Import Coq.Program.Equality.
 
 Lemma fourth:
   forall (d : Delta) (alpha : TV.T) (k : Kappa) (tau : Tau),
-        K (dctxt alpha k d) tau k ->
+        K (D.ctxt alpha k d) tau k ->
         K d tau k.
 Proof.
   intros d alpha k tau Kder.
@@ -97,7 +97,7 @@ Proof.
   simpl_one_JMeq.
   subst.
   pose proof H as H'.
-  unfold dctxt in H.
+  unfold D.ctxt in H.
   unfold D.map in H.
   fold D.map in H.
   case_eq(D.K_eq alpha0 alpha); intros; rewrite H0 in H.
@@ -108,12 +108,12 @@ Proof.
   simpl_one_JMeq.
   subst.
   pose proof H as H'.
-  unfold dctxt in H.
+  unfold D.ctxt in H.
   unfold D.map in H.
   fold D.map in H.
   case_eq(D.K_eq alpha0 alpha); intros; rewrite H0 in H; try solve[inversion H].
   apply K_utype; try assumption.
-  assert(Z: dctxt alpha0 k (dctxt alpha A d) ~= dctxt alpha A d).
+  assert(Z: D.ctxt alpha0 k (D.ctxt alpha A d) ~= D.ctxt alpha A d).
   admit.
   apply IHKder in Z.
   admit. (* K r str *)

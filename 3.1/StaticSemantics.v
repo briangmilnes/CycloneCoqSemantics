@@ -85,7 +85,7 @@ Inductive styp : Delta -> Upsilon -> Gamma -> Tau -> St   -> Prop :=
                                (s : St) (e : E),
                           G.map g x = None ->
                           K d tau' A ->  (* Thesis change. *)
-                          styp d u (gctxt x tau' g) tau s ->
+                          styp d u (G.ctxt x tau' g) tau s ->
                           rtyp d u g e    tau' ->
                           styp d u g tau  (letx x e s)
 
@@ -101,7 +101,7 @@ Inductive styp : Delta -> Upsilon -> Gamma -> Tau -> St   -> Prop :=
                           G.map g x = None ->
                           K d tau A      ->
                           rtyp d u g e (T.etype p alpha k tau') ->
-                          styp (dctxt alpha k d) u (gctxt x tau' g)
+                          styp (D.ctxt alpha k d) u (G.ctxt x tau' g)
                                tau s ->
                           styp d u g tau (open e alpha x s)
 
@@ -110,9 +110,9 @@ Inductive styp : Delta -> Upsilon -> Gamma -> Tau -> St   -> Prop :=
                                (k : Kappa) (tau tau' : T.T)
                                (s : St) (e : E),
                           rtyp d u g e (T.etype aliases alpha k tau') -> 
-                          styp (dctxt alpha k d)
+                          styp (D.ctxt alpha k d)
                                u 
-                               (gctxt x tau' g)
+                               (G.ctxt x tau' g)
                                tau s ->
                           D.map d alpha = None ->
                           G.map g x = None ->
@@ -125,7 +125,7 @@ with      ltyp :   Delta -> Upsilon -> Gamma -> E -> T.T -> Prop :=
                            (x : EV.T) (p : Path) (tau tau': T.T),
                       G.map g x = Some tau' ->
                       gettype u x nil tau' p tau ->
-                      WFC d u g->
+                      WFC d u g ->
                       K d tau' A -> 
                       ltyp d u g (p_e x p) tau
 
@@ -212,7 +212,7 @@ with      rtyp :  Delta -> Upsilon -> Gamma -> E   -> T.T -> Prop :=
   | SR_3_13 : forall (d : Delta) (u : Upsilon) (g : Gamma) (tau tau': T.T) 
                      (s : St) (x : EV.T),
                    G.map g x = None ->
-                   styp d u (gctxt x tau g) tau' s ->
+                   styp d u (G.ctxt x tau g) tau' s ->
                    ret s ->
                    rtyp d u g (f_e (dfun tau x tau' s)) (T.arrow tau tau')
 
@@ -220,7 +220,7 @@ with      rtyp :  Delta -> Upsilon -> Gamma -> E   -> T.T -> Prop :=
                         (tau : T.T) (alpha : TV.T) (k : Kappa),
                    D.map d alpha = None ->
                    WFC  d u g ->
-                   rtyp (dctxt alpha k d) u g (f_e f) tau ->
+                   rtyp (D.ctxt alpha k d) u g (f_e f) tau ->
                    rtyp d u g (f_e (ufun alpha k f)) (T.utype alpha k tau).
 
 Scheme styp_ind_mutual := Induction for styp Sort Prop
@@ -229,42 +229,43 @@ with   rtyp_ind_mutual := Induction for rtyp Sort Prop.
 Combined Scheme typ_ind_mutual from
           styp_ind_mutual, ltyp_ind_mutual, rtyp_ind_mutual.
 
+(*
 Lemma ltyp_context_dependent_induction_mutual:
   forall P : forall (beta : TV.T) (k : Kappa) (d : Delta) (u : Upsilon) (g : Gamma)
                     (t : Tau) (s : St),
-       styp (dctxt beta k d) u g t s -> Prop, 
+       styp (D.ctxt beta k d) u g t s -> Prop, 
     forall P0 : forall (beta : TV.T) (k : Kappa) (d : Delta) (u : Upsilon) 
                        (g : Gamma) (e : E) (t : T.T),
-        ltyp (dctxt beta k d) u g e t -> Prop, 
+        ltyp (D.ctxt beta k d) u g e t -> Prop, 
      forall P1 : forall (beta : TV.T) (k : Kappa) (d : Delta) (u : Upsilon) 
                         (g : Gamma) (e : E) (t : T.T),
-        rtyp (dctxt beta k d) u g e t -> Prop,
+        rtyp (D.ctxt beta k d) u g e t -> Prop,
   (forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
-         (tau tau' : T.T) (e : E) (r : rtyp (dctxt beta k' d) u g e tau'),
+         (tau tau' : T.T) (e : E) (r : rtyp (D.ctxt beta k' d) u g e tau'),
        P1 beta k' d u g e tau' r -> 
        P beta k' d u g tau (e_s e) (styp_e_3_1 tau r)) ->
   (forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
-          (tau : T.T) (e : E) (r : rtyp (dctxt beta k' d) u g e tau),
+          (tau : T.T) (e : E) (r : rtyp (D.ctxt beta k' d) u g e tau),
         P1 beta k' d u g e tau r -> 
         P beta k' d u g tau (retn e) (styp_return_3_2 r)) ->
   (forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
-          (tau : T.T) (s1 s2 : St) (s : styp (dctxt beta k' d) u g tau s1),
+          (tau : T.T) (s1 s2 : St) (s : styp (D.ctxt beta k' d) u g tau s1),
         P beta k' d u g tau s1 s ->
-        forall s0 : styp (dctxt beta k' d) u g tau s2,
+        forall s0 : styp (D.ctxt beta k' d) u g tau s2,
         P beta k' d u g tau s2 s0 -> 
         P beta k' d u g tau (seq s1 s2) (styp_seq_3_3 s s0)) ->
   (forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
-          (tau : T.T) (e : E) (s : St) (r : rtyp (dctxt beta k' d) u g e T.cint),
+          (tau : T.T) (e : E) (s : St) (r : rtyp (D.ctxt beta k' d) u g e T.cint),
         P1 beta k' d u g e T.cint r ->
-        forall s0 : styp (dctxt beta k' d) u g tau s,
+        forall s0 : styp (D.ctxt beta k' d) u g tau s,
         P beta k' d u g tau s s0 -> 
         P beta k' d u g tau (while e s) (styp_while_3_4 r s0)) ->
   (forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
-          (tau : T.T) (e : E) (s1 s2 : St) (r : rtyp (dctxt beta k' d) u g e T.cint),
+          (tau : T.T) (e : E) (s1 s2 : St) (r : rtyp (D.ctxt beta k' d) u g e T.cint),
         P1 beta k' d u g e T.cint r ->
-        forall s : styp (dctxt beta k' d) u g tau s1,
+        forall s : styp (D.ctxt beta k' d) u g tau s1,
         P beta k' d u g tau s1 s ->
-        forall s0 : styp (dctxt beta k' d) u g tau s2,
+        forall s0 : styp (D.ctxt beta k' d) u g tau s2,
         P beta k' d u g tau s2 s0 -> 
         P beta k' d u g tau (if_s e s1 s2) (styp_if_3_5 r s s0)) ->
 (* s0 wrong both ways *)
@@ -272,9 +273,9 @@ Lemma ltyp_context_dependent_induction_mutual:
   (forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
           (x : EV.T) (tau tau' : T.T) (s : St) (e : E)
           (e0 : G.map g x = None) (k : K d tau' A)
-          (s0 : styp (dctxt beta k' d) u (gctxt x tau' g) tau s),
-        P beta k' d u (gctxt x tau' g) tau s s0 ->
-        forall r : rtyp (dctxt beta k' d) u g e tau',
+          (s0 : styp (D.ctxt beta k' d) u (G.ctxt x tau' g) tau s),
+        P beta k' d u (G.ctxt x tau' g) tau s s0 ->
+        forall r : rtyp (D.ctxt beta k' d) u g e tau',
         P1 beta k' d u g e tau' r ->
         P beta k' d u g tau (letx x e s) (styp_let_3_6 e0 k s0 r)) -> 
 *)
@@ -284,15 +285,15 @@ Lemma ltyp_context_dependent_induction_mutual:
           (e1 : G.map g x = None) (k0 : K d tau A)
           (r : rtyp d u g e (T.etype p alpha k tau')),
         P1 beta k' d u g e (T.etype p alpha k tau') r ->
-        forall s0 : styp (dctxt beta k' (dctxt alpha k d)) u (gctxt x tau' g) tau s,
-        P beta k' (dctxt alpha k d) u (gctxt x tau' g) tau s s0 ->
+        forall s0 : styp (D.ctxt beta k' (D.ctxt alpha k d)) u (G.ctxt x tau' g) tau s,
+        P beta k' (D.ctxt alpha k d) u (G.ctxt x tau' g) tau s s0 ->
         P beta k' d u g tau (open e alpha x s) (styp_open_3_7 e0 e1 k0 r s0)) ->
   (forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
           (x : EV.T) (alpha : TV.T) (k : Kappa) (tau tau' : T.T) 
-          (s : St) (e : E) (r : rtyp (dctxt beta k' d) u g e (T.etype aliases alpha k tau')),
+          (s : St) (e : E) (r : rtyp (D.ctxt beta k' d) u g e (T.etype aliases alpha k tau')),
         P1 beta k' d u g e (T.etype aliases alpha k tau') r ->
-        forall s0 : styp (dctxt alpha k d) u (gctxt x tau' g) tau s,
-        P beta k' (dctxt alpha k d) u (gctxt x tau' g) tau s s0 ->
+        forall s0 : styp (D.ctxt alpha k d) u (G.ctxt x tau' g) tau s,
+        P beta k' (D.ctxt alpha k d) u (G.ctxt x tau' g) tau s s0 ->
         forall (e0 : D.map d alpha = None) (e1 : G.map g x = None)
           (k0 : K d tau A),
         P beta k' d u g tau (openstar e alpha x s) (styp_openstar_3_8 r s0 e0 e1 k0)) ->
@@ -373,22 +374,23 @@ Lemma ltyp_context_dependent_induction_mutual:
            (T.etype p alpha k tau) (SR_3_12 r a k0)) ->
   (forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
            (tau tau' : T.T) (s : St) (x : EV.T) (e : G.map g x = None)
-           (s0 : styp d u (gctxt x tau g) tau' s),
-         P beta k' d u (gctxt x tau g) tau' s s0 ->
+           (s0 : styp d u (G.ctxt x tau g) tau' s),
+         P beta k' d u (G.ctxt x tau g) tau' s s0 ->
          forall r : ret s,
          P1 beta k' d u g (f_e (dfun tau x tau' s)) (T.arrow tau tau')
            (SR_3_13 e s0 r)) ->
   (forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
            (f24 : F) (tau : T.T) (alpha : TV.T) (k : Kappa)
            (e : D.map d alpha = None) (w : WFC d u g)
-           (r : rtyp (dctxt alpha k d) u g (f_e f24) tau),
-         P1 beta k' (dctxt alpha k d) u g (f_e f24) tau r ->
+           (r : rtyp (D.ctxt alpha k d) u g (f_e f24) tau),
+         P1 beta k' (D.ctxt alpha k d) u g (f_e f24) tau r ->
          P1 beta k' d u g (f_e (ufun alpha k f24)) (T.utype alpha k tau)
            (SR_3_14 e w r)) ->
   forall (beta : TV.T) (k' : Kappa) (d : Delta) (u : Upsilon) (g : Gamma) 
          (e : E) (t : T.T) (l : ltyp d u g e t), P0 beta k' d u g e t l.
 Proof.
 Admitted.
+*)
 
 (* Bug 42, getH *)
 
@@ -401,7 +403,7 @@ Inductive htyp: Upsilon -> Gamma -> Heap -> Gamma -> Prop :=
                       H.delete h x = h' ->
                       htyp u g h' g' ->
                       rtyp ddot u g v tau ->
-                      htyp u g h (gctxt x tau g').
+                      htyp u g h (G.ctxt x tau g').
 
 (* Bug 43, HM.map *)
 Inductive refp  : Heap -> Upsilon -> Prop :=
@@ -411,7 +413,7 @@ Inductive refp  : Heap -> Upsilon -> Prop :=
                       H.map h x = Some v' -> 
                       get v' p (pack tau' v (etype aliases alpha k tau)) ->
                       refp h u ->
-                      refp h (uctxt (x,p) tau' u).
+                      refp h (U.ctxt (x,p) tau' u).
 
 Inductive prog  : Heap -> St -> Prop := 
   | program  : forall (h : Heap) (u : Upsilon) (g : Gamma) (tau : T.T) (s : St),

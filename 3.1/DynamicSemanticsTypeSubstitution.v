@@ -67,8 +67,8 @@ end.
 Fixpoint subst_Gamma (g : Gamma) (tau : Tau) (alpha : TV.T) : Gamma :=
   match g with
    | G.cdot => gdot
-   | (gctxt x tau' g') => 
-     (gctxt x (subst_Tau tau' tau alpha) (subst_Gamma g' tau alpha))
+   | (G.ctxt x tau' g') => 
+     (G.ctxt x (subst_Tau tau' tau alpha) (subst_Gamma g' tau alpha))
 end.
 Functional Scheme subst_Gamma_ind := Induction for subst_Gamma Sort Prop.
 

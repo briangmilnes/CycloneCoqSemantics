@@ -78,7 +78,7 @@ Qed.
 
 (* Bug 22, misnamed contructors in WFDG. *)
 Example SL_3_1_test:
-  ltyp ddot udot (gctxt x cint gdot) (p_e x []) cint.
+  ltyp ddot udot (G.ctxt x cint gdot) (p_e x []) cint.
 Proof.
   apply SL_3_1 with (tau':=cint);
   eauto 20 with Chapter3.
@@ -87,14 +87,14 @@ Qed.
 (* Bug 23, just got SL_3_2 wrong. *)
 (* Bug 24, contexts were messed up due to trying to follow Dan's type overloading of WF. *)
 Example SL_3_2_test:
-  ltyp ddot udot (gctxt x (ptype cint) gdot) (star (p_e x [])) cint.
+  ltyp ddot udot (G.ctxt x (ptype cint) gdot) (star (p_e x [])) cint.
 Proof.
   apply SL_3_2;
   eauto 20 with Chapter3.
 Qed.
 
 Example SL_3_3_test:
-  ltyp ddot udot (gctxt x (cross cint cint) gdot) (dot (p_e x []) zero_pe) cint.
+  ltyp ddot udot (G.ctxt x (cross cint cint) gdot) (dot (p_e x []) zero_pe) cint.
 Proof.
   apply SL_3_3 with (t1:=cint). 
   apply SL_3_1 with (tau':= (cross cint cint)); 
@@ -102,7 +102,7 @@ Proof.
 Qed.
 
 Example SL_3_4_test:
-  ltyp ddot udot (gctxt x (cross cint cint) gdot) (dot (p_e x []) one_pe) cint.
+  ltyp ddot udot (G.ctxt x (cross cint cint) gdot) (dot (p_e x []) one_pe) cint.
 Proof.
 (* Again syntax direction. *)
   apply SL_3_4 with (t0:=cint);   eauto 20 with Chapter3.
@@ -154,7 +154,7 @@ Proof.
 Qed.
 
 Example K_B_test:
-  K (dctxt alpha B ddot) (tv_t alpha) B.
+  K (D.ctxt alpha B ddot) (tv_t alpha) B.
 Proof.
   apply K_B; eauto 20 with Chapter3.
 Qed.
@@ -204,14 +204,14 @@ Qed.
 
 (* Bug 26, bad contexting in SR_3_2. *)
 Example SR_3_1_test:
-  rtyp ddot udot (gctxt x tau gdot) (p_e x []) tau.
+  rtyp ddot udot (G.ctxt x tau gdot) (p_e x []) tau.
 Proof.
   apply SR_3_1 with (tau':= tau); 
   eauto 20 with Chapter3.
 Qed.
 
 Example SR_3_2_test:
-  rtyp ddot udot (gctxt x (ptype cint) gdot) (star (p_e x [])) cint.
+  rtyp ddot udot (G.ctxt x (ptype cint) gdot) (star (p_e x [])) cint.
 Proof.
   apply SR_3_2;
   eauto 20 with Chapter3.
@@ -225,7 +225,7 @@ Proof.
 Qed.
 
 Example SR_3_4_test:
-  rtyp ddot udot (gctxt x (cross cint cint) gdot)
+  rtyp ddot udot (G.ctxt x (cross cint cint) gdot)
        (dot (p_e x []) one_pe) cint.
 Proof.
   apply SR_3_4 with (t0:= cint).
@@ -241,7 +241,7 @@ Qed.
 
 (* Bug 27, star instead of amp. *)
 Example SR_3_6_test:
-  rtyp ddot udot (gctxt x (cross cint cint) gdot)
+  rtyp ddot udot (G.ctxt x (cross cint cint) gdot)
        (amp (p_e x [])) (ptype (cross cint cint)).
 Proof.
   apply SR_3_6.
@@ -256,7 +256,7 @@ Proof.
 Qed.
 
 Example SR_3_8_test:
-  rtyp ddot udot (gctxt x cint gdot)
+  rtyp ddot udot (G.ctxt x cint gdot)
        (assign (p_e x []) (i_e (i_i 0))) cint.
 Proof.
   apply SR_3_8;
@@ -343,7 +343,7 @@ Proof.
 Qed.
 
 Example htyp_xv_test:
-  htyp udot gdot (hctxt x v hdot) (gctxt x tau gdot).
+  htyp udot gdot (H.ctxt x v hdot) (G.ctxt x tau gdot).
 Proof.
   (* loss of syntax direction here but we don't mind really as eauto is working. *)
   (* eauto 20 with Chapter3. *)

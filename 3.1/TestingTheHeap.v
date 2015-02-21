@@ -21,9 +21,9 @@ Require Export TestUtilities.
 
 
 Example assign_int :
- S (hctxt x  (i_e (i_i 0)) hdot)
+ S (H.ctxt x  (i_e (i_i 0)) hdot)
    (seq (e_s (assign (p_e x []) (i_e (i_i 1)))) (retn (p_e x [])))
-   (hctxt x  (i_e (i_i 1)) hdot)
+   (H.ctxt x  (i_e (i_i 1)) hdot)
    (seq (e_s (i_e (i_i 1))) (retn (p_e x []))).
 Proof.
   apply S_seq_3_10.
@@ -33,18 +33,18 @@ Proof.
 Qed.
 
 Example assign_int_no_nils :
- S (hctxt x  (i_e (i_i 0)) hdot)
+ S (H.ctxt x  (i_e (i_i 0)) hdot)
    (seq (e_s (assign (p_e x []) (i_e (i_i 1)))) (retn (p_e x [])))
-   (hctxt x  (i_e (i_i 1)) hdot)
+   (H.ctxt x  (i_e (i_i 1)) hdot)
    (seq (e_s (i_e (i_i 1))) (retn (p_e x []))).
 Proof.
  eauto 20 with Chapter3.
 Qed.
 
 Example assign_x_gets_address_y :
- S (hctxt x  (i_e (i_i 0)) (hctxt y (i_e (i_i 0)) hdot))
+ S (H.ctxt x  (i_e (i_i 0)) (H.ctxt y (i_e (i_i 0)) hdot))
    (e_s (assign (p_e x []) (amp (p_e y []))))
-   (hctxt x  (amp (p_e y [])) (hctxt y (i_e (i_i 0)) hdot))
+   (H.ctxt x  (amp (p_e y [])) (H.ctxt y (i_e (i_i 0)) hdot))
    (e_s (amp (p_e y []))).
 Proof.
   apply S_exp_3_9_1.
@@ -54,9 +54,9 @@ Qed.
 
 (* TODO make this a statement not a right hand side. *)
 Example return_address_of_y :
- S (hctxt x (amp (p_e y []))  (hctxt y (i_e (i_i 0)) hdot))
+ S (H.ctxt x (amp (p_e y []))  (H.ctxt y (i_e (i_i 0)) hdot))
    (e_s (p_e x []))
-   (hctxt x (amp (p_e y []))  (hctxt y (i_e (i_i 0)) hdot))
+   (H.ctxt x (amp (p_e y []))  (H.ctxt y (i_e (i_i 0)) hdot))
    (e_s (amp (p_e y []))).
 Proof.
   apply S_exp_3_9_1.
@@ -67,9 +67,9 @@ Qed.
 
 Example return_ptr_to_y:
  S
-   (hctxt x (amp (p_e y []))  (hctxt y (i_e (i_i 0)) hdot))
+   (H.ctxt x (amp (p_e y []))  (H.ctxt y (i_e (i_i 0)) hdot))
    (e_s (star (p_e x [])))
-   (hctxt x (amp (p_e y []))  (hctxt y (i_e (i_i 0)) hdot))
+   (H.ctxt x (amp (p_e y []))  (H.ctxt y (i_e (i_i 0)) hdot))
    (e_s (star (amp (p_e y [])))).
 Proof.
   (* eauto 20 with Chapter3. *)
@@ -87,9 +87,9 @@ Proof.
 Qed.
 
 Example return_contents_of_y :
- S  (hctxt x (amp (p_e y []))  (hctxt y (i_e (i_i 0)) hdot))
+ S  (H.ctxt x (amp (p_e y []))  (H.ctxt y (i_e (i_i 0)) hdot))
     (e_s (star (amp (p_e y []))))
-    (hctxt x (amp (p_e y []))  (hctxt y (i_e (i_i 0)) hdot))
+    (H.ctxt x (amp (p_e y []))  (H.ctxt y (i_e (i_i 0)) hdot))
     (e_s (p_e y [])).
 Proof.
   eauto 20 with Chapter3.

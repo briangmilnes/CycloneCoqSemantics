@@ -22,7 +22,7 @@ Lemma WFD_weakening:
   forall (d : Delta) (alpha : TV.T) (k : Kappa),
      WFD d ->
       D.map d alpha = None ->
-      WFD (dctxt alpha k d).
+      WFD (D.ctxt alpha k d).
 Proof.
   intros d.
   induction d; intros.

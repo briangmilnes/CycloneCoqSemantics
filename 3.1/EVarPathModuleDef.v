@@ -27,6 +27,7 @@ Module Base.
 
 Definition UE := prod E.Var Path.
 
+(* Does andb here break unfold ? *)
 Function beq_ue (u u' : UE) : bool := 
   match u, u' with
     | (x,p), (x', p') => andb (E.beq_t x x') (beq_path p p')

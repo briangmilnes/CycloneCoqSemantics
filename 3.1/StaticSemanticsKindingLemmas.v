@@ -70,7 +70,7 @@ Proof.
   intros.
   assert (Z: D.map d' alpha = None).
   AdmitAlphaConversion.
-  apply IHKder with (d':= (dctxt alpha k d')) in H; try assumption.
+  apply IHKder with (d':= (D.ctxt alpha k d')) in H; try assumption.
   apply K_utype; try assumption.
   constructor; try  assumption.
   apply WFD_implies_nodup; try assumption.
@@ -81,7 +81,7 @@ Proof.
   intros.
   assert (Z: D.map d' alpha = None).
   AdmitAlphaConversion.
-  apply IHKder with (d':= (dctxt alpha k d')) in H; try assumption.
+  apply IHKder with (d':= (D.ctxt alpha k d')) in H; try assumption.
   apply K_etype; try assumption.
   constructor; try  assumption.
   apply WFD_implies_nodup; try assumption.

@@ -3,11 +3,12 @@ all: TAGS src tactic lemma test proof experiment
 
 SRCFILES=BoolEqualitySigDef.vo  ContextFunDef.vo  ContextSigDef.vo  DeltaModuleDef.vo  EVarModuleDef.vo  EVarPathModuleDef.vo  GammaModuleDef.vo  KappaModuleDef.vo  NonceSigDef.vo  PathModuleDef.vo  PhiModuleDef.vo  TauModuleDef.vo  TVarModuleDef.vo  UpsilonModuleDef.vo  VariablesFunDef.vo  VariablesSigDef.vo TermModuleDef.vo HeapModuleDef.vo LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemanticsTypingHeapObjects.vo StaticSemantics.vo TypeSafety.vo
 
-TESTFILES=TestUtilities.vo FormalSyntaxTest.v DynamicSemanticsTypeSubstitutionTest.vo DynamicSemanticsTest.vo DynamicSemanticsHeapObjectsTest.vo StaticSemanticsKindingAndContextWellFormednessTest.v StaticSemanticsTest.vo StaticSemanticsTypingHeapObjectsTest.vo KindingTest.vo
+
+TESTFILES=TestUtilities.vo FormalSyntaxTest.vo DynamicSemanticsTypeSubstitutionTest.vo DynamicSemanticsTest.vo DynamicSemanticsHeapObjectsTest.vo StaticSemanticsTest.vo StaticSemanticsTypingHeapObjectsTest.vo KindingTest.vo
 
 LEMMAFILES=NatLemmas.vo StaticSemanticsHeapObjectsLemmas.vo StaticSemanticsKindingAndContextWellFormednessLemmas.vo StaticSemanticsKindingLemmas.vo StaticSemanticsWellFormednessLemmas.vo
 
-PROOFFILES=SubstitutionsProof.v ReturnPreservationProof.v 
+PROOFFILES=SubstitutionsProof.vo ReturnPreservationProof.vo TermWeakeningProof.vo
 
 TACTICFILES=CpdtTactics.vo Case.vo TacticNotations.vo AlphaConversion.vo Tacticals.vo MoreTacticals.vo
 
