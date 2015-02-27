@@ -19,6 +19,7 @@ Require Export StaticSemantics.
 Require Export CpdtTactics.
 Require Export TacticNotations.
 
+(* Mis named. *)
 Lemma K_weakening:
   forall (d : Delta) (tau : Tau) (k : K.T),
       WFD d ->

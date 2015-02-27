@@ -11,6 +11,7 @@ Require Export TacticNotations.
 Require Export Tacticals.
 Require Export AlphaConversion.
 Require Export StaticSemanticsKindingAndContextWellFormednessLemmas.
+Require Export StaticSemanticsKindingLemmas.
 
 Lemma WFU_t_implies_K_nil_A:
   forall (t : Tau) (e : EVP.E.Var) (p : Path)  (u' : Upsilon),
@@ -26,57 +27,114 @@ Lemma WFU_strengthening:
    WFU u' ->
    WFU u.
 Proof.
+(*
   intros u u' ext WFUu'.
   induction WFUu'; intros; try solve[crush].
   apply U.empty_extends_only_empty in ext; subst.
   constructor.
-  assert (Z: WFU (U.ctxt (x, p) tau u0)).
-  constructor; try assumption.
-  assert (Y: U.nodup (U.ctxt (x, p) tau u0) = true).
-  unfold U.nodup.
-  fold U.nodup.
-  rewrite H.
-  apply WFU_implies_nodup in WFUu'; try assumption.
+
   apply U.extends_r_weak in ext; try assumption.
   pose proof ext as ext'.
   apply IHWFUu' in ext; try assumption.
-
+  assert (Z: WFU (U.ctxt (x, p) tau u0)).
+  constructor; try assumption.
+  apply WFU_implies_nodup in Z; try assumption.
+  (* almost but no cigar I'd say. *)
+  case_eq(U.map u (x, p)); intros.
+  admit.
+  reflexivity.
+*)
+  intros u.
+  induction u; intros; try solve[crush].
 Admitted.
 
-Lemma WFDG_g_strengthening:
-  forall (d : Delta) (g g' : Gamma),
-    WFDG d (g ++ g') ->
-    WFDG d g.
+Lemma WFD_WFDG_implies_K_d_t_A:
+  forall d g x tau,
+    WFD d ->
+    WFDG d g ->
+    G.map g x = Some tau ->
+    K d tau A.
 Proof.
-  intros.
-  induction g.
-  Case "g = []".
-   rewrite app_nil_l in H.
-   constructor.
-   inversion H.
-   crush.
-  Case "a :: g'". 
-   constructor.
-   apply getG_None_Strengthening with (g':=g').
-   assumption.
-   assumption.
-   assumption.
-  Case "(alpha,k) :: d0".
-   constructor.
-   assumption.
-   destruct a.
-   constructor.
-   inversion H1.
-   apply getG_None_Strengthening with (g':=g').   
-   assumption.
-   crush.
-   AdmitAlphaConversion.
-   admit. (* K? *)
-   crush.
-   inversion H.
-   admit. (* TODO *)
-   admit.
+ intros d g x tau WFDder WFDGder.
+ induction WFDGder; intros; try solve[crush].
+ unfold G.map in H1.
+ fold G.map in H1.
+ case_eq(G.K_eq x x0); intros; rewrite H2 in H1.
+ inversion H1; subst; try assumption.
+ apply IHWFDGder in WFDder; try assumption.
+ inversion WFDder; subst. 
+ apply IHWFDGder in H0; try assumption.
+ apply K_weakening with (d:= d); try assumption.
+ pose proof H5 as H5'.
+ apply WFD_implies_nodup in H5'.
+ apply D.extends_r_str; try assumption.
+ apply D.extends_refl; try assumption.
+ unfold D.nodup.
+ fold D.nodup.
+ rewrite H3.
+ assumption.
 Qed.
+
+Lemma WFDG_g_strengthening:
+  forall (g g' : Gamma),
+    G.extends g g' = true ->
+    forall (d : Delta), 
+      WFD d ->
+      WFDG d g' ->
+      WFDG d g.
+Proof.
+  (* closer no cigar. *)
+  intros g.
+  induction g; intros; try solve[crush].
+
+  pose proof H as H'.
+  apply G.extends_l_str in H.
+  apply IHg with (d:= d) in H; try assumption.
+  constructor; try assumption.
+  admit. (* H' WFDG g' should imply k is not in there. *)
+  apply WFD_WFDG_implies_K_d_t_A with (g:= (G.ctxt k t g)) (x:= k); try assumption.
+  constructor; try assumption.
+  admit.
+  admit.
+  unfold G.map.
+  fold G.map.
+  rewrite G.K.beq_t_refl.
+  reflexivity.
+Admitted.
+
+(* by extends induction
+  intros g g'.
+  functional induction (G.extends g g'); intros; try solve[crush].
+  apply IHb with (d:= d) in H; try assumption.
+  constructor; try assumption.
+  admit. (* Stuck dang it. *)
+  apply WFD_WFDG_implies_K_d_t_A with (g:= c') (x:= k); try assumption.
+  apply G.T.beq_t_eq in e1; subst; try assumption.
+*)
+
+(* By  WFDG induction
+
+  intros d g' WFDGder g ext.
+  induction WFDGder; try solve[crush]; intros.
+
+  apply G.empty_extends_only_empty in ext.
+  subst.
+  constructor; try assumption.
+
+  apply G.extends_r_weak in ext; try assumption.
+  apply IHwfdgdg' in ext; try assumption.
+  apply WFDG_implies_nodup in wfdgdg'.
+  unfold G.nodup.
+  fold G.nodup.
+  rewrite H; try assumption.
+  admit. (* perhaps stuck. *)
+  apply IHwfdgdg' in ext.
+  constructor; try assumption.
+Qed.
+
+*)
+
+
 
 Lemma WFD_strengthening:
  forall (d d' : Delta),

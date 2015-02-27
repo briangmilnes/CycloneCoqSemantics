@@ -52,6 +52,8 @@ Lemma WFDG_implies_nodup:
     WFDG d g ->
     G.nodup g = true.
 Proof.
-Admitted.
+  intros d g WFGDder.
+  induction WFGDder; try solve[crush].
+Qed.
 
 

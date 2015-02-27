@@ -12,6 +12,7 @@
     b) masking of symbols
     c) clean usage of K_eq/T_eq in all such modules.
     d) work on map/none/some naming. 
+    e) r/l are really conclusion and assumption.
 *)
 
 Require Import List.
@@ -298,9 +299,13 @@ Lemma extends1_r_str:
       nodup (ctxt v t (ctxt v' t' c')) = true ->
       extends1 c v t (ctxt v' t' c') = true.
 Proof.
-  intros c v t c'.
+  intros.
   induction c'; intros.
-  admit.
+  unfold extends1 in H.
+  fold extends1 in H.
+  simpl in H.
+  case_eq(map (ctxt v' t' (cdot K T)) v); intros.
+
 (* Stuck.
   intros c v t c'.
   functional induction (extends1 c v t c'); try solve[crush].
@@ -330,6 +335,20 @@ Proof.
 *)
 Admitted.
 
+Lemma extends_refl_no_nodup:
+  forall c, 
+    extends c c = true.
+Proof.
+  intros.
+  induction c; try solve [crush].
+  unfold extends.
+  fold extends.
+  simpl.
+  rewrite K.beq_t_refl.
+  rewrite T.beq_t_refl.
+  unfold extends.
+  fold extends.
+Qed.
 
 Lemma extends_refl:
   forall c, 
@@ -876,9 +895,14 @@ Lemma map_none_r_weak:
   forall k k' t c,
     map (ctxt k t c) k' = None ->
     K_eq k' k = false ->
-    map c k = None.
+    map c k' = None.
 Proof.
-Admitted.
+  intros.
+  unfold map in H.
+  fold map in H.
+  rewrite H0 in H.
+  assumption.
+Qed.
 
 Lemma extends_trans:
   forall c c' c'',

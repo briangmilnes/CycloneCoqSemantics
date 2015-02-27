@@ -30,12 +30,15 @@ Require Import UpsilonModuleDef.
 
 Module LanguageModule.
   Module T   := TauModule.
+  Definition TVar := T.TV.T.
   (* Paths come from terms. *)
   Module Pth := PathModule.   
 
   Export TermModule.
   Module TM := TermModule.
   (* I'd have to functorize this to show the dependencies to TM.EV and Path and so on. *)
+  Definition EVar := TM.EV.T.
+
   Module EVP := EVarPathModule.
 
   Module D := ContextFun T.TV T.K.

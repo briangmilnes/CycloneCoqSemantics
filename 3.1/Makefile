@@ -6,9 +6,9 @@ SRCFILES=BoolEqualitySigDef.vo  ContextFunDef.vo  ContextSigDef.vo  DeltaModuleD
 
 TESTFILES=TestUtilities.vo FormalSyntaxTest.vo DynamicSemanticsTypeSubstitutionTest.vo DynamicSemanticsTest.vo DynamicSemanticsHeapObjectsTest.vo StaticSemanticsTest.vo StaticSemanticsTypingHeapObjectsTest.vo KindingTest.vo
 
-LEMMAFILES=NatLemmas.vo StaticSemanticsHeapObjectsLemmas.vo StaticSemanticsKindingAndContextWellFormednessLemmas.vo StaticSemanticsKindingLemmas.vo StaticSemanticsWellFormednessLemmas.vo
+LEMMAFILES=NatLemmas.vo ListLemmas.vo StaticSemanticsHeapObjectsLemmas.vo StaticSemanticsKindingAndContextWellFormednessLemmas.vo StaticSemanticsKindingLemmas.vo StaticSemanticsWellFormednessLemmas.vo
 
-PROOFFILES=SubstitutionsProof.vo ReturnPreservationProof.vo TermWeakeningProof.vo
+PROOFFILES=SubstitutionsProof.vo ReturnPreservationProof.vo TermWeakeningProof.vo CannonicalFormsProof.vo PathExtensionProof.vo
 
 TACTICFILES=CpdtTactics.vo Case.vo TacticNotations.vo AlphaConversion.vo Tacticals.vo MoreTacticals.vo
 
