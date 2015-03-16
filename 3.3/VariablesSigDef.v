@@ -15,9 +15,9 @@ Require Import Init.Datatypes.
 Require Import Coq.Init.Logic.
 Require Import Coq.Structures.Equalities.
 
-Require Export BoolEqualitySigDef.
+Require Export BoolEqualitySetSigDef.
 
-Module Type VariablesSig <: BoolEqualitySig.
+Module Type VariablesSig <: BoolEqualitySetSig.
   Inductive Var : Set :=
   | var   : nat -> Var.
 
@@ -52,5 +52,26 @@ Module Type VariablesSig <: BoolEqualitySig.
  Parameter eqb_iff_neq:   forall a b, eqb a b = false <-> a <> b.
  Hint Resolve eqb_iff_neq.
 
-(* Now get finite weak list sets for variables. *)
+(* Again so you can see what you have to work with. *)
+  Parameter elt : Type.
+  Parameter empty : t.
+  Parameter is_empty : t -> bool.
+  Parameter mem : elt -> t -> bool.
+  Parameter add : elt -> t -> t.
+  Parameter singleton : elt -> t.
+  Parameter remove : elt -> t -> t.
+  Parameter union : t -> t -> t.
+  Parameter inter : t -> t -> t.
+  Parameter diff : t -> t -> t.
+  Parameter equal : t -> t -> bool.
+  Parameter subset : t -> t -> bool.
+  Parameter fold : forall A : Type, (elt -> A -> A) -> t -> A -> A.
+  Parameter for_all : (elt -> bool) -> t -> bool.
+  Parameter exists_ : (elt -> bool) -> t -> bool.
+  Parameter filter : (elt -> bool) -> t -> t.
+  Parameter partition : (elt -> bool) -> t -> t * t.
+  Parameter cardinal : t -> nat.
+  Parameter elements : t -> list elt.
+  Parameter choose : t -> option elt.
+
 End VariablesSig.

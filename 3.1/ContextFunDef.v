@@ -37,7 +37,6 @@ Module ContextFun(KM : BoolEqualitySig) (TM : BoolEqualitySig) <: ContextSig.
   Definition K    := K.T.
   Definition K_eq := K.beq_t.
   Hint Unfold K_eq.
-
   
   Module T := TM.
   Definition T    := T.T.

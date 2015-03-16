@@ -13,7 +13,7 @@ Require Export Tacticals.
 Require Export TestUtilities.
 
 Example gettype_empty_test2:
-  gettype udot x [] tau [] tau.
+  gettype U.dot x [] tau [] tau.
 Proof.
   eauto 20 with Chapter3.
 Qed.
@@ -21,13 +21,13 @@ Qed.
 Definition pnil : Path := [].
 
 Example getu_for_cint:
- U.map (U.ctxt (x, pnil) cint udot) (x,pnil) = Some cint.
+ U.map (U.ctxt (x, pnil) cint U.dot) (x,pnil) = Some cint.
 Proof.
   eauto 20 with Chapter3.
 Qed.
 
 Example gettype_etype_test2:
-  gettype (U.ctxt (x, pnil) cint udot) x pnil 
+  gettype (U.ctxt (x, pnil) cint U.dot) x pnil 
           (etype aliases alpha k cint) [u_pe] cint.
 Proof.
   eapply gettype_etype;  eauto 20 with Chapter3.
@@ -39,13 +39,13 @@ Definition t0 := cint.
 Definition t1 := cint.
 
 Example gettype_left_test2:
-  gettype udot x [] (cross t0 t1) [i_pe zero_pe] cint.
+  gettype U.dot x [] (cross t0 t1) [i_pe zero_pe] cint.
 Proof.   
   constructor; eauto 20 with Chapter3.
 Qed.
 
 Example gettype_right_test2:
-  gettype udot x [] (cross cint cint) [i_pe one_pe] cint.
+  gettype U.dot x [] (cross cint cint) [i_pe one_pe] cint.
 Proof.
   eauto 20 with Chapter3.
 Qed.

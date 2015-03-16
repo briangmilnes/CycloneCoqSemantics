@@ -1,0 +1,24 @@
+AlphaConversion.vo AlphaConversion.glob AlphaConversion.v.beautified: AlphaConversion.v
+BooleanEqualityDef.vo BooleanEqualityDef.glob BooleanEqualityDef.v.beautified: BooleanEqualityDef.v
+BooleanEqualitySetDef.vo BooleanEqualitySetDef.glob BooleanEqualitySetDef.v.beautified: BooleanEqualitySetDef.v BooleanEqualityDef.vo
+BooleanEqualitySetFunDef.vo BooleanEqualitySetFunDef.glob BooleanEqualitySetFunDef.v.beautified: BooleanEqualitySetFunDef.v BooleanEqualityDef.vo BooleanEqualitySetDef.vo
+Case.vo Case.glob Case.v.beautified: Case.v
+ContextDef.vo ContextDef.glob ContextDef.v.beautified: ContextDef.v BooleanEqualitySetDef.vo
+ContextFunDef.vo ContextFunDef.glob ContextFunDef.v.beautified: ContextFunDef.v ContextDef.vo BooleanEqualityDef.vo BooleanEqualitySetFunDef.vo CpdtTactics.vo MoreTacticals.vo
+CpdtTactics.vo CpdtTactics.glob CpdtTactics.v.beautified: CpdtTactics.v
+EVarModuleDef.vo EVarModuleDef.glob EVarModuleDef.v.beautified: EVarModuleDef.v VariablesFunDef.vo BooleanEqualitySetFunDef.vo NonceDef.vo
+EVarPathModuleDef.vo EVarPathModuleDef.glob EVarPathModuleDef.v.beautified: EVarPathModuleDef.v BooleanEqualityDef.vo EVarModuleDef.vo PathModuleDef.vo CpdtTactics.vo Case.vo
+KappaModuleDef.vo KappaModuleDef.glob KappaModuleDef.v.beautified: KappaModuleDef.v BooleanEqualityDef.vo CpdtTactics.vo Case.vo
+LanguageModuleDef.vo LanguageModuleDef.glob LanguageModuleDef.v.beautified: LanguageModuleDef.v CpdtTactics.vo Case.vo EVarModuleDef.vo EVarPathModuleDef.vo TauModuleDef.vo PathModuleDef.vo PhiModuleDef.vo TermModuleDef.vo
+MoreTacticals.vo MoreTacticals.glob MoreTacticals.v.beautified: MoreTacticals.v
+NatLemmas.vo NatLemmas.glob NatLemmas.v.beautified: NatLemmas.v CpdtTactics.vo Case.vo
+NonceDef.vo NonceDef.glob NonceDef.v.beautified: NonceDef.v
+PathModuleDef.vo PathModuleDef.glob PathModuleDef.v.beautified: PathModuleDef.v BooleanEqualityDef.vo EVarModuleDef.vo CpdtTactics.vo Case.vo
+PhiModuleDef.vo PhiModuleDef.glob PhiModuleDef.v.beautified: PhiModuleDef.v BooleanEqualityDef.vo CpdtTactics.vo Case.vo NatLemmas.vo
+TVarModuleDef.vo TVarModuleDef.glob TVarModuleDef.v.beautified: TVarModuleDef.v VariablesFunDef.vo BooleanEqualitySetFunDef.vo NonceDef.vo
+TacticNotations.vo TacticNotations.glob TacticNotations.v.beautified: TacticNotations.v Case.vo
+Tacticals.vo Tacticals.glob Tacticals.v.beautified: Tacticals.v
+TauModuleDef.vo TauModuleDef.glob TauModuleDef.v.beautified: TauModuleDef.v BooleanEqualityDef.vo TVarModuleDef.vo KappaModuleDef.vo PhiModuleDef.vo CpdtTactics.vo Case.vo MoreTacticals.vo
+TermModuleDef.vo TermModuleDef.glob TermModuleDef.v.beautified: TermModuleDef.v BooleanEqualityDef.vo TVarModuleDef.vo EVarModuleDef.vo KappaModuleDef.vo PhiModuleDef.vo PathModuleDef.vo TauModuleDef.vo CpdtTactics.vo Case.vo MoreTacticals.vo
+VariablesDef.vo VariablesDef.glob VariablesDef.v.beautified: VariablesDef.v BooleanEqualitySetDef.vo
+VariablesFunDef.vo VariablesFunDef.glob VariablesFunDef.v.beautified: VariablesFunDef.v CpdtTactics.vo Case.vo NatLemmas.vo NonceDef.vo VariablesDef.vo

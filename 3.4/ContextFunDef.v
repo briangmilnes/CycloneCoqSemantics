@@ -2,65 +2,28 @@
  This is the definition of formal syntax for Dan Grossman's Thesis, 
   "SAFE PROGRAMMING AT THE C LEVEL OF ABSTRACTION". 
 
-  A context module functor that allows us to build all of the
-  context modules for all four contexts.
+  Finally a nice clean enough easy to use context functor.
 
 *)
-
-(* TODO:
-    a) signature matches lemmas
-    b) masking of symbols
-    c) clean usage of K_eq/T_eq in all such modules.
-    d) work on map/none/some naming. 
-    e) r/l are really conclusion and assumption.
-*)
-
-Require Import List.
-Export ListNotations.
-Require Export ZArith.
-Require Import Init.Datatypes.
-Require Export Coq.Bool.Bool.
-
-Require Export CpdtTactics.
-Require Export Case.
-
-Require Export ContextSigDef.
-Require Export BoolEqualitySigDef.
-Require Export BooleanEqualitySetFunDef.
-
-Require Export Coq.MSets.MSets.
-Require Export Coq.MSets.MSetInterface.
-Require Export Coq.MSets.MSetWeakList.
-
-Require Export MoreTacticals.
-
 Set Implicit Arguments.
+Require Export ContextDef.
+Require Export BooleanEqualityDef.
+Require Export BooleanEqualitySetFunDef.
+Require Export CpdtTactics.
+Require Import MoreTacticals.
 
-Module ContextFun(K: BoolEqualitySig) (T : BoolEqualitySig) <: ContextSig.
-
-  Module K := K.
-  Module T := T.
-  Definition K := K.t.
-  Definition K_eq := K.eqb.
-  Definition T := T.t.
-  Definition T_eq := T.eqb.
-
-  Module KSet := BooleanEqualitySetFun(K).
+Module ContextFun(K': BooleanEquality) (T' : BooleanEquality) <: Context.
+  Module K := BooleanEqualitySetFun(K').
+  Module T := T'.
 
 Inductive Context': Type :=
 | dot  : Context' 
-| ctxt :  K.t -> T.t -> Context' -> Context' .
+| ctxt :  K.elt -> T.t -> Context' -> Context' .
 
 Definition Context := Context'.
-Tactic Notation "Context_ind_cases" tactic(first) ident(c) :=
- first;
-[ Case_aux c "(dot K T)"
-| Case_aux c "(ctxt k t c)"
-].
-
 Definition empty  := dot.
 
-Function add (c : Context') (k: K.t) (t : T.t)  : Context' :=
+Function add (c : Context') (k: K.elt) (t : T.t)  : Context' :=
   match c with
     | dot => (ctxt k t (dot))
     | (ctxt k' t' c') =>
@@ -71,7 +34,7 @@ Function add (c : Context') (k: K.t) (t : T.t)  : Context' :=
   end.
 Hint Unfold add. 
 
-Function map (c : Context') (k : K.t) : option T.t :=
+Function map (c : Context') (k : K.elt) : option T.t :=
   match c with
     | dot => None
     | (ctxt k' t' c') =>
@@ -82,7 +45,7 @@ Function map (c : Context') (k : K.t) : option T.t :=
   end.
 Hint Unfold map.
 
-Function delete (c : Context') (k : K.t) : Context' :=
+Function delete (c : Context') (k : K.elt) : Context' :=
   match k, c with
     | k, dot => empty
     | k, (ctxt k' t' c') =>
@@ -129,11 +92,12 @@ Function concat (c c' : Context') {struct c'} : Context' :=
   | (ctxt k v d) => (ctxt k v (concat c d))
   end.
 
-Function dom (c : Context') : KSet.t :=
+Function dom (c : Context') : K.t :=
  match c with 
- | dot => KSet.empty
- | (ctxt k v c') => KSet.union (KSet.singleton k) (dom c')
+ | dot => K.empty
+ | (ctxt k v c') => K.union (K.singleton k) (dom c')
  end.
+
 
 (* Do I need this? is it being used by LN LibEnv.env? *)
 Lemma Context'_ind': 
@@ -146,7 +110,7 @@ Proof.
 Qed.
 
 (* Can I add k t to the front of c'? *)
-Function extends1 (c : Context') (k : K.t ) (t : T.t) (c' : Context') : bool :=
+Function extends1 (c : Context') (k : K.elt ) (t : T.t) (c' : Context') : bool :=
   match map c' k with
    | Some _ => false
    | None =>
@@ -157,7 +121,7 @@ Function extends1 (c : Context') (k : K.t ) (t : T.t) (c' : Context') : bool :=
 end.
 Hint Unfold extends1.
 
-Function extends1' (c : Context') (k : K.t ) (t : T.t) (c' : Context') : bool :=
+Function extends1' (c : Context') (k : K.elt ) (t : T.t) (c' : Context') : bool :=
   match map c' k with
    | Some _ => false
    | None =>
@@ -178,11 +142,17 @@ Proof.
   crush.
 Qed.
 
+Ltac case_if e := 
+  match goal with 
+    | H: context [if e ?x ?y then _ else _] |- _ => case_eq(e x y); intros; subst
+    | |- context [if e ?x ?y then _ else _] => case_eq(e x y); intros; subst
+  end.
+
 Lemma map_add: forall c k t, map (add c k t) k = Some t.
 Proof.
   intros.
   induction c; crush.
-  case_eq (K.eqb k t0); crush.
+  case_if K.eqb; crush.
 Qed.
 
 Lemma map_agreement:
@@ -237,7 +207,30 @@ Proof.
   fold map in H.
   unfold map in H0.
   fold map in H0.
-  case_eq(K.eqb k t0); case_eq(K.eqb k' t0); intros; rewrite H1 in H0; rewrite H2 in H; try solve [inversion H].
+
+  Ltac rewrite_eq e :=
+    match goal with
+     | [ H : e ?a ?b = _ , 
+         I : context[if e ?a ?b then _ else _ ]  |- _ ] =>
+       rewrite H in I; try solve[inversion I]
+    end.
+
+Ltac case_if2 e := 
+  match goal with 
+    | H: context [if e ?x ?y then _ else _] |- _ => case_eq(e x y); intros; 
+          rewrite_eq e
+    | |- context [if e ?x ?y then _ else _] => case_eq(e x y); intros; 
+          rewrite_eq e
+  end.
+
+(*  Much cleaner!  No variables, no context variables.  *)
+  case_if2 K.eqb;   case_if2 K.eqb.
+
+(*
+  case_eq(K.eqb k e); case_eq(K.eqb k' e); intros;
+  rewrite H1 in *; rewrite H2 in *; try solve [inversion H].
+*)
+
   inversion H0.
   subst.
   case_eq(K.eqb k k'); intros; try reflexivity.
@@ -392,7 +385,7 @@ Proof.
   apply extends_r_str; try assumption.
   unfold nodup in H.
   fold nodup in H.
-  case_eq(map c t); intros; rewrite H0 in H.
+  case_eq(map c e); intros; rewrite H0 in H.
   inversion H.
   apply IHc in H.
   assumption.
@@ -448,8 +441,8 @@ Proof.
   fold extends in H.
   unfold extends.
   fold extends.
-  case_eq(map c' k); intros; rewrite H0 in *; case_eq(map c' t0); intros; try rewrite H1 in *; try solve[inversion H];   case_eq(T.eqb t t2); intros; try rewrite H2 in *; try inversion H. 
- case_eq(T.eqb t1 t3); intros; rewrite H4 in *; try inversion H; reflexivity.
+  case_eq(map c' k); intros; rewrite H0 in *; case_eq(map c' e); intros; try rewrite H1 in *; try solve[inversion H]; case_eq(T.eqb t t1); intros; try rewrite H2 in *; try inversion H. 
+ case_eq(T.eqb t0 t2); intros; rewrite H4 in *; try inversion H; reflexivity.
 Qed.
 
 Lemma map_extends_none_agreement:
@@ -518,7 +511,7 @@ Proof.
   fold map.
   unfold add in H.
   fold add in H.
-  case_eq(K.eqb k0 t1); case_eq(K.eqb k t1); intros; rewrite H2 in H.
+  case_eq(K.eqb k0 e); case_eq(K.eqb k e); intros; rewrite H2 in H.
   apply K.eqb_trans with (x:= k) in H1.
   apply K.eqb_to_eq in H1.
   subst.
@@ -558,10 +551,10 @@ Proof.
   intros.
   unfold nodup in H.
   fold nodup in H.
-  case_eq (map c t); intros; rewrite H1 in H; try inversion H.
+  case_eq (map c e); intros; rewrite H1 in H; try inversion H.
   unfold map in H0.
   fold map in H0.
-  case_eq (K.eqb k t); intros; rewrite H2 in H0.
+  case_eq (K.eqb k e); intros; rewrite H2 in H0.
   inversion H0.
 
   unfold add.
@@ -570,13 +563,13 @@ Proof.
   unfold nodup.
   fold nodup.
   rewrite H3.  
-  case_eq (map (add c k t1) t); intros.
+  case_eq (map (add c k t0) e); intros.
   apply map_r_str_add in H4; try assumption.
   rewrite H4 in H1.
   inversion H1.
   apply IHc with (k:= k) (t:= t1) in H; try assumption.
   rewrite K.eqb_sym in H2; try assumption.
-  apply IHc with (k:= k) (t:= t1) in H3; try assumption.
+  apply IHc with (k:= k) (t:= t0) in H3; try assumption.
 Qed.
 
 Lemma nodup_r_str:
@@ -611,7 +604,7 @@ Proof.
   induction c; try solve[crush].
   unfold map in H.
   fold map in H.
-  case_eq(K.eqb k t0); intros; rewrite H1 in H.
+  case_eq(K.eqb k e); intros; rewrite H1 in H.
   inversion H; subst.
   apply K.eqb_to_eq in H1.
   rewrite H1 in H0.
@@ -662,7 +655,7 @@ Proof.
   inversion H.
   unfold map.
   fold map.
-  case_eq(K.eqb k t0); intros.
+  case_eq(K.eqb k e); intros.
   apply K.eqb_to_eq in H1.
   subst.
   unfold add in H.
@@ -675,7 +668,7 @@ Proof.
   assumption.
   unfold add in H.
   fold add in H.
-  case_eq(K.eqb k' t0); intros; rewrite H2 in H.
+  case_eq(K.eqb k' e); intros; rewrite H2 in H.
   unfold map in H.
   fold map in H.
   rewrite H0 in H.
@@ -700,22 +693,22 @@ Proof.
   fold extends in H.
   unfold extends.
   fold extends.
-  case_eq(map c' t0); intros;
-  case_eq(map (ctxt k t c') t0); intros; rewrite H3 in H; try solve[inversion H].
-  case_eq(T.eqb t1 t2); intros; try rewrite H4 in *; try solve[inversion H].
-  case_eq(T.eqb t1 t3); intros;rewrite H5 in H; try solve[inversion H].
+  case_eq(map c' e); intros;
+  case_eq(map (ctxt k t c') e); intros; rewrite H3 in H; try solve[inversion H].
+  case_eq(T.eqb t0 t1); intros; try rewrite H4 in *; try solve[inversion H].
+  case_eq(T.eqb t0 t2); intros;rewrite H5 in H; try solve[inversion H].
   unfold map in H1.
   fold map in H1.
-  case_eq(K.eqb k t0); intros; rewrite H6 in H1; try inversion H1.
+  case_eq(K.eqb k e); intros; rewrite H6 in H1; try inversion H1.
   apply IHc in H; try assumption.
-  case_eq(T.eqb t1 t3); intros; rewrite H5 in H; try solve[inversion H].
+  case_eq(T.eqb t0 t2); intros; rewrite H5 in H; try solve[inversion H].
   apply T.eqb_to_eq in H5.
   subst.
   unfold map in H3.
   fold map in H3.
   unfold map in H1.
   fold map in H1.
-  case_eq(K.eqb k t0); intros.
+  case_eq(K.eqb k e); intros.
   rewrite K.eqb_sym in H3.
   rewrite H5 in *.
   inversion H1.
@@ -732,7 +725,7 @@ Proof.
   fold map in H3.
   unfold map in H1.
   fold map in H1.
-  case_eq(K.eqb t0 k); intros.
+  case_eq(K.eqb e k); intros.
   rewrite K.eqb_sym in H1.
   rewrite H4 in *.
   inversion H1.
@@ -781,7 +774,7 @@ Proof.
   fold map in H.
   unfold add in H0.
   fold add in H0.
-  case_eq(K.eqb k t); case_eq(K.eqb k' t); intros; rewrite H1 in H0; rewrite H2 in H.
+  case_eq(K.eqb k e); case_eq(K.eqb k' e); intros; rewrite H1 in H0; rewrite H2 in H.
   apply K.eqb_trans with (x:= k') in H1.
   apply K.eqb_to_eq in H2.
   subst.
@@ -906,14 +899,15 @@ Lemma map_none_r_str:
 Proof.
   intros.
   induction c.
-  refold map.
+  unfold map.
+  fold map.
   rewrite H1.
   reflexivity.
   refold map.
   refold_in map H.
   refold_in map H0.
-  case_eq(K.eqb v t0); intros; rewrite H2 in *;
-  case_eq(K.eqb v' t0); intros; rewrite H3 in *;
+  case_eq(K.eqb v e); intros; rewrite H2 in *;
+  case_eq(K.eqb v' e); intros; rewrite H3 in *;
   case_eq(K.eqb v' v); intros; rewrite H4 in *;
   try solve[inversion H];
   try solve[inversion H0];
@@ -951,25 +945,26 @@ Proof.
   pose proof extendscc' as H'.
   apply extends_l_str in extendscc'.
   inversion nodupc.
-  case_eq (map c t); intros; rewrite H in H0; try solve[inversion H0].
+  case_eq (map c e); intros; rewrite H in H0; try solve[inversion H0].
   rewrite H0.
   apply IHc in H0; try assumption.
-  apply extends_l_weak with (k:= t) (t:= t0).
+  apply extends_l_weak with (k:= e) (t:= t).
   assumption.
 
   unfold map.
   fold map.
-  case_eq (K.eqb t t3); intros.
+  case_eq (K.eqb e e1); intros.
   apply K.eqb_to_eq in H1.
   rewrite <- H1 in extendsc'c''.
   rewrite <- H1 in H0.
   rewrite <- H1 in nodupc''.
 
+(* Naming mess up. 
   assert (Z: map (ctxt t t0 c) t = Some t0).
   simpl.
   rewrite K.eqb_refl.
   reflexivity.
-(* Naming mess up. 
+
   apply map_extends_some_agreement with (v:= k) (t:= t) in H'; try assumption.
   apply map_extends_some_agreement with (v:= k) (t:= t) in extendsc'c'';
     try assumption.

@@ -11,7 +11,7 @@ Require Export LanguageModuleDef.
 (* TODO Not in the thesis. I need it and in K when the context is formed. *)
       
 Inductive WFD : Delta -> Prop :=
-  | WFD_nil    : WFD ddot
+  | WFD_nil    : WFD D.dot
   | WFD_xtau   : forall (d : Delta) (alpha : TVar) (k : Kappa),
                  D.map d alpha = None ->
                  WFD  d ->
@@ -219,16 +219,16 @@ Admitted.
 
 
 Inductive WFU : Upsilon -> Prop :=
-  | WFU_nil : WFU udot
+  | WFU_nil : WFU U.dot
   | WFU_A   : forall (u : Upsilon) (tau : Tau) (p : Path) (x : EVar),
                  U.map u (x,p) = None ->
                  WFU  u ->
-                 K ddot tau A ->
+                 K D.dot tau A ->
                  WFU (U.ctxt (x,p) tau u).
 
 Inductive WFDG : Delta -> Gamma -> Prop :=
   | WFDG_d_nil : forall (d: Delta),
-                     WFDG d gdot
+                     WFDG d G.dot
   | WFDG_xt      : forall (d: Delta) (g: Gamma) (x : EVar) (tau : Tau),
                      G.map g x = None -> 
                      K d tau A ->
@@ -244,7 +244,7 @@ Lemma WFDG_context_dependent_induction:
   forall P : TVar -> Kappa -> Delta -> Gamma -> Prop, 
     (* WFDG_d_nil *)
     (forall  (beta : TVar) (k : Kappa) (d : Delta), 
-       P beta k d gdot) -> 
+       P beta k d G.dot) -> 
     (* WFDG_xt *)
     (forall (beta : TVar) (k : Kappa) (d : Delta) (g : Gamma) (x : EVar) (tau : Tau),
         G.map g x = None ->

@@ -22,7 +22,7 @@ Require Export Case.
 *)
 
 Example alpha_star_B :
-    K (D.ctxt (TV.var 0) A ddot) (ptype (tv_t (TV.var 0))) B.
+    K (D.ctxt (TV.var 0) A D.dot) (ptype (tv_t (TV.var 0))) B.
 Proof.
   apply K_star_A. 
   eauto 20 with Chapter3.
@@ -35,7 +35,7 @@ Lemma can_K_alpha :
   exists (d : Delta) (alpha : TVar) (k1 k2 : Kappa),
     K (D.ctxt alpha k1 d) (tv_t alpha) k2.
 Proof.
-  apply ex_intro with (x:= ddot).
+  apply ex_intro with (x:= D.dot).
   apply ex_intro with (x:= (TV.var 0)).
   apply ex_intro with (x:= B).
   apply ex_intro with (x:= B).
@@ -47,7 +47,7 @@ Lemma can_K_alpha_A :
   exists (d : Delta) (alpha : TVar) (k1 k2 : Kappa),
     K (D.ctxt alpha k1 d) (tv_t alpha) k2.
 Proof.
-  apply ex_intro with (x:= ddot).
+  apply ex_intro with (x:= D.dot).
   apply ex_intro with (x:= (TV.var 0)).
   apply ex_intro with (x:= B).
   apply ex_intro with (x:= A).
@@ -58,7 +58,7 @@ Qed.
 
 Lemma can_AK_alpha :
   ~ exists (k1 k2 : Kappa),
-      AK (D.ctxt (TV.var 0) k1 ddot) (tv_t (TV.var 0)) k2.
+      AK (D.ctxt (TV.var 0) k1 D.dot) (tv_t (TV.var 0)) k2.
 Proof.
   unfold not.
   intros.
@@ -71,9 +71,9 @@ Admitted.
 
 Lemma can_AK_alpha_A :
   exists (d : Delta) (alpha : TVar) (k1 k2 : Kappa),
-    K (D.ctxt alpha k1 ddot) (tv_t alpha) k2.
+    K (D.ctxt alpha k1 D.dot) (tv_t alpha) k2.
 Proof.
-  apply ex_intro with (x:= ddot).
+  apply ex_intro with (x:= D.dot).
   apply ex_intro with (x:= (TV.var 0)).
   apply ex_intro with (x:= B).
   apply ex_intro with (x:= A).

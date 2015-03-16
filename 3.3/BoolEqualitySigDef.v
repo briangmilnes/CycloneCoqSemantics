@@ -5,26 +5,17 @@
   Boolean Equalities. 
 
 *)
-
-Require Import List.
-Export ListNotations.
-Require Import ZArith.
-Require Import Init.Datatypes.
-Require Import Coq.Init.Logic.
-Require Import Coq.Structures.Equalities.
 Set Implicit Arguments.
+Require Import Coq.Structures.Equalities.
+Require Export Coq.MSets.MSets.
 
 (* Extend BooleanDecidableType a bit for easy use. *)
-
+(* Definitions repeated so you don't have to troll through the Coq library.*)
 Module Type BoolEqualitySig  <: BooleanDecidableType.
   Parameter t : Type.
-
   Parameter eq : t -> t -> Prop.
-
   Parameter eq_equiv : Equivalence eq.
-
   Parameter eq_dec : forall x y : t, {eq x y} + {~ eq x y}.
-
   Parameter eqb : t -> t -> bool.
   Hint Resolve eqb.
 
@@ -57,4 +48,5 @@ Module Type BoolEqualitySig  <: BooleanDecidableType.
 
   Parameter eqb_iff_neq:   forall a b, eqb a b = false <-> a <> b.
   Hint Resolve eqb_iff_neq.
+
 End BoolEqualitySig.

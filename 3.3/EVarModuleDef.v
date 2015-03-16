@@ -6,16 +6,9 @@
 
 *)
 
-Require Import List.
-Export ListNotations.
-Require Import ZArith.
-Require Import Init.Datatypes.
-Require Import Coq.Init.Logic.
-
+Set Implicit Arguments.
 Require Export VariablesFunDef.
 Require Export NonceSigDef.
-
-Set Implicit Arguments.
 
 Module EVarNonce : NonceSig.
 End EVarNonce.

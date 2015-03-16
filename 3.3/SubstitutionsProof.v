@@ -157,7 +157,7 @@ Proof.
   Case "WFDG ([(alpha, k)] ++ d) g".
    intros tau.
    inversion getd.
-   destruct (D.K_eq alpha alpha0).
+   destruct (T.TV.eqb alpha alpha0).
    inversion H1.
    apply IHWFDGder with (tau:= tau) in H1.
    assumption.
@@ -181,7 +181,7 @@ Proof.
    intros.
    unfold U.map in H1.
    fold U.map in H1.
-   case_eq(U.K_eq (x,p) (x0,p0)); intros; rewrite H2 in *.
+   case_eq(EVarPathModuleDef.EVarPathModule.eqb (x,p) (x0,p0)); intros; rewrite H2 in *.
    inversion H1.
    subst.
    apply A_4_Useless_Substitutions_1 with (alpha:= alpha) (tau:= tau0) in H0;

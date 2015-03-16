@@ -11,32 +11,36 @@ Export ListNotations.
 Require Export ZArith.
 Require Import Init.Datatypes.
 Require Export Coq.Bool.Bool.
+Require Import Coq.Structures.Equalities.
+Require Export Coq.MSets.MSets.
 
 Require Export VariablesSigDef.
-Require Export BoolEqualitySigDef.
+Require Export BoolEqualitySetSigDef.
 
 Set Implicit Arguments.
 
 Module Type ContextSig.
-  Declare Module K : BoolEqualitySig.
-  Declare Module T : BoolEqualitySig.
+  Declare Module K : BoolEqualitySetSig.
+  Declare Module T : BoolEqualitySetSig.
+  Declare Module KSet : WOps(K).
 
   Parameter K    : Type.
   Parameter K_eq : K -> K -> bool.
   Parameter T    : Type.
   Parameter T_eq : T -> T -> bool.
 
-  Parameter Context : Type -> Type -> Type.
-  Parameter empty   : Context K T.
-  Parameter add     : Context K T -> K -> T -> Context K T.
-  Parameter map     : Context K T -> K -> option T.
-  Parameter nodup   : Context K T -> bool.
-  Parameter equal   : Context K T -> Context K T -> bool.
-  Parameter concat  : Context K T -> Context K T -> Context K T.
+  Parameter Context : Type.
+  Parameter empty   : Context.
+  Parameter add     : Context -> K -> T -> Context.
+  Parameter map     : Context -> K -> option T.
+  Parameter nodup   : Context -> bool.
+  Parameter equal   : Context -> Context -> bool.
+  Parameter concat  : Context -> Context -> Context.
+  Parameter dom     : Context -> KSet.t.
 
-  Parameter extends  : Context K T -> Context K T -> bool.
+  Parameter extends  : Context -> Context -> bool.
   (* Can I add k t into c' and extend c? *)
-  Parameter extends1 : Context K T -> K -> T -> Context K T -> bool.
+  Parameter extends1 : Context -> K -> T -> Context -> bool.
 (* Parameter remove  : Context K T -> K -> Context K T. *)
   Axiom map_empty_none: forall k, map empty k = None.
 

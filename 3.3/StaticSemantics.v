@@ -396,19 +396,19 @@ Admitted.
 
 Inductive htyp: Upsilon -> Gamma -> Heap -> Gamma -> Prop :=
    | htyp_empty : forall (u : Upsilon) (g: Gamma),
-                       htyp u g hdot gdot
+                       htyp u g H.dot G.dot
    | htyp_xv    : forall (u : Upsilon) (g g': Gamma) (h h': Heap) (x : EVar) (v : E) (tau : Tau),
                       H.map h x = Some v ->
                       Value v ->
                       H.delete h x = h' ->
                       htyp u g h' g' ->
-                      rtyp ddot u g v tau ->
+                      rtyp D.dot u g v tau ->
                       htyp u g h (G.ctxt x tau g').
 
 (* Bug 43, HM.map *)
 Inductive refp  : Heap -> Upsilon -> Prop :=
   | refp_empty  : forall (h : Heap),
-                       refp h udot
+                       refp h U.dot
   | refp_pack  : forall (h : Heap) (u : Upsilon) (x : EVar) (p : Path) (tau tau' : Tau) (alpha : TVar) (k : Kappa) (v v' : E),
                       H.map h x = Some v' -> 
                       get v' p (pack tau' v (etype aliases alpha k tau)) ->
@@ -419,6 +419,6 @@ Inductive prog  : Heap -> St -> Prop :=
   | program  : forall (h : Heap) (u : Upsilon) (g : Gamma) (tau : Tau) (s : St),
                     htyp u g h g ->
                     refp h u     ->
-                    styp ddot u g tau s ->
+                    styp D.dot u g tau s ->
                     ret s -> 
                     prog h s.

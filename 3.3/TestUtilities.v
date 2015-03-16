@@ -61,7 +61,7 @@ Definition p0   := [(i_pe zero_pe)].
 Definition p1   := [(i_pe one_pe)].
 
 
-Definition h    := (H.ctxt x e hdot).
+Definition h    := (H.ctxt x e H.dot).
 
 Definition q := aliases.
 
@@ -83,5 +83,5 @@ Definition ufg  := (ufun gamma A faa).
 Definition ufaa := (ufun alpha A faa).
 Definition ufbb := (ufun beta  A faa).
 
-
+ 
 

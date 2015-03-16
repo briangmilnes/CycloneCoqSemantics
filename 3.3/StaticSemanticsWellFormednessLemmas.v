@@ -29,11 +29,11 @@ Proof.
   constructor; try reflexivity.
   constructor.
   inversion H; subst.
-  apply IHd  with (alpha:= alpha) (k:= k0) in H5; try assumption.
+  apply IHd  with (alpha:= alpha) (k:= t1) in H5; try assumption.
   inversion H5; subst; try assumption.
   constructor; try assumption.
   inversion H0.
-  case_eq(D.K_eq alpha k); intros; rewrite H1 in H2; try solve[inversion H2].
+  case_eq(T.TV.eqb alpha t0); intros; rewrite H1 in H2; try solve[inversion H2].
   reflexivity.
 Qed.
 

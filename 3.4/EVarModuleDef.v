@@ -6,9 +6,12 @@
 
 *)
 Set Implicit Arguments.
-Require Export NonceSigDef.
 Require Export VariablesFunDef.
+Require Export BooleanEqualitySetFunDef.
+Require Export NonceDef.
 
-Module TVarNonce : NonceSig.
-End TVarNonce.
-Module TVarModule := VariablesFun(TVarNonce).
+Module EVarNonce : Nonce.
+End EVarNonce.
+
+Module EVarModule := VariablesFun(EVarNonce).
+Module EVarModuleSet := BooleanEqualitySetFun(EVarModule).

@@ -78,7 +78,7 @@ Qed.
 
 (* Bug 22, misnamed contructors in WFDG. *)
 Example SL_3_1_test:
-  ltyp ddot udot (G.ctxt x cint gdot) (p_e x []) cint.
+  ltyp D.dot U.dot (G.ctxt x cint G.dot) (p_e x []) cint.
 Proof.
   apply SL_3_1 with (tau':=cint);
   eauto 20 with Chapter3.
@@ -87,14 +87,14 @@ Qed.
 (* Bug 23, just got SL_3_2 wrong. *)
 (* Bug 24, contexts were messed up due to trying to follow Dan's type overloading of WF. *)
 Example SL_3_2_test:
-  ltyp ddot udot (G.ctxt x (ptype cint) gdot) (star (p_e x [])) cint.
+  ltyp D.dot U.dot (G.ctxt x (ptype cint) G.dot) (star (p_e x [])) cint.
 Proof.
   apply SL_3_2;
   eauto 20 with Chapter3.
 Qed.
 
 Example SL_3_3_test:
-  ltyp ddot udot (G.ctxt x (cross cint cint) gdot) (dot (p_e x []) zero_pe) cint.
+  ltyp D.dot U.dot (G.ctxt x (cross cint cint) G.dot) (dot (p_e x []) zero_pe) cint.
 Proof.
   apply SL_3_3 with (t1:=cint). 
   apply SL_3_1 with (tau':= (cross cint cint)); 
@@ -102,7 +102,7 @@ Proof.
 Qed.
 
 Example SL_3_4_test:
-  ltyp ddot udot (G.ctxt x (cross cint cint) gdot) (dot (p_e x []) one_pe) cint.
+  ltyp D.dot U.dot (G.ctxt x (cross cint cint) G.dot) (dot (p_e x []) one_pe) cint.
 Proof.
 (* Again syntax direction. *)
   apply SL_3_4 with (t0:=cint);   eauto 20 with Chapter3.
@@ -111,7 +111,7 @@ Qed.
 (* Test styp *)
 (* Return at the end of a program, any old type will do. *)
 Example styp_e_test:
-  styp ddot udot gdot tau (e_s e).
+  styp D.dot U.dot G.dot tau (e_s e).
 Proof.
   apply styp_e_3_1 with (tau':= cint);
   eauto 20 with Chapter3.
@@ -119,42 +119,42 @@ Qed.
 
 (* Bug 25 bad constructor naming in SL. *)
 Example styp_return_test:
-  styp ddot udot gdot tau (retn e).
+  styp D.dot U.dot G.dot tau (retn e).
 Proof.
   apply styp_return_3_2;
   eauto 20 with Chapter3.
 Qed.
 
 Example styp_seq_test:
-  styp ddot udot gdot tau (seq s1 s2).
+  styp D.dot U.dot G.dot tau (seq s1 s2).
 Proof.
   apply styp_seq_3_3;
   eauto 20 with Chapter3.
 Qed.
 
 Example styp_while_test:
-  styp ddot udot gdot tau (while e s).
+  styp D.dot U.dot G.dot tau (while e s).
 Proof.
   apply styp_while_3_4;
   eauto 20 with Chapter3.
 Qed.
 
 Example styp_if_test:
-  styp ddot udot gdot tau (if_s e s1 s2).
+  styp D.dot U.dot G.dot tau (if_s e s1 s2).
 Proof.
   apply styp_if_3_5; 
   eauto 20 with Chapter3.
 Qed.
    
 Example styp_let_test:
-  styp ddot udot gdot tau  (letx x e s).
+  styp D.dot U.dot G.dot tau  (letx x e s).
 Proof.
   apply styp_let_3_6 with (tau':= cint);
   eauto 20 with Chapter3.
 Qed.
 
 Example K_B_test:
-  K (D.ctxt alpha B ddot) (tv_t alpha) B.
+  K (D.ctxt alpha B D.dot) (tv_t alpha) B.
 Proof.
   apply K_B; eauto 20 with Chapter3.
 Qed.
@@ -168,7 +168,7 @@ Definition oaxaa := open paxaa alpha x (e_s (p_e x [i_pe zero_pe])).
 (* Bug 31, aliases where phi is wanted in styp_open_3_7. *)
 (* Bug 32, phi  where alieases is wanted in styp_open_3_8. *)
 Example styp_open_test:
-  styp ddot udot gdot 
+  styp D.dot U.dot G.dot 
        cint 
        (open (pack cint 
                    (cpair (i_e (i_i 0)) (i_e (i_i 1)))
@@ -185,7 +185,7 @@ Proof.
 Qed.
 
 Example styp_openstar_test:
-  styp ddot udot gdot 
+  styp D.dot U.dot G.dot 
        cint 
        (openstar (pack cint 
                    (cpair (i_e (i_i 0)) (i_e (i_i 1)))
@@ -204,28 +204,28 @@ Qed.
 
 (* Bug 26, bad contexting in SR_3_2. *)
 Example SR_3_1_test:
-  rtyp ddot udot (G.ctxt x tau gdot) (p_e x []) tau.
+  rtyp D.dot U.dot (G.ctxt x tau G.dot) (p_e x []) tau.
 Proof.
   apply SR_3_1 with (tau':= tau); 
   eauto 20 with Chapter3.
 Qed.
 
 Example SR_3_2_test:
-  rtyp ddot udot (G.ctxt x (ptype cint) gdot) (star (p_e x [])) cint.
+  rtyp D.dot U.dot (G.ctxt x (ptype cint) G.dot) (star (p_e x [])) cint.
 Proof.
   apply SR_3_2;
   eauto 20 with Chapter3.
 Qed.
       
 Example SR_3_3_test:
-  rtyp ddot udot gdot (dot (cpair (i_e (i_i 0)) (i_e (i_i 1))) zero_pe) cint.
+  rtyp D.dot U.dot G.dot (dot (cpair (i_e (i_i 0)) (i_e (i_i 1))) zero_pe) cint.
 Proof.
   apply SR_3_3 with (t1:=cint);
   eauto 20 with Chapter3.
 Qed.
 
 Example SR_3_4_test:
-  rtyp ddot udot (G.ctxt x (cross cint cint) gdot)
+  rtyp D.dot U.dot (G.ctxt x (cross cint cint) G.dot)
        (dot (p_e x []) one_pe) cint.
 Proof.
   apply SR_3_4 with (t0:= cint).
@@ -233,7 +233,7 @@ Proof.
 Qed.
 
 Example SR_3_5_test:
-  rtyp ddot udot gdot (i_e (i_i 0)) cint.
+  rtyp D.dot U.dot G.dot (i_e (i_i 0)) cint.
 Proof.
   apply SR_3_5.
   eauto 20 with Chapter3.
@@ -241,7 +241,7 @@ Qed.
 
 (* Bug 27, star instead of amp. *)
 Example SR_3_6_test:
-  rtyp ddot udot (G.ctxt x (cross cint cint) gdot)
+  rtyp D.dot U.dot (G.ctxt x (cross cint cint) G.dot)
        (amp (p_e x [])) (ptype (cross cint cint)).
 Proof.
   apply SR_3_6.
@@ -249,14 +249,14 @@ Proof.
 Qed.
 
 Example SR_3_7_test:
-  rtyp ddot udot gdot (cpair (i_e (i_i 0)) (i_e (i_i 1))) (cross cint cint).
+  rtyp D.dot U.dot G.dot (cpair (i_e (i_i 0)) (i_e (i_i 1))) (cross cint cint).
 Proof.
   apply SR_3_7;
   eauto 20 with Chapter3.
 Qed.
 
 Example SR_3_8_test:
-  rtyp ddot udot (G.ctxt x cint gdot)
+  rtyp D.dot U.dot (G.ctxt x cint G.dot)
        (assign (p_e x []) (i_e (i_i 0))) cint.
 Proof.
   apply SR_3_8;
@@ -267,7 +267,7 @@ Qed.
 (* Bug 34, overly general typing, in SR_3_5 must make it specific to integer. *)
 
 Example SR_3_9_test:
-  rtyp ddot udot gdot 
+  rtyp D.dot U.dot G.dot 
        (appl (f_e (dfun cint x cint (retn (p_e x []))))
              (i_e (i_i 0)))
        cint.
@@ -276,7 +276,7 @@ Proof.
 Qed.
 
 Example SR_3_10_test:
-  rtyp ddot udot gdot 
+  rtyp D.dot U.dot G.dot 
        (call (retn (i_e (i_i 0))))
        cint.
 Proof.
@@ -287,7 +287,7 @@ Qed.
 (* TODO totally bogus e in here. *)
 Example SR_3_11_test:
   rtyp 
-    ddot udot gdot
+    D.dot U.dot G.dot
     (inst (f_e (ufun alpha B
                      (dfun (tv_t alpha) x (tv_t alpha) (retn (p_e x [])))))
           cint)
@@ -299,7 +299,7 @@ Qed.
 
 (* TODO why wont' this kind at A? *)
 Example SR_3_12_test:
-  rtyp ddot udot gdot
+  rtyp D.dot U.dot G.dot
        (pack cint (cpair (i_e (i_i 0)) (i_e (i_i 1))) 
              (etype aliases alpha B (cross (tv_t alpha) (tv_t alpha))))
        (etype aliases alpha B (cross (tv_t alpha) (tv_t alpha))).
@@ -309,7 +309,7 @@ Proof.
 Qed.
 
 Example SR_3_13_test:
-  rtyp ddot udot gdot 
+  rtyp D.dot U.dot G.dot 
        (f_e (dfun cint x cint (retn (i_e (i_i 0)))))
        (arrow cint cint).
 Proof.
@@ -322,7 +322,7 @@ Definition pid := (dfun (tv_t alpha) x (tv_t alpha) (retn (p_e x []))).
 (* Bug 35, extra E quantified, extra Tau. *)
 
 Example SR_3_14_test:
-  rtyp ddot udot gdot 
+  rtyp D.dot U.dot G.dot 
        (f_e (ufun alpha B (dfun (tv_t alpha) x (tv_t alpha) (retn (p_e x [])))))
        (utype alpha B (arrow (tv_t alpha) (tv_t alpha))).
 Proof.
@@ -336,25 +336,25 @@ Qed.
 (* Bug 16, H x->v H' not H x->v. *)
 
 Example htyp_empty_test:
-  htyp udot gdot hdot gdot.
+  htyp U.dot G.dot H.dot G.dot.
 Proof.
   apply htyp_empty;
   eauto 20 with Chapter3.
 Qed.
 
 Example htyp_xv_test:
-  htyp udot gdot (H.ctxt x v hdot) (G.ctxt x tau gdot).
+  htyp U.dot G.dot (H.ctxt x v H.dot) (G.ctxt x tau G.dot).
 Proof.
   (* loss of syntax direction here but we don't mind really as eauto is working. *)
   (* eauto 20 with Chapter3. *)
-  eapply htyp_xv with (g':= gdot);
+  eapply htyp_xv with (g':= G.dot);
   eauto 20 with Chapter3.
 Qed.
 
 (* Test refp. *)
 
 Example refp_empty_test:
-  refp h udot.
+  refp h U.dot.
 Proof.
  apply refp_empty.
 Qed.
@@ -394,8 +394,8 @@ Admitted.
 (* Test prog. *)
 
 Example program_test:
-  prog hdot (retn (i_e (i_i 0))).
+  prog H.dot (retn (i_e (i_i 0))).
 Proof.
-  apply program with (u:= udot) (g:= gdot) (tau:=cint);
+  apply program with (u:= U.dot) (g:= G.dot) (tau:=cint);
   eauto 20 with Chapter3.
 Qed.

@@ -4,29 +4,20 @@
 
    Bind all the modules together, rename things for convenience.
 
-   Require Export LanguageModuleDef to get this.
+   Require Export LanguageModule to get this.
 *)
 
 
 Set Implicit Arguments.
-Require Export List.
-Export ListNotations.
-Require Export ZArith.
-Require Export Init.Datatypes.
-
 Require Export CpdtTactics.
 Require Export Case.
 
-Require Import EVarModuleDef.
-Require Import EVarPathModuleDef.
-Require Import TauModuleDef.
-Require Import PathModuleDef.
-Require Import PhiModuleDef.
-Require Import TermModuleDef.
-Require Import DeltaModuleDef.
-Require Import GammaModuleDef.
-Require Import HeapModuleDef.
-Require Import UpsilonModuleDef.
+Require Export EVarModuleDef.
+Require Export EVarPathModuleDef.
+Require Export TauModuleDef.
+Require Export PathModuleDef.
+Require Export PhiModuleDef.
+Require Export TermModuleDef.
 
 Module LanguageModule.
   Module T   := TauModule.

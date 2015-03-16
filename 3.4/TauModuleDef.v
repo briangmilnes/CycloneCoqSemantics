@@ -14,18 +14,18 @@ Require Import Coq.Init.Logic.
 Require Import Coq.Bool.Bool.
 Require Import Coq.Structures.Equalities.
 
-Require Export BoolEqualitySigDef.
+Require Export BooleanEqualityDef.
 Require Export TVarModuleDef.
 Require Export KappaModuleDef.
 Require Export PhiModuleDef.
-Require Export CpdtTactics. 
+Require Export CpdtTactics.
 Require Export Case.
 Require Export MoreTacticals.
 
-Module TauModule <: BoolEqualitySig.
+Module TauModule <: BooleanEquality.
 
 Module Types.
- Module TV  := TVarModule. (* So terms can expose it in language module. *)
+ Module TVS  := TVarModuleSet.
  Module K := KappaModule.
  Include K.Types.
  Module P := PhiModule.
@@ -33,7 +33,7 @@ Module Types.
 
 Inductive Tau : Type :=
  | btvar  : nat -> Tau                               (* A bound type variable, a de Bruijn index. *)
- | ftvar  : TV.t -> Tau                              (* A free type variable. *)
+ | ftvar  : TVS.elt -> Tau                              (* A free type variable. *)
  | cint   : Tau                                      (* Cyclone's Integers. *)
  | cross  : Tau -> Tau -> Tau                        (* Pairs. *)
  | arrow  : Tau -> Tau -> Tau                        (* Function    type. *)
@@ -70,7 +70,7 @@ Inductive lc_tau : Tau -> Prop :=
  | lc_tau_ftvar : forall x, lc_tau (ftvar x)
  | lc_tau_arrow : forall t0 t1, lc_tau t0 -> lc_tau t1 -> lc_tau (arrow t0 t1)
  | lc_tau_utype : forall L' k t,
-                  (forall alpha, (TVSM.mem alpha L') = false
+                  (forall alpha, (TVS.mem alpha L') = false
                                  -> lc_tau (open_rec_tau 0 (ftvar alpha) t )) ->
                   lc_tau (utype k t).
 
