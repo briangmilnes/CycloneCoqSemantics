@@ -4,21 +4,32 @@ BooleanEqualitySetDef.vo BooleanEqualitySetDef.glob BooleanEqualitySetDef.v.beau
 BooleanEqualitySetFunDef.vo BooleanEqualitySetFunDef.glob BooleanEqualitySetFunDef.v.beautified: BooleanEqualitySetFunDef.v BooleanEqualityDef.vo BooleanEqualitySetDef.vo
 Case.vo Case.glob Case.v.beautified: Case.v
 ContextDef.vo ContextDef.glob ContextDef.v.beautified: ContextDef.v BooleanEqualitySetDef.vo
-ContextFunDef.vo ContextFunDef.glob ContextFunDef.v.beautified: ContextFunDef.v ContextDef.vo BooleanEqualityDef.vo BooleanEqualitySetFunDef.vo CpdtTactics.vo MoreTacticals.vo
+ContextFunDef.vo ContextFunDef.glob ContextFunDef.v.beautified: ContextFunDef.v ContextDef.vo BooleanEqualityDef.vo BooleanEqualitySetFunDef.vo VariableEqualityDef.vo VariableEqualitySetFunDef.vo CpdtTactics.vo MoreTacticals.vo
 CpdtTactics.vo CpdtTactics.glob CpdtTactics.v.beautified: CpdtTactics.v
-EVarModuleDef.vo EVarModuleDef.glob EVarModuleDef.v.beautified: EVarModuleDef.v VariablesFunDef.vo BooleanEqualitySetFunDef.vo NonceDef.vo
+DynamicSemanticsHeapObjectsTest.vo DynamicSemanticsHeapObjectsTest.glob DynamicSemanticsHeapObjectsTest.v.beautified: DynamicSemanticsHeapObjectsTest.v LanguageModuleDef.vo Tacticals.vo TestUtilities.vo
+DynamicSemanticsTest.vo DynamicSemanticsTest.glob DynamicSemanticsTest.v.beautified: DynamicSemanticsTest.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo Tacticals.vo TestUtilities.vo
+DynamicSemanticsTypeSubstitution.vo DynamicSemanticsTypeSubstitution.glob DynamicSemanticsTypeSubstitution.v.beautified: DynamicSemanticsTypeSubstitution.v LanguageModuleDef.vo
+DynamicSemanticsTypeSubstitutionTest.vo DynamicSemanticsTypeSubstitutionTest.glob DynamicSemanticsTypeSubstitutionTest.v.beautified: DynamicSemanticsTypeSubstitutionTest.v LanguageModuleDef.vo TestUtilities.vo DynamicSemanticsTypeSubstitution.vo
+EVarModuleDef.vo EVarModuleDef.glob EVarModuleDef.v.beautified: EVarModuleDef.v VariableEqualityFunDef.vo VariableEqualitySetFunDef.vo NonceDef.vo
 EVarPathModuleDef.vo EVarPathModuleDef.glob EVarPathModuleDef.v.beautified: EVarPathModuleDef.v BooleanEqualityDef.vo EVarModuleDef.vo PathModuleDef.vo CpdtTactics.vo Case.vo
+FormalSyntaxTest.vo FormalSyntaxTest.glob FormalSyntaxTest.v.beautified: FormalSyntaxTest.v LanguageModuleDef.vo TestUtilities.vo
 KappaModuleDef.vo KappaModuleDef.glob KappaModuleDef.v.beautified: KappaModuleDef.v BooleanEqualityDef.vo CpdtTactics.vo Case.vo
-LanguageModuleDef.vo LanguageModuleDef.glob LanguageModuleDef.v.beautified: LanguageModuleDef.v CpdtTactics.vo Case.vo EVarModuleDef.vo EVarPathModuleDef.vo TauModuleDef.vo PathModuleDef.vo PhiModuleDef.vo TermModuleDef.vo
+KindingTest.vo KindingTest.glob KindingTest.v.beautified: KindingTest.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo CpdtTactics.vo Case.vo
+LanguageModuleDef.vo LanguageModuleDef.glob LanguageModuleDef.v.beautified: LanguageModuleDef.v CpdtTactics.vo Case.vo EVarModuleDef.vo EVarPathModuleDef.vo TauModuleDef.vo PathModuleDef.vo PhiModuleDef.vo TermModuleDef.vo ContextFunDef.vo
 MoreTacticals.vo MoreTacticals.glob MoreTacticals.v.beautified: MoreTacticals.v
 NatLemmas.vo NatLemmas.glob NatLemmas.v.beautified: NatLemmas.v CpdtTactics.vo Case.vo
 NonceDef.vo NonceDef.glob NonceDef.v.beautified: NonceDef.v
 PathModuleDef.vo PathModuleDef.glob PathModuleDef.v.beautified: PathModuleDef.v BooleanEqualityDef.vo EVarModuleDef.vo CpdtTactics.vo Case.vo
 PhiModuleDef.vo PhiModuleDef.glob PhiModuleDef.v.beautified: PhiModuleDef.v BooleanEqualityDef.vo CpdtTactics.vo Case.vo NatLemmas.vo
-TVarModuleDef.vo TVarModuleDef.glob TVarModuleDef.v.beautified: TVarModuleDef.v VariablesFunDef.vo BooleanEqualitySetFunDef.vo NonceDef.vo
-TacticNotations.vo TacticNotations.glob TacticNotations.v.beautified: TacticNotations.v Case.vo
-Tacticals.vo Tacticals.glob Tacticals.v.beautified: Tacticals.v
+StaticSemanticsTest.vo StaticSemanticsTest.glob StaticSemanticsTest.v.beautified: StaticSemanticsTest.v LanguageModuleDef.vo TestUtilities.vo Tacticals.vo
+StaticSemanticsTypingHeapObjectsTest.vo StaticSemanticsTypingHeapObjectsTest.glob StaticSemanticsTypingHeapObjectsTest.v.beautified: StaticSemanticsTypingHeapObjectsTest.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo Tacticals.vo TestUtilities.vo
+TVarModuleDef.vo TVarModuleDef.glob TVarModuleDef.v.beautified: TVarModuleDef.v VariableEqualityFunDef.vo VariableEqualitySetFunDef.vo NonceDef.vo
+TacticNotations.vo TacticNotations.glob TacticNotations.v.beautified: TacticNotations.v Case.vo LanguageModuleDef.vo
+Tacticals.vo Tacticals.glob Tacticals.v.beautified: Tacticals.v DynamicSemanticsTypeSubstitution.vo
 TauModuleDef.vo TauModuleDef.glob TauModuleDef.v.beautified: TauModuleDef.v BooleanEqualityDef.vo TVarModuleDef.vo KappaModuleDef.vo PhiModuleDef.vo CpdtTactics.vo Case.vo MoreTacticals.vo
 TermModuleDef.vo TermModuleDef.glob TermModuleDef.v.beautified: TermModuleDef.v BooleanEqualityDef.vo TVarModuleDef.vo EVarModuleDef.vo KappaModuleDef.vo PhiModuleDef.vo PathModuleDef.vo TauModuleDef.vo CpdtTactics.vo Case.vo MoreTacticals.vo
-VariablesDef.vo VariablesDef.glob VariablesDef.v.beautified: VariablesDef.v BooleanEqualitySetDef.vo
-VariablesFunDef.vo VariablesFunDef.glob VariablesFunDef.v.beautified: VariablesFunDef.v CpdtTactics.vo Case.vo NatLemmas.vo NonceDef.vo VariablesDef.vo
+TestUtilities.vo TestUtilities.glob TestUtilities.v.beautified: TestUtilities.v LanguageModuleDef.vo
+VariableEqualityDef.vo VariableEqualityDef.glob VariableEqualityDef.v.beautified: VariableEqualityDef.v BooleanEqualityDef.vo
+VariableEqualityFunDef.vo VariableEqualityFunDef.glob VariableEqualityFunDef.v.beautified: VariableEqualityFunDef.v CpdtTactics.vo Case.vo NatLemmas.vo NonceDef.vo VariableEqualityDef.vo
+VariableEqualitySetDef.vo VariableEqualitySetDef.glob VariableEqualitySetDef.v.beautified: VariableEqualitySetDef.v BooleanEqualitySetDef.vo VariableEqualityDef.vo
+VariableEqualitySetFunDef.vo VariableEqualitySetFunDef.glob VariableEqualitySetFunDef.v.beautified: VariableEqualitySetFunDef.v VariableEqualitySetDef.vo VariableEqualityDef.vo

@@ -8,7 +8,7 @@
 *)
 
 Require Export Case.
-Require Export LanguageModule.
+Require Export LanguageModuleDef.
 Require Export StaticSemantics.
 
 Tactic Notation "Tau_ind_cases" tactic(first) ident(c) :=

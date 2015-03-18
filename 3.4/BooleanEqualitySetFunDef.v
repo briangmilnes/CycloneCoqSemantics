@@ -6,6 +6,8 @@ Set Implicit Arguments.
 Require Export BooleanEqualityDef.
 Require Export BooleanEqualitySetDef.
 
+(* TODO a variables version of this. *)
+
 Module BooleanEqualitySetFun(BE' : BooleanEquality) : BooleanEqualitySet.
   Module BE := BE'.
   Module BESet := Ops(BE).

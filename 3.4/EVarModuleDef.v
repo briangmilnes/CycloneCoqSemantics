@@ -6,12 +6,12 @@
 
 *)
 Set Implicit Arguments.
-Require Export VariablesFunDef.
-Require Export BooleanEqualitySetFunDef.
+Require Export VariableEqualityFunDef.
+Require Export VariableEqualitySetFunDef.
 Require Export NonceDef.
 
 Module EVarNonce : Nonce.
 End EVarNonce.
 
-Module EVarModule := VariablesFun(EVarNonce).
-Module EVarModuleSet := BooleanEqualitySetFun(EVarModule).
+Module EVarModule := VariableEqualityFun(EVarNonce).
+Module EVarModuleSet := VariableEqualitySetFun(EVarModule).

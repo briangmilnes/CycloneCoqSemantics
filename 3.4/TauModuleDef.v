@@ -25,15 +25,19 @@ Require Export MoreTacticals.
 Module TauModule <: BooleanEquality.
 
 Module Types.
- Module TVS  := TVarModuleSet.
  Module K := KappaModule.
  Include K.Types.
  Module P := PhiModule.
  Include P.Types.
 
+ Module TVS  := TVarModuleSet.
+ Module TV  := TVarModuleSet.BE.
+ Definition TVar := TVS.elt.
+ Definition TVars := TVS.t.
+
 Inductive Tau : Type :=
  | btvar  : nat -> Tau                               (* A bound type variable, a de Bruijn index. *)
- | ftvar  : TVS.elt -> Tau                              (* A free type variable. *)
+ | ftvar  : TVar -> Tau                              (* A free type variable. *)
  | cint   : Tau                                      (* Cyclone's Integers. *)
  | cross  : Tau -> Tau -> Tau                        (* Pairs. *)
  | arrow  : Tau -> Tau -> Tau                        (* Function    type. *)
@@ -44,15 +48,17 @@ Inductive Tau : Type :=
 End Types.
 Include Types.
 
-(*
-Fixpoint fv_tau (tau : Tau) {struct tau} : TVars :=
+Fixpoint fv_tau (tau : Tau) {struct tau} : TVS.t :=
   match tau with
-    | btvar i     => TVSM.empty
-    | ftvar x     => TVSM.singleton x
-    | arrow t0 t1 => TVSM.union (fv_tau t0) (fv_tau t1)
+    | btvar i     => TVS.empty
+    | ftvar x     => TVS.singleton x
+    | cint        => TVS.empty
+    | cross t0 t1 => TVS.union (fv_tau t0) (fv_tau t1)
+    | arrow t0 t1 => TVS.union (fv_tau t0) (fv_tau t1)
+    | ptype t0    => (fv_tau t0)
     | utype k t0   => (fv_tau t0)
+    | etype _ _ t0   => (fv_tau t0)
 end.
-*)
 
 Fixpoint open_rec_tau  (k : nat) (tau' : Tau) (tau : Tau)  {struct tau}  : Tau :=
  match tau with 
@@ -66,29 +72,47 @@ Fixpoint open_rec_tau  (k : nat) (tau' : Tau) (tau : Tau)  {struct tau}  : Tau :
    | etype p kp t0 => etype p kp (open_rec_tau (S k) tau' t0)
   end.
 
+(* Is this complete ?*)
 Inductive lc_tau : Tau -> Prop := 
+ | lc_tau_cint  : lc_tau cint
  | lc_tau_ftvar : forall x, lc_tau (ftvar x)
+ | lc_tau_cross : forall t0 t1, lc_tau t0 -> lc_tau t1 -> lc_tau (cross t0 t1)
  | lc_tau_arrow : forall t0 t1, lc_tau t0 -> lc_tau t1 -> lc_tau (arrow t0 t1)
- | lc_tau_utype : forall L' k t,
+ | lc_tau_ptype : forall t0, lc_tau t0 -> lc_tau (ptype t0)
+ | lc_tau_utype : forall L' k t0,
                   (forall alpha, (TVS.mem alpha L') = false
-                                 -> lc_tau (open_rec_tau 0 (ftvar alpha) t )) ->
-                  lc_tau (utype k t).
+                                 -> lc_tau (open_rec_tau 0 (ftvar alpha) t0)) ->
+                  lc_tau (utype k t0)
+ | lc_tau_etype : forall L' p k t0,
+                  (forall alpha, (TVS.mem alpha L') = false
+                                 -> lc_tau (open_rec_tau 0 (ftvar alpha) t0)) ->
+                  lc_tau (etype p k t0).
+
+Fixpoint subst_Tau  (t : Tau) (tau : Tau) (alpha : TVar) {struct t} : Tau := 
+  match t with 
+    | btvar i      => btvar i
+    | ftvar beta   => if (TVS.BE.eqb alpha beta) then tau else (ftvar beta)
+    | cint         => cint
+    | cross t0 t1  => cross (subst_Tau t0 t alpha) (subst_Tau t1 t alpha)
+    | arrow t0 t1  => arrow (subst_Tau t0 t alpha) (subst_Tau t1 t alpha)
+    | ptype t0     => ptype (subst_Tau t0 t alpha)
+    | utype k t0   => utype k (subst_Tau t0 t alpha)
+    | etype p k t0 => etype p k (subst_Tau t0 t alpha)
+end.
 
 Function eqb (t t' : Tau) : bool :=
  match t, t' with
- | tv_t alpha, tv_t beta => TV.eqb alpha beta
+ | btvar i, btvar j => beq_nat i j
+ | ftvar alpha, ftvar beta => TVS.eqb alpha beta
  | cint, cint => true
  | (cross t0 t1), (cross t0' t1') => andb (eqb t0 t0') (eqb t1 t1')
  | (arrow t0 t1), (arrow t0' t1') => andb (eqb t0 t0') (eqb t1 t1')
  | ptype t, ptype t' => (eqb t t')
-(* No alpha conversion for the moment. *)
- | utype alpha kappa tau, utype alpha' kappa' tau' =>
-   andb (andb (TV.eqb alpha alpha') (K.eqb kappa kappa'))
+ | utype kappa tau, utype kappa' tau' =>
+   andb (K.eqb kappa kappa') (eqb tau tau')
+ | etype p kappa tau, etype p' kappa' tau' =>
+   andb (andb (P.eqb p p')  (K.eqb kappa kappa'))
         (eqb tau tau')
- | etype p alpha kappa tau, etype p' alpha' kappa' tau' =>
-   andb (andb (P.eqb p p')  (TV.eqb alpha alpha'))
-        (andb (K.eqb kappa kappa') (eqb tau tau'))
-   
  | _ , _ => false
 end.
 Hint Unfold eqb.
@@ -99,6 +123,7 @@ Fixpoint eq (a b : Tau) : Prop :=
      | false => False
      | true => True
     end.
+Hint Unfold eq.
 
 Ltac destruct_away := 
   repeat match goal with
@@ -107,19 +132,30 @@ Ltac destruct_away :=
 
 Lemma eqb_eq : forall x y : Tau, eqb x y = true <-> eq x y.
 Proof.
-  destruct x; destruct y; crush; destruct_away.
+  induction x; induction y;  unfold iff; split; intros;
+  try solve[unfold eq;
+             rewrite H;
+             reflexivity];
+  unfold eq in H;
+  repeat match goal with
+    | [ |- ?X = true ] => destruct X; try solve[inversion H]; try reflexivity
+  end.
 Qed.
 
 Lemma eqb_to_eq:
   forall t0 t1, eqb t0 t1 = true -> t0 = t1.
 Proof.
-  induction t0; induction t1; intros; try solve [inversion H].
+  induction t0; induction t1; intros; try solve [inversion H]; try reflexivity.
 
-  inversion H.
-  apply TV.eqb_to_eq in H1.
-  rewrite H1.
+  unfold eqb in H.
+  symmetry in H.
+  apply beq_nat_eq in H.
+  subst.
   reflexivity.
 
+  unfold eqb in H.
+  apply TVS.eqb_to_eq in H.
+  subst.
   reflexivity.
 
   unfold eqb in H.
@@ -150,11 +186,8 @@ Proof.
   fold eqb in H.
   apply andb_true_iff in H.
   inversion H.
-  apply andb_true_iff in H0.
-  inversion H0.
   apply IHt0 in H1.
-  apply TV.eqb_to_eq in H2.
-  apply K.eqb_to_eq in H3.
+  apply K.eqb_to_eq in H0.
   subst.
   reflexivity.
 
@@ -164,12 +197,9 @@ Proof.
   inversion H.
   apply andb_true_iff in H0.
   inversion H0.
-  apply andb_true_iff in H1.
-  inversion H1.
-  apply IHt0 in H5.
+  apply IHt0 in H1.
   apply P.eqb_to_eq in H2.
-  apply TV.eqb_to_eq in H3.
-  apply K.eqb_to_eq in H4.
+  apply K.eqb_to_eq in H3.
   subst.
   reflexivity.
 Qed.
@@ -181,6 +211,8 @@ Lemma eqb_refl:
 Proof.
   intros.
   induction t; crush.
+  symmetry.
+  apply beq_nat_refl.
 Qed.
 Hint Resolve eqb_refl.
 
@@ -196,52 +228,56 @@ Qed.
 Ltac apply_beq_eqs := 
   repeat match goal with
     | [ I : eqb _ _ = true 
-        |- _ ] => apply eqb_to_eq in I; subst; try reflexivity
+        |- _ ] => apply eqb_to_eq in I; subst; try reflexivity; try assumption
     | [ I : P.eqb _ _ = true 
-        |- _ ] => apply P.eqb_to_eq in I; subst; try reflexivity
+        |- _ ] => apply P.eqb_to_eq in I; subst; try reflexivity; try assumption
     | [ I : K.eqb _ _ = true 
-        |- _ ] => apply K.eqb_to_eq in I; subst; try reflexivity
-    | [ I : TV.eqb _ _ = true 
-        |- _ ] => apply TV.eqb_to_eq in I; subst; try reflexivity
+        |- _ ] => apply K.eqb_to_eq in I; subst; try reflexivity; try assumption
+    | [ I : TVS.eqb _ _ = true 
+        |- _ ] => apply TVS.eqb_to_eq in I; subst; try reflexivity; try assumption
 end.
 
 Lemma eqb_iff_eq:    forall a b, eqb a b = true <-> a = b.
 Proof.
-  destruct a; destruct b; try solve[crush];
-  split;
+  induction a; induction b;
+  unfold iff;
+  split; 
   intros;
-  unfold eqb in H;
-  fold eqb in H;
-  simplify_boolean_and_true;
-  apply_beq_eqs;
-  intros;
-  inversion H;
-  subst;
-  apply eqb_refl.
+  try reflexivity;
+  try solve [inversion H];
+  try solve [inversion H;
+             subst;
+             apply eqb_refl;
+             reflexivity];
+  apply_beq_eqs.
 Qed.
 Hint Resolve eqb_iff_eq.
 
-(* not quite sure why I have to change the proof structure here at all. *)
+Ltac apply_eqs_sym := 
+  repeat match goal with
+    | [ |- beq_nat ?n ?n' = beq_nat ?n' ?n ] => 
+      apply beq_nat_sym
+    | [ |- TVS.eqb ?n ?n' = TVS.eqb ?n' ?n ] => 
+      apply TVS.eqb_sym
+end.
+
 Lemma eqb_sym : forall x y, eqb x y = eqb y x.
 Proof.
-  induction x; induction y; auto.
-  try solve [crush].
-  try solve [crush].
-  try solve [crush].
-  try solve [crush].
-  unfold eqb.
-  fold eqb.
-  rewrite TV.eqb_sym.
-  rewrite K.eqb_sym.
-  rewrite IHx.
-  reflexivity.
-  unfold eqb.
-  fold eqb.
-  rewrite TV.eqb_sym.
-  rewrite P.eqb_sym.
-  rewrite K.eqb_sym.
-  rewrite IHx.
-  reflexivity.
+  induction x; induction y; auto;
+  try solve[
+        unfold eqb;
+        fold eqb;
+        apply_eqs_sym];
+  try solve[refold eqb;
+             apply IHx];
+  try solve[refold eqb;
+             congruence];
+  try solve[
+        refold eqb;
+        try rewrite K.eqb_sym;
+        try rewrite P.eqb_sym;
+        try rewrite IHx;
+        congruence].
 Qed.
 Hint Immediate eqb_sym.
 
@@ -257,62 +293,27 @@ Qed.
 Lemma eqb_to_neq:
   forall t0 t1, eqb t0 t1 = false -> t0 <> t1.
 Proof.
-  induction t0; induction t1; intros; try solve [inversion H]; try solve [discriminate].
-  apply TV.eqb_to_neq in H.
-  crush.
-
-  unfold eqb in H.
-  fold eqb in H.
-  apply andb_false_iff in H.
-  destruct H.
-  apply IHt0_1 in H.
-  crush.
-  apply IHt0_2 in H.
-  crush.
-
-  unfold eqb in H.
-  fold eqb in H.
-  apply andb_false_iff in H.
-  destruct H.
-  apply IHt0_1 in H.
-  crush.
-  apply IHt0_2 in H.
-  crush.
-
-  unfold eqb in H.
-  fold eqb in H.
-  apply IHt0 in H.
-  crush.
-  
-  unfold eqb in H.
-  fold eqb in H.
-  apply andb_false_iff in H.
-  destruct H.
-  apply andb_false_iff in H.
-  destruct H.
-  apply TV.eqb_to_neq in H.
-  crush.
-  apply K.eqb_to_neq in H.
-  crush.
-  apply IHt0 in H.
-  crush.
-
-  unfold eqb in H.
-  fold eqb in H.
-  apply andb_false_iff in H.
-  destruct H.
-  apply andb_false_iff in H.
-  destruct H.
-  apply P.eqb_to_neq in H.
-  crush.
-  apply TV.eqb_to_neq in H.
-  crush.
-  apply andb_false_iff in H.
-  destruct H.
-  apply K.eqb_to_neq in H.
-  crush.
-  apply IHt0 in H.
-  crush.
+  induction t0; induction t1; intros; try solve [inversion H]; try solve [discriminate];
+  try solve[refold_in eqb H;
+            try apply beq_nat_false_iff in H;
+            try apply TVS.eqb_to_neq in H;
+            congruence];
+  try solve[inversion H;
+             try apply andb_false_iff in H1;
+             try apply IHt0 in H;
+             inversion H1;
+             try apply IHt0_1 in H0;
+             try apply IHt0_2 in H0;
+             congruence];
+  try solve[refold_in eqb H;
+             simplify_boolean_and_false;
+             try apply K.eqb_to_neq in H0;
+             try apply P.eqb_to_neq in H0;
+             try apply IHt0 in H0;
+             try apply K.eqb_to_neq in H;
+             try apply P.eqb_to_neq in H;
+             try apply IHt0 in H0;
+             congruence].
 Qed.  
 Hint Resolve eqb_to_neq.
 
@@ -324,8 +325,8 @@ Ltac fold_n_neq :=
         IH: forall _, eqb ?x _ = false <-> ?x <> _
        |- _ <> _  ] => 
        apply IH in I; congruence
-    | [ H : TV.eqb _ _ = false |- _ ] =>
-      apply TV.eqb_to_neq in H; try congruence
+    | [ H : TVS.eqb _ _ = false |- _ ] =>
+      apply TVS.eqb_to_neq in H; try congruence
     | [ H : K.eqb _ _ = false |- _ ] =>
       apply K.eqb_to_neq in H; try congruence
     | [ H : P.eqb _ _ = false |- _ ] =>
@@ -375,22 +376,6 @@ Proof.
   apply eqb_eq.
   apply eqb_trans with (x:= x) (y:= y) (z:= z); try assumption.
 Qed.
-
-Function NotFreeInTau (beta : TV.Var) (tau : Tau) : Prop :=
-  match tau with 
-    | tv_t alpha => 
-      if TV.eqb beta alpha then False else True
-    | cint        => True 
-    | cross t0 t1 => 
-       (NotFreeInTau beta t0) /\ (NotFreeInTau beta t1)
-    | arrow t0 t1 => 
-        (NotFreeInTau beta t0) /\ (NotFreeInTau beta t1)
-    | ptype t     => NotFreeInTau beta t
-    | utype alpha _ t =>
-      if TV.eqb beta alpha then True else NotFreeInTau beta t
-    | etype _ alpha _ t =>  
-      if TV.eqb beta alpha then True else NotFreeInTau beta t
-  end.
 
 Instance eq_equiv : Equivalence eq.
 Proof. 

@@ -34,31 +34,3 @@ Proof.
   apply IHn1.
 Qed.
 Hint Resolve beq_nat_trans.
-
-Lemma Zeq_bool_refl:
-  forall i, Zeq_bool i i = true.
-Admitted.
-Hint Resolve Zeq_bool_refl.
-
-Lemma Zeq_bool_sym:
-  forall i i', Zeq_bool i i' = Zeq_bool i' i.
-Admitted.
-Hint Resolve Zeq_bool_sym.
-
-Lemma Zeq_bool_trans:
-  forall i i0 i1,  
-    Zeq_bool i i0 = true ->
-    Zeq_bool i0 i1 = true ->
-    Zeq_bool i i1 = true.
-Admitted.
-Hint Resolve Zeq_bool_trans.
-
-Lemma Zeq_bool_eq:
-  forall i i', Zeq_bool i i' = true -> i = i'.
-Admitted.
-Hint Resolve Zeq_bool_eq.
-
-Lemma Zeq_bool_neq:
-  forall i i', Zeq_bool i i' = false -> i <> i'.
-Admitted.
-Hint Resolve Zeq_bool_neq.

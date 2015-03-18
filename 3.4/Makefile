@@ -1,7 +1,7 @@
 -include coq.depends
 all: TAGS src tactic lemma test proof experiment 
 
-SRCFILES=BooleanEqualityDef.vo BooleanEqualitySetDef.vo BooleanEqualitySetFunDef.vo ContextDef.vo ContextFunDef.vo  EVarModuleDef.vo  EVarPathModuleDef.vo   KappaModuleDef.vo  NonceDef.vo  PathModuleDef.vo  PhiModuleDef.vo  TauModuleDef.vo  TVarModuleDef.vo  VariablesDef.vo VariablesFunDef.vo   TermModuleDef.vo LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemanticsTypingHeapObjects.vo StaticSemantics.vo TypeSafety.vo 
+SRCFILES=BooleanEqualityDef.vo BooleanEqualitySetDef.vo BooleanEqualitySetFunDef.vo VariableEqualityDef.v VariableEqualityFunDef.v VariableEqualitySetDef.v VariableEqualitySetFunDef.v ContextDef.vo ContextFunDef.vo  EVarModuleDef.vo  EVarPathModuleDef.vo   KappaModuleDef.vo  NonceDef.vo  PathModuleDef.vo  PhiModuleDef.vo  TauModuleDef.vo  TVarModuleDef.vo TermModuleDef.vo LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemanticsTypingHeapObjects.vo StaticSemantics.vo TypeSafety.vo 
 
 TESTFILES=TestUtilities.vo FormalSyntaxTest.vo DynamicSemanticsTypeSubstitutionTest.vo DynamicSemanticsTest.vo DynamicSemanticsHeapObjectsTest.vo StaticSemanticsTest.vo StaticSemanticsTypingHeapObjectsTest.vo KindingTest.vo
 

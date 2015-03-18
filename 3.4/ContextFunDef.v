@@ -9,10 +9,13 @@ Set Implicit Arguments.
 Require Export ContextDef.
 Require Export BooleanEqualityDef.
 Require Export BooleanEqualitySetFunDef.
+Require Export VariableEqualityDef.
+Require Export VariableEqualitySetFunDef.
 Require Export CpdtTactics.
 Require Import MoreTacticals.
 
-Module ContextFun(K': BooleanEquality) (T' : BooleanEquality) <: Context.
+(* Todo admit, fix or undo. *)
+Module ContextFun(K': BooleanEquality) (T' : BooleanEquality). (* <: Context. *)
   Module K := BooleanEqualitySetFun(K').
   Module T := T'.
 
