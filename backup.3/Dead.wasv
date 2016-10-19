@@ -1,0 +1,215 @@
+(* Code removed this cycle, mostly partial functions encoded as relations changed to 
+ total functions of options. *)
+
+(*
+Inductive NotInDomH : EVar -> H -> Prop := 
+  | EmptyH    : forall (x : EVar), NotInDomH x nil
+  | SetEqualH : forall (x  y : EVar) (h : H) (v : E),
+                  x <> y -> 
+                  NotInDomH x h ->
+                  NotInDomH x (cons (y,v) h).
+*)
+
+(*
+
+Inductive getH : H -> EVar -> E -> Prop :=
+  | getH_top  : forall (h : H) (x : EVar) (e : E),
+                 getH (cons (x,e) h) x e 
+  | getH_next : forall (h : H) (x y: EVar) (e e': E),
+                 x <> y ->
+                 getH h                 x e ->
+                 getH (cons (y,e') h) x e.
+
+*)
+
+(* The abstract syntax of states, which are just a H and a statement. *)
+(* Hint Constructors NotInDomH : Chapter3. *)
+(* Hint Constructors NotInDomD : Chapter3. *)
+
+(* In fact, we just used getH = None. *)
+Fixpoint InDomH(x : EVar) (h : H) : option E :=
+  match x, h with 
+    | evar x', (evar y',v) :: h' =>
+      if beq_nat x' y' 
+      then Some v 
+      else InDomH x h'
+    | _ , nil => None
+  end.
+
+Inductive NotInDomD : TVar -> Delta -> Prop := 
+  | EmptyD    : forall (alpha : TVar), NotInDomD alpha nil
+  | SetEqualD : forall (alpha  beta : TVar) (d : Delta) (k : Kappa),
+                  alpha <> beta -> 
+                  NotInDomD alpha d ->
+                  NotInDomD alpha (cons (beta,k) d).
+
+(* Relational fetch but I may want to go to partial maps with options. ? *)
+
+Inductive getG : Gamma -> EVar -> Tau -> Prop :=
+  | getG_top  : forall (g : Gamma) (x : EVar)  (tau : Tau),
+                 getG (cons (x,tau) g) x tau
+  | getG_next : forall (g : Gamma) (x y: EVar) (tau tau': Tau),
+                 x <> y ->
+                 getG g                 x tau ->
+                 getG (cons (y,tau') g) x tau.
+
+Inductive NotInDomG : EVar -> Gamma -> Prop := 
+  | EmptyG    : forall (x : EVar), NotInDomG x nil
+  | SetEqualG : forall (x y : EVar) (g : Gamma) (tau : Tau),
+                  x <> y ->
+                  NotInDomG x g ->
+                  NotInDomG x (cons (y,tau) g).
+
+
+Inductive getU : Upsilon -> EVar -> P -> Tau -> Prop :=
+  | getU_top  : forall (u : Upsilon) (x : EVar) (p : P) (tau : Tau),
+                 getU (cons ((p_e x p),tau) u) x p tau
+  (* Ask Dan if the paths are checked here. ? *)
+  | getU_next : forall (u : Upsilon) (x y: EVar) (p p': P) (tau tau': Tau),
+                 x <> y \/ p <> p'->
+                 getU u x p tau -> 
+                 getU (cons ((p_e y p'),tau') u) x p tau.
+
+
+Hint Constructors getU      : Chapter3.
+
+
+Example M_test_add_this:
+  M (cons (x,v) hdot) x v.
+Proof.
+  apply M_add_this.
+  apply IIsAValue.
+Qed.
+
+Example M_test_add_other:
+                   M hdot x v ->
+                   M (cons (y,e) hdot) x v.
+Proof.
+  apply M_add_other.
+  apply IIsAValue.
+  compute.
+  intros H.
+  inversion H.
+Qed.
+
+(* The dynamic semantics treat heaps as partial mappings so we need a predicate relating the heap 
+  and an EVar to a value to make this partial mapping. We can't make a total function of it.
+
+  We'll call it M for memory. 
+*)
+
+Inductive M : H -> EVar -> E -> Prop :=
+  | M_add_this : forall (H : H) (x : EVar) (v : E),
+                   Value v ->
+                   M (cons (x,v) H) x v
+  | M_add_other: forall (H : H) (x y : EVar) (e v: E),
+                   Value v ->
+                   x <> y -> 
+                   M H x v ->
+                   M (cons (y,e) H) x v.
+
+
+Hint Constructors M         : Chapter3.
+
+
+(* Move to dead code. 
+   Now done by eauto!
+Ltac adjust_context_matches :=
+  repeat
+    match goal with
+    | [ |- K    [?x] _ _ ]      => try rewrite <- app_nil_l with (l:=[x])
+    | [ |- ASGN [?x] _ ]        => try rewrite <- app_nil_l with (l:=[x])
+    | [ |- WFU  [?x] ]          => try rewrite <- app_nil_l with (l:=[x])
+    | [ |- WFC _ _ [?x] ]          => try rewrite <- app_nil_l with (l:=[x])
+    | [ |- WFDG _ [?x] ]        => try rewrite <- app_nil_l with (l:=[x])
+    | [ |- htyp _ _ _ [?x] ]    => try rewrite <- app_nil_l with (l:=[x])
+    | [ |- htyp _ _ [?y] _ ]    => try rewrite app_nil_l_nil with (l:=[y])
+    | [ |- ltyp (c _ _ [?y]) _ ]=> try rewrite app_nil_l_nil with (l:=[y])
+    (* Some rules require []++[x] some []++[x]++[]. *)
+    (* | [ |- S _ (state [?h] _) ] => try rewrite app_nil_l     with (l:=[h]) *)
+    | [ |- R _ (state [?h] _) ] => try rewrite app_nil_l_nil with (l:=[h])
+    end.
+*)
+
+Inductive gettype : Upsilon -> EVar -> P -> Tau -> P -> Tau -> Prop := 
+ | gettype_empty : forall (u : Upsilon) (x : EVar) (p: P) (tau : Tau),
+                     gettype u x p tau nil tau
+
+(* Bug 30, tau'' is what ? *)
+ | gettype_etype : forall (u : Upsilon) (x : EVar) (p p': P) (tau tau' tau'': Tau) (alpha : TVar) (k : Kappa),
+                     gettype u x (p ++ [u_pe]) (subst_Tau tau' tau'' alpha) p' tau ->
+                     getU    u x p = Some tau'' ->
+                     gettype u x p (etype aliases alpha k tau') (u_pe :: p') tau
+ | gettype_left  : forall (u : Upsilon) (x : EVar) (p p': P) (tau t0 t1: Tau),
+                     gettype u x (p ++ [(i_pe (i_i 0))]) t0 p' tau ->
+                     gettype u x p (cross t0 t1) ((i_pe (i_i 0)) :: p') tau
+ | gettype_right : forall (u : Upsilon) (x : EVar) (p p': P) (tau t0 t1: Tau),
+                     gettype u x (p ++ [(i_pe (i_i 1))]) t1 p' tau ->
+                     gettype u x p (cross t0 t1) ((i_pe (i_i 1)) :: p') tau.
+
+
+(* TODO How to simplify the inclusion of the existing proofs. *)
+Theorem Empty_Type_Safety' :
+ forall (s : St) (tau : Tau),
+   EmptySubsetSt s ->
+   EmptySubsetTau tau ->
+   (Type_Safety s tau).
+Proof.
+  intros s tau.
+  intros NoSuchStatement NoSuchType.
+  induction s;
+    try (try inversion NoSuchStatement;
+         try inversion NoSuchType).
+Admitted.
+
+
+  (* The free H and Evar's are not caused by R,L or S's sole induction,
+    when applied by induction but ARE when applied by apply.
+    Am I simply misapplying? *)
+(*
+  apply (L_ind
+           (fun (s s' : State) => 
+              (* let (_,st)  := s in *)
+              let (_,st') := s' in
+              (* IntSubsetSt st ->  *)
+              ret st')).
+
+  intros.
+  Focus 3.
+*)
+(*
+  (* Let's see if I can apply the individual mutual induction principles. *)
+  apply (L_ind_mutual
+           (fun (s s' : State) (rd : R s s') =>
+              (* let (_,st)  := s in *)
+              let (_,st') := s' in
+              (* IntSubsetSt st ->  *)
+              ret st')
+           (fun (s s' : State) (sd : S s s') =>
+              (* let (_,st)  := s in *)
+              let (_,st') := s' in
+              (* IntSubsetSt st -> *)
+              ret st')
+           (fun (s s' : State) (ld : L s s') =>
+              (* let (_,st)  := s in *)
+              let (_,st') := s' in
+              (* IntSubsetSt st -> *)
+              ret st')); intros.
+  Focus 8.
+ (* I can and S,R,L all fuck up. *)
+  Focus 4.
+  (* L Broken goals are, ret (e_s v), ret (e_s v1), call/let,  ret (e_s v),
+    z <> 0%Z ,  if (seq (while ... , ret (let , ret (e_s (p_e x,
+    ret (e_s (p_e, *)
+  (* Now let's see what is common in these cases. They appear to be
+    overly unfolded to me. *)
+
+
+  (* Bug 39 ? Free H's in SLR inductions ? 
+   Not in SLR, I'll check ret. is it that only st' is used?  No.
+  *)
+(* 
+*)
+
+Inductive C :=
+  | c : Delta -> Upsilon -> Gamma -> C.

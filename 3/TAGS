@@ -1,0 +1,487 @@
+
+AlphaConversion.v,0
+
+CannonicalFormsProof.v,420
+Lemma A_9_Cannonical_Forms_1A_9_Cannonical_Forms_127,693
+Lemma A_9_Cannonical_Forms_2A_9_Cannonical_Forms_240,960
+Lemma A_9_Cannonical_Forms_3A_9_Cannonical_Forms_355,1303
+Lemma A_9_Cannonical_Forms_4A_9_Cannonical_Forms_471,1650
+Lemma A_9_Cannonical_Forms_5A_9_Cannonical_Forms_587,1979
+Lemma A_9_Cannonical_Forms_6A_9_Cannonical_Forms_6103,2354
+Lemma A_9_Cannonical_Forms_7A_9_Cannonical_Forms_7120,2802
+
+Case.v,0
+
+ContextExtensionLemmas.v,274
+Lemma ExtendedByD_weakeningExtendedByD_weakening26,635
+Lemma ExtendedByD_preserved_under_add_alpha_kExtendedByD_preserved_under_add_alpha_k74,1712
+Lemma Nil_ExtendedByD_Only_NilNil_ExtendedByD_Only_Nil98,2335
+Lemma ExtendedByD_reflexiveExtendedByD_reflexive110,2534
+
+ContextExtensionRelation.v,61
+Inductive ExtendedByD20,456
+Inductive ExtendedByG39,1130
+
+ContextExtensionTest.v,0
+
+ContextFunDef.v,320
+  Definition K31,726
+  Definition K_eq32,757
+  Definition T33,792
+  Definition T_eq34,856
+  Definition beq_t35,891
+Inductive Context'37,928
+Definition Context41,1061
+Definition empty48,1225
+Lemma map_empty_nonemap_empty_none98,2356
+Lemma nodup_emptynodup_empty103,2431
+Lemma map_addmap_add109,2564
+
+ContextModule2.v,0
+
+ContextSigDef.v,368
+  Parameter KK28,633
+  Parameter K_eqK_eq29,658
+  Parameter TT30,693
+  Parameter T_eqT_eq31,718
+  Parameter ContextContext33,754
+  Parameter emptyempty34,798
+  Parameter addadd35,833
+  Parameter mapmap36,893
+  Parameter nodupnodup37,945
+  Parameter equalequal38,988
+  Parameter extendsextends39,1046
+  Axiom map_empty_nonemap_empty_none45,1236
+
+ContextWeakeningProof.v,125
+Lemma A_1_Context_Weakening_1A_1_Context_Weakening_137,1016
+Lemma A_1_Context_Weakening_2A_1_Context_Weakening_2110,2560
+
+CpdtTactics.v,26
+Definition done116,4779
+
+DynamicSemantics.v,73
+Inductive S19,471
+Inductive multi239,8874
+Definition Sstar248,9235
+
+DynamicSemanticsHeapObjects.v,22
+Inductive get17,372
+
+DynamicSemanticsHeapObjectsTest.v,0
+
+DynamicSemanticsTest.v,184
+Definition s28,697
+Definition s'31,824
+Definition e33,863
+Definition e'34,931
+Definition hxv36,964
+Definition etau92,2002
+Definition H3893,2050
+Definition h703177,3936
+
+DynamicSemanticsTypeSubstitution.v,139
+Fixpoint subst_Tau17,322
+Fixpoint subst_E32,1037
+Fixpoint subst_Gamma72,3088
+Lemma subst_Gamma_over_appsubst_Gamma_over_app81,3371
+
+DynamicSemanticsTypeSubstitutionTest.v,0
+
+EVarDef.v,0
+
+Equalities.v,178
+Fixpoint beq_evar_p24,439
+Fixpoint beq_phi30,583
+Fixpoint beq_tau37,747
+Fixpoint beq_i54,1393
+Fixpoint beq_ipe59,1492
+Fixpoint beq_pe66,1638
+Fixpoint beq_st73,1812
+
+FormalSyntax.v,443
+Inductive Kappa31,697
+Inductive TVar45,1028
+Inductive Phi55,1249
+Inductive Tau69,1648
+Inductive EVar100,2967
+Inductive I111,3401
+Inductive IPE116,3619
+Definition P123,4030
+Inductive St125,4116
+Inductive Value171,7014
+Definition HE196,7736
+Definition H197,7773
+Definition DE232,8556
+Definition Delta233,8597
+Definition GE321,11246
+Definition Gamma322,11285
+Definition UE335,11632
+Definition Upsilon336,11680
+
+FormalSyntaxTest.v,0
+
+GetLemmasRelation.v,772
+Lemma getU_Some_WeakeninggetU_Some_Weakening20,456
+Lemma getG_weakeninggetG_weakening42,908
+Lemma getH_Some_weakeninggetH_Some_weakening52,1130
+Lemma getD_None_StrengtheninggetD_None_Strengthening62,1353
+Lemma getG_None_StrengtheninggetG_None_Strengthening86,1767
+Lemma getD_Some_WeakeninggetD_Some_Weakening117,2305
+Lemma getG_Some_WeakeninggetG_Some_Weakening131,2629
+Lemma getD_Some_non_empty_dgetD_Some_non_empty_d140,2844
+Lemma getD_extension_agreementgetD_extension_agreement149,3014
+Lemma getD_extension_agreement_fungetD_extension_agreement_fun181,3713
+Lemma Duplicate_Alpha_implies_not_WFDDuplicate_Alpha_implies_not_WFD210,4308
+Lemma getD_weakeninggetD_weakening223,4603
+Lemma getD_alpha_some_beta_nonegetD_alpha_some_beta_none268,5464
+
+HeapObjectSafetyProof.v,487
+Lemma A_11_Heap_Object_Safety_1A_11_Heap_Object_Safety_136,1078
+Lemma A_11_Heap_Object_Safety_2A_11_Heap_Object_Safety_267,1702
+Lemma A_11_Heap_Object_Safety_3A_11_Heap_Object_Safety_3134,3554
+Lemma gettype_nil_pathgettype_nil_path188,5114
+Lemma A_11_Heap_Object_Safety_3_induction_testsA_11_Heap_Object_Safety_3_induction_tests211,5437
+Lemma A_11_Heap_Object_Safety_3_CorollaryA_11_Heap_Object_Safety_3_Corollary288,7431
+Lemma getD_from_nil_NonegetD_from_nil_None316,8174
+
+HeapWeakeningProof.v,632
+Lemma WFDG_nil_strengthening_rightWFDG_nil_strengthening_right31,839
+Lemma WFDG_nil_strengthening_leftWFDG_nil_strengthening_left48,1154
+Lemma WFU_strengthening_rightWFU_strengthening_right68,1547
+Lemma NotInDomU_strengtheningNotInDomU_strengthening86,1863
+Lemma WFU_strengthening_leftWFU_strengthening_left118,2466
+Lemma WFC_nil_strengthening_leftWFC_nil_strengthening_left137,2819
+Lemma WFC_nil_strengthening_rightWFC_nil_strengthening_right149,3158
+Lemma A_3_Heap_Weakening_1_strengthen_quantificationA_3_Heap_Weakening_1_strengthen_quantification164,3611
+Lemma A_3_Heap_Weakening_2A_3_Heap_Weakening_2188,4421
+
+KappaDef.v,0
+
+KappaSigDef.v,0
+
+KindingTest.v,164
+Lemma can_K_alphacan_K_alpha41,1152
+Lemma can_K_alpha_Acan_K_alpha_A53,1441
+Lemma can_AK_alphacan_AK_alpha66,1747
+Lemma can_AK_alpha_Acan_AK_alpha_A79,2036
+
+ListLemmas.v,237
+Lemma cons_is_append_singletoncons_is_append_singleton15,286
+Lemma append_nil_noopappend_nil_noop23,419
+Lemma list_of_length_0_is_nillist_of_length_0_is_nil32,540
+Lemma rev_nilrev_nil43,724
+Lemma rev_cons_apprev_cons_app51,831
+
+MutualRecursionProof.v,449
+Inductive Kappa18,457
+Inductive I22,658
+Inductive Tau25,707
+Inductive St32,907
+Inductive fooS56,1508
+Inductive fooE58,1575
+Inductive fooF60,1640
+Theorem Test_InductionTest_Induction67,1779
+Theorem Test_Mutual_Induction_Only_STest_Mutual_Induction_Only_S77,1983
+Inductive typeSt87,2200
+Theorem Well_Typed_Statements_Are_FooWell_Typed_Statements_Are_Foo106,3351
+Theorem Well_Typed_Terms_Are_FooWell_Typed_Terms_Are_Foo114,3510
+
+NatLemmas.v,78
+Lemma beq_nat_symbeq_nat_sym20,428
+Lemma beq_nat_transbeq_nat_trans26,558
+
+NonceSigDef.v,0
+
+PFunTest.v,182
+Definition empty_nat_set41,717
+Definition empty_set_nat_nat50,920
+Definition empty_pfun_nat_nat51,975
+Definition pfun_nat_nat_add58,1167
+Definition pfun_nat_nat_get61,1270
+
+PartialFunction.v,50
+Definition pfun14,325
+Inductive WFpfun46,1376
+
+PathExtensionProof.v,720
+Lemma A_10_Path_Extension_1_A_good_getA_10_Path_Extension_1_A_good_get29,744
+Lemma A_10_Path_Extension_1_A_bad_get_almostA_10_Path_Extension_1_A_bad_get_almost98,2499
+Lemma A_10_Path_Extension_1_A_bad_get_induction_length_pA_10_Path_Extension_1_A_bad_get_induction_length_p189,4504
+Lemma A_10_Path_Extension_1_A_bad_get_induction_length_p_tighten_vA_10_Path_Extension_1_A_bad_get_induction_length_p_tighten_v280,6769
+Lemma A_10_Path_Extension_1_B_good_getA_10_Path_Extension_1_B_good_get366,9067
+Lemma A_10_Path_Extension_2_AA_10_Path_Extension_2_A424,10738
+Lemma A_10_Path_Extension_2_B'A_10_Path_Extension_2_B'535,14345
+Lemma A_10_Path_Extension_2_B_length_p'A_10_Path_Extension_2_B_length_p'573,15698
+
+PathLemmas.v,129
+Lemma beq_path_symmetricbeq_path_symmetric22,424
+Lemma beq_path_eqbeq_path_eq47,1008
+Lemma beq_path_neqbeq_path_neq74,1463
+
+ReturnPreservationProof.v,61
+Lemma A_8_Return_PreservationA_8_Return_Preservation29,779
+
+StaticSemantics.v,123
+Inductive ret19,492
+Inductive styp49,1428
+Inductive htyp233,9860
+Inductive refp245,10377
+Inductive prog254,10817
+
+StaticSemanticsHeapObjectsLemmas.v,93
+Lemma gettype_weakeninggettype_weakening27,734
+Lemma refp_weakeningrefp_weakening61,1694
+
+StaticSemanticsKindingAndContextWellFormedness.v,115
+Inductive K25,653
+Inductive AK69,2094
+Inductive WFU111,3520
+Inductive WFDG119,3784
+Inductive WFC135,4583
+
+StaticSemanticsKindingAndContextWellFormednessTest.v,26
+Definition pnil174,2762
+
+StaticSemanticsKindingLemmas.v,77
+Lemma K_weakeningK_weakening29,805
+Lemma AK_weakeningAK_weakening95,2794
+
+StaticSemanticsLemmas.v,177
+Lemma ltyp_weakeningltyp_weakening31,862
+Lemma styp_weakeningstyp_weakening39,1072
+Lemma rtyp_weakeningrtyp_weakening48,1333
+Lemma htyp_weakeninghtyp_weakening337,10928
+
+StaticSemanticsTest.v,105
+Definition axaa177,3649
+Definition paxaa178,3726
+Definition oaxaa180,3873
+Definition pid334,7657
+
+StaticSemanticsTypingHeapObjects.v,27
+Inductive gettype47,1385
+
+StaticSemanticsTypingHeapObjectsTest.v,68
+Definition pnil25,527
+Definition t040,845
+Definition t141,868
+
+StaticSemanticsTypingLemmas.v,0
+
+StaticSemanticsWellFormednessLemmas.v,652
+Lemma NotInDomU_strengthening'NotInDomU_strengthening'33,869
+Lemma NotInDomU_strengtheningNotInDomU_strengthening55,1314
+Lemma WFU_strengtheningWFU_strengthening92,2056
+Lemma WFDG_g_strengtheningWFDG_g_strengthening114,2508
+Lemma WFD_strengtheningWFD_strengthening149,3145
+Lemma WFDG_d_strengtheningWFDG_d_strengthening167,3418
+Lemma WFDG_strengtheningWFDG_strengthening184,3754
+Lemma WFC_strengtheningWFC_strengthening196,4028
+Lemma WFC_strengthening_rightWFC_strengthening_right220,4762
+Lemma WFU_weakeningWFU_weakening229,4942
+Lemma WFDG_g_weakeningWFDG_g_weakening240,5180
+Lemma WFDG_g_weakening_2WFDG_g_weakening_2271,5929
+
+StaticSemanticsWellFormednessLemmas2.v,588
+Lemma NotInDomU_strengtheningNotInDomU_strengthening33,900
+Lemma WFU_strengtheningWFU_strengthening68,1506
+Lemma WFDG_g_strengtheningWFDG_g_strengthening151,2964
+Lemma WFD_strengtheningWFD_strengthening186,3601
+Lemma WFDG_d_strengtheningWFDG_d_strengthening204,3874
+Lemma WFDG_strengtheningWFDG_strengthening221,4210
+Lemma WFC_strengtheningWFC_strengthening233,4456
+Lemma WFC_strengthening_rightWFC_strengthening_right257,5141
+Lemma WFDG_g_weakeningWFDG_g_weakening266,5408
+Lemma WFDG_g_weakening_2WFDG_g_weakening_2297,6157
+Lemma WFU_weakeningWFU_weakening307,6397
+
+SubstitutionsProof.v,985
+Lemma substitution_with_different_type_variablessubstitution_with_different_type_variables32,837
+Lemma substitution_with_different_type_variables_ptypesubstitution_with_different_type_variables_ptype44,1137
+Lemma A_4_Useless_Substitutions_1A_4_Useless_Substitutions_156,1461
+Lemma A_4_Useless_Substitutions_2A_4_Useless_Substitutions_2137,3971
+Lemma A_4_Useless_Substitutions_3A_4_Useless_Substitutions_3170,4803
+Lemma NotFreeIn_Tau_subst_uselessNotFreeIn_Tau_subst_useless196,5507
+Lemma A_5_Commuting_SubstitutionsA_5_Commuting_Substitutions264,6873
+Inductive Extends1D307,8011
+Lemma A_6_Substitution_2A_6_Substitution_2450,11645
+Lemma A_6_Substitution_3A_6_Substitution_3482,12467
+Lemma A_6_Substitution_4A_6_Substitution_4540,13820
+Lemma A_6_Substitution_5A_6_Substitution_5568,14372
+Lemma A_6_Substitution_6A_6_Substitution_6584,14825
+Lemma A_6_Substitution_7A_6_Substitution_7643,16044
+Lemma A_6_Substitution_8_1_2_3A_6_Substitution_8_1_2_3695,17642
+
+TVarDef.v,0
+
+TacticNotations.v,0
+
+Tacticals.v,58
+Lemma app_removefirst_firstapp_removefirst_first61,2150
+
+TauTypingInfoDef.v,234
+Inductive Tau25,621
+Definition T34,1182
+Lemma beq_kappa_reflbeq_kappa_refl44,1364
+Lemma beq_kappa_symbeq_kappa_sym51,1484
+Lemma beq_phi_reflbeq_phi_refl66,1801
+Lemma beq_phi_symbeq_phi_sym73,1915
+Definition beq_t99,2763
+
+TauTypingInfoFunDef.v,174
+Lemma beq_t_reflbeq_t_refl28,612
+Lemma beq_t_symbeq_t_sym38,813
+Lemma beq_t_eqbeq_t_eq63,1302
+Lemma beq_t_neqbeq_t_neq110,2163
+Lemma beq_t_transbeq_t_trans127,2541
+
+TermPreservationProof.v,164
+Inductive extends_Upsilon32,862
+Lemma A_13_Term_Preservation_1A_13_Term_Preservation_140,1084
+Lemma A_13_Term_Preservation_3A_13_Term_Preservation_3459,11814
+
+TermProgressProof.v,193
+Lemma A_14_Term_Progress_1_mutual_indA_14_Term_Progress_1_mutual_ind100,2337
+Lemma A_14_Term_Progress_2A_14_Term_Progress_2231,5766
+Lemma A_14_Term_Progress_3A_14_Term_Progress_3260,6824
+
+TermWeakeningProof.v,226
+Lemma A_2_Term_Weakening_1A_2_Term_Weakening_130,818
+Lemma A_2_Term_Weakening_2A_2_Term_Weakening_262,1886
+Lemma A_2_Term_Weakening_3A_2_Term_Weakening_3263,8636
+Lemma A_2_Term_Weakening_4A_2_Term_Weakening_4435,14115
+
+TestUtilities.v,1325
+Definition k15,312
+Definition ka16,332
+Definition kb17,352
+Definition v'20,423
+Definition v''21,458
+Definition v22,493
+Definition v023,528
+Definition v124,564
+Definition vi025,599
+Definition vi126,635
+Definition vi227,670
+Definition e29,706
+Definition e'30,741
+Definition e031,775
+Definition e132,810
+Definition e233,844
+Definition s35,879
+Definition s'36,918
+Definition s137,957
+Definition s238,996
+Definition x40,1036
+Definition x'41,1066
+Definition y42,1096
+Definition y'43,1126
+Definition z44,1156
+Definition z'45,1186
+Definition alpha47,1217
+Definition beta48,1247
+Definition gamma49,1277
+Definition i51,1308
+Definition i152,1337
+Definition i253,1366
+Definition i354,1395
+Definition tau56,1425
+Definition tau'57,1450
+Definition t58,1486
+Definition t'59,1511
+Definition t060,1547
+Definition t161,1572
+Definition pdot63,1609
+Definition p064,1636
+Definition p165,1673
+Definition hdot67,1710
+Definition h68,1737
+Definition ddot70,1770
+Definition udot73,1829
+Definition gdot76,1889
+Definition q78,1921
+Definition f83,2128
+Definition faa85,2208
+Definition fbb87,2298
+Definition applff90,2388
+Definition applfaa91,2442
+Definition applfbb92,2498
+Definition ufg94,2555
+Definition ufaa95,2594
+Definition ufbb96,2633
+
+TestingTheHeap.v,0
+
+TypeSafety.v,52
+Inductive NotStuck23,608
+Definition Stuck32,902
+
+TypeSafetyProof.v,63
+Theorem Type_SafetyType_Safety25,650
+ Definition Thm34,913
+
+TypingInfoModule2.v,35
+Lemma beq_t_reflbeq_t_refl27,553
+
+TypingInfoProofsSigDef.v,174
+ Axiom beq_t_reflbeq_t_refl24,509
+ Axiom beq_t_symbeq_t_sym26,587
+ Axiom beq_t_transbeq_t_trans28,671
+ Axiom beq_t_eqbeq_t_eq30,790
+ Axiom beq_t_neqbeq_t_neq32,873
+
+TypingInfoSigDef.v,50
+  Parameter TT24,501
+  Axiom beq_tbeq_t25,523
+
+TypingWellFormednessProof.v,363
+Lemma A_7_Typing_Well_Formedness_1A_7_Typing_Well_Formedness_132,838
+Lemma A_7_Typing_Well_Formedness_2A_7_Typing_Well_Formedness_281,2399
+Lemma A_7_Typing_Well_Formedness_3A_7_Typing_Well_Formedness_3267,6404
+Lemma A_7_Typing_Well_Formedness_4A_7_Typing_Well_Formedness_4410,9385
+Lemma A_7_Typing_Well_Formedness_5A_7_Typing_Well_Formedness_5440,10294
+
+UpsilonTest.v,96
+Definition pkt133,3533
+Definition pk134,3589
+Definition t136,3638
+Definition t'140,3718
+
+ValueLemmas.v,126
+Lemma value_or_notvalue_or_not31,851
+Lemma rtyp_value_d_strengthening_rtyp_indrtyp_value_d_strengthening_rtyp_ind111,2392
+
+VarLemmas.v,501
+Lemma beq_kappa_reflexivebeq_kappa_reflexive18,343
+Lemma beq_kappa_eqbeq_kappa_eq27,475
+Lemma beq_kappa_neqbeq_kappa_neq40,670
+Lemma beq_tvar_reflexivebeq_tvar_reflexive53,870
+Lemma beq_tvar_symmetricbeq_tvar_symmetric64,1050
+Lemma beq_tvar_eqbeq_tvar_eq80,1523
+Lemma beq_tvar_neqbeq_tvar_neq100,1887
+Lemma beq_evar_reflexivebeq_evar_reflexive121,2316
+Lemma beq_evar_symmetricbeq_evar_symmetric132,2480
+Lemma beq_evar_eqbeq_evar_eq148,2904
+Lemma beq_evar_neqbeq_evar_neq168,3233
+
+VariablesDef.v,23
+ Inductive Var21,459
+
+VariablesProofsFunDef.v,191
+Lemma beq_var_reflbeq_var_refl28,611
+Lemma beq_var_symbeq_var_sym40,793
+Lemma beq_var_transbeq_var_trans51,993
+Lemma beq_var_eqbeq_var_eq62,1210
+Lemma beq_var_neqbeq_var_neq78,1471
+
+VariablesProofsSigDef.v,194
+ Axiom beq_var_reflbeq_var_refl26,540
+ Axiom beq_var_symbeq_var_sym29,652
+ Axiom beq_var_transbeq_var_trans31,744
+ Axiom beq_var_eqbeq_var_eq33,873
+ Axiom beq_var_neqbeq_var_neq35,962
+
+VariablesSigDef.v,54
+  Inductive Var23,470
+ Axiom beq_varbeq_var26,520

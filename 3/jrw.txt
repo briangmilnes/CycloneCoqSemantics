@@ -1,0 +1,10 @@
+
+1) Function vs fixpoint?
+2) Enforcing nodup in ctxt creation?
+3) Proving it otherwise.
+4) Equality relations.
+5) What have you done in this area?
+6) Inversion?
+7) % issues
+8) Using set vs type?
+9) Something less than crush that simplifies variables?

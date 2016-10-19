@@ -1,0 +1,39 @@
+All of the unanswered questions on LN/TLC.
+
+Experiements
+
+1) env_ind, is that why environment induction is working?
+Try his style environment induction in milnes style.
+
+2) Suss out the standard finite sets for use in variables.
+
+3) Do I need his rightward style in environments?
+
+
+Pros
+1) Lots of automation.
+2) Too many changes to understand or make it simple for people to
+ pick up.
+
+
+Cons
+1) Uses lists.
+2) Lots of rewriting, but that happens with my style too.
+3) bad theorem naming
+4) syntax really only works if you have a single term to iterate
+through, can be fixed.
+5) 
+
+Milnes Style
+
+Cons
+1) I'm not using standard relations models for my equalities,
+ I should be using Coq.Bool.BoolEq. 
+2) I also have lots of unfolding.
+3) Not enough automation.
+4) I'm writing ML style modules instead of typeclass shortcuts.
+4) I should be using WSet of variables. 
+
+Pro
+1) Lib LN is only 230 lines. Sucking up 25KLOC of TLC seems insane
+ for this value.

@@ -1,0 +1,53 @@
+AlphaConversion.vo AlphaConversion.glob AlphaConversion.v.beautified: AlphaConversion.v
+BoolEqualitySetSigDef.vo BoolEqualitySetSigDef.glob BoolEqualitySetSigDef.v.beautified: BoolEqualitySetSigDef.v BoolEqualitySigDef.vo
+BoolEqualitySigDef.vo BoolEqualitySigDef.glob BoolEqualitySigDef.v.beautified: BoolEqualitySigDef.v
+BooleanEqualitySetFunDef.vo BooleanEqualitySetFunDef.glob BooleanEqualitySetFunDef.v.beautified: BooleanEqualitySetFunDef.v BoolEqualitySigDef.vo
+CannonicalFormsProof.vo CannonicalFormsProof.glob CannonicalFormsProof.v.beautified: CannonicalFormsProof.v CpdtTactics.vo Tacticals.vo LanguageModuleDef.vo StaticSemantics.vo
+Case.vo Case.glob Case.v.beautified: Case.v
+ContextFunDef.vo ContextFunDef.glob ContextFunDef.v.beautified: ContextFunDef.v CpdtTactics.vo Case.vo ContextSigDef.vo BoolEqualitySigDef.vo BooleanEqualitySetFunDef.vo MoreTacticals.vo
+ContextSigDef.vo ContextSigDef.glob ContextSigDef.v.beautified: ContextSigDef.v VariablesSigDef.vo BoolEqualitySetSigDef.vo
+CpdtTactics.vo CpdtTactics.glob CpdtTactics.v.beautified: CpdtTactics.v
+DeltaModuleDef.vo DeltaModuleDef.glob DeltaModuleDef.v.beautified: DeltaModuleDef.v CpdtTactics.vo Case.vo ContextSigDef.vo BoolEqualitySigDef.vo EVarModuleDef.vo TauModuleDef.vo ContextFunDef.vo
+DynamicSemantics.vo DynamicSemantics.glob DynamicSemantics.v.beautified: DynamicSemantics.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo
+DynamicSemanticsHeapObjects.vo DynamicSemanticsHeapObjects.glob DynamicSemanticsHeapObjects.v.beautified: DynamicSemanticsHeapObjects.v LanguageModuleDef.vo
+DynamicSemanticsHeapObjectsTest.vo DynamicSemanticsHeapObjectsTest.glob DynamicSemanticsHeapObjectsTest.v.beautified: DynamicSemanticsHeapObjectsTest.v LanguageModuleDef.vo DynamicSemanticsHeapObjects.vo Tacticals.vo TestUtilities.vo
+DynamicSemanticsTest.vo DynamicSemanticsTest.glob DynamicSemanticsTest.v.beautified: DynamicSemanticsTest.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo Tacticals.vo TestUtilities.vo
+DynamicSemanticsTypeSubstitution.vo DynamicSemanticsTypeSubstitution.glob DynamicSemanticsTypeSubstitution.v.beautified: DynamicSemanticsTypeSubstitution.v LanguageModuleDef.vo
+DynamicSemanticsTypeSubstitutionTest.vo DynamicSemanticsTypeSubstitutionTest.glob DynamicSemanticsTypeSubstitutionTest.v.beautified: DynamicSemanticsTypeSubstitutionTest.v LanguageModuleDef.vo TestUtilities.vo DynamicSemanticsTypeSubstitution.vo
+EVarModuleDef.vo EVarModuleDef.glob EVarModuleDef.v.beautified: EVarModuleDef.v VariablesFunDef.vo NonceSigDef.vo
+EVarPathModuleDef.vo EVarPathModuleDef.glob EVarPathModuleDef.v.beautified: EVarPathModuleDef.v BoolEqualitySigDef.vo EVarModuleDef.vo PathModuleDef.vo CpdtTactics.vo Case.vo
+FormalSyntaxTest.vo FormalSyntaxTest.glob FormalSyntaxTest.v.beautified: FormalSyntaxTest.v LanguageModuleDef.vo TestUtilities.vo
+GammaModuleDef.vo GammaModuleDef.glob GammaModuleDef.v.beautified: GammaModuleDef.v CpdtTactics.vo Case.vo ContextSigDef.vo BoolEqualitySigDef.vo EVarModuleDef.vo TauModuleDef.vo ContextFunDef.vo
+HeapModuleDef.vo HeapModuleDef.glob HeapModuleDef.v.beautified: HeapModuleDef.v CpdtTactics.vo Case.vo ContextSigDef.vo BoolEqualitySigDef.vo EVarModuleDef.vo ContextFunDef.vo TermModuleDef.vo
+KappaModuleDef.vo KappaModuleDef.glob KappaModuleDef.v.beautified: KappaModuleDef.v BoolEqualitySigDef.vo CpdtTactics.vo Case.vo
+KindingTest.vo KindingTest.glob KindingTest.v.beautified: KindingTest.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemantics.vo TypeSafety.vo CpdtTactics.vo Case.vo
+LanguageModuleDef.vo LanguageModuleDef.glob LanguageModuleDef.v.beautified: LanguageModuleDef.v CpdtTactics.vo Case.vo EVarModuleDef.vo EVarPathModuleDef.vo TauModuleDef.vo PathModuleDef.vo PhiModuleDef.vo TermModuleDef.vo DeltaModuleDef.vo GammaModuleDef.vo HeapModuleDef.vo UpsilonModuleDef.vo
+ListLemmas.vo ListLemmas.glob ListLemmas.v.beautified: ListLemmas.v
+MoreTacticals.vo MoreTacticals.glob MoreTacticals.v.beautified: MoreTacticals.v
+NatLemmas.vo NatLemmas.glob NatLemmas.v.beautified: NatLemmas.v CpdtTactics.vo Case.vo
+NonceSigDef.vo NonceSigDef.glob NonceSigDef.v.beautified: NonceSigDef.v
+PathExtensionProof.vo PathExtensionProof.glob PathExtensionProof.v.beautified: PathExtensionProof.v CpdtTactics.vo TacticNotations.vo LanguageModuleDef.vo ListLemmas.vo
+PathModuleDef.vo PathModuleDef.glob PathModuleDef.v.beautified: PathModuleDef.v BoolEqualitySigDef.vo EVarModuleDef.vo CpdtTactics.vo Case.vo
+PhiModuleDef.vo PhiModuleDef.glob PhiModuleDef.v.beautified: PhiModuleDef.v BoolEqualitySigDef.vo CpdtTactics.vo Case.vo NatLemmas.vo
+ReturnPreservationProof.vo ReturnPreservationProof.glob ReturnPreservationProof.v.beautified: ReturnPreservationProof.v LanguageModuleDef.vo Tacticals.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemantics.vo SubstitutionsProof.vo TypeSafety.vo CpdtTactics.vo Case.vo
+StaticSemantics.vo StaticSemantics.glob StaticSemantics.v.beautified: StaticSemantics.v LanguageModuleDef.vo DynamicSemanticsHeapObjects.vo StaticSemanticsTypingHeapObjects.vo StaticSemanticsKindingAndContextWellFormedness.vo
+StaticSemanticsHeapObjectsLemmas.vo StaticSemanticsHeapObjectsLemmas.glob StaticSemanticsHeapObjectsLemmas.v.beautified: StaticSemanticsHeapObjectsLemmas.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemanticsKindingAndContextWellFormednessLemmas.vo StaticSemantics.vo TypeSafety.vo CpdtTactics.vo TacticNotations.vo Tacticals.vo
+StaticSemanticsKindingAndContextWellFormedness.vo StaticSemanticsKindingAndContextWellFormedness.glob StaticSemanticsKindingAndContextWellFormedness.v.beautified: StaticSemanticsKindingAndContextWellFormedness.v LanguageModuleDef.vo
+StaticSemanticsKindingAndContextWellFormednessLemmas.vo StaticSemanticsKindingAndContextWellFormednessLemmas.glob StaticSemanticsKindingAndContextWellFormednessLemmas.v.beautified: StaticSemanticsKindingAndContextWellFormednessLemmas.v LanguageModuleDef.vo StaticSemanticsKindingAndContextWellFormedness.vo CpdtTactics.vo TacticNotations.vo Tacticals.vo
+StaticSemanticsKindingLemmas.vo StaticSemanticsKindingLemmas.glob StaticSemanticsKindingLemmas.v.beautified: StaticSemanticsKindingLemmas.v LanguageModuleDef.vo AlphaConversion.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemanticsKindingAndContextWellFormednessLemmas.vo StaticSemantics.vo CpdtTactics.vo TacticNotations.vo
+StaticSemanticsTest.vo StaticSemanticsTest.glob StaticSemanticsTest.v.beautified: StaticSemanticsTest.v LanguageModuleDef.vo DynamicSemanticsHeapObjects.vo StaticSemanticsTypingHeapObjects.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemantics.vo TestUtilities.vo Tacticals.vo
+StaticSemanticsTypingHeapObjects.vo StaticSemanticsTypingHeapObjects.glob StaticSemanticsTypingHeapObjects.v.beautified: StaticSemanticsTypingHeapObjects.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo StaticSemanticsKindingAndContextWellFormedness.vo
+StaticSemanticsTypingHeapObjectsTest.vo StaticSemanticsTypingHeapObjectsTest.glob StaticSemanticsTypingHeapObjectsTest.v.beautified: StaticSemanticsTypingHeapObjectsTest.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo Tacticals.vo TestUtilities.vo
+StaticSemanticsWellFormednessLemmas.vo StaticSemanticsWellFormednessLemmas.glob StaticSemanticsWellFormednessLemmas.v.beautified: StaticSemanticsWellFormednessLemmas.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemantics.vo TypeSafety.vo CpdtTactics.vo TacticNotations.vo AlphaConversion.vo
+SubstitutionsProof.vo SubstitutionsProof.glob SubstitutionsProof.v.beautified: SubstitutionsProof.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemanticsKindingLemmas.vo StaticSemanticsWellFormednessLemmas.vo StaticSemantics.vo TypeSafety.vo CpdtTactics.vo Case.vo TacticNotations.vo MoreTacticals.vo AlphaConversion.vo
+TVarModuleDef.vo TVarModuleDef.glob TVarModuleDef.v.beautified: TVarModuleDef.v NonceSigDef.vo VariablesFunDef.vo
+TacticNotations.vo TacticNotations.glob TacticNotations.v.beautified: TacticNotations.v Case.vo LanguageModuleDef.vo StaticSemantics.vo
+Tacticals.vo Tacticals.glob Tacticals.v.beautified: Tacticals.v DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemantics.vo
+TauModuleDef.vo TauModuleDef.glob TauModuleDef.v.beautified: TauModuleDef.v BoolEqualitySigDef.vo TVarModuleDef.vo KappaModuleDef.vo PhiModuleDef.vo CpdtTactics.vo Case.vo MoreTacticals.vo
+TermModuleDef.vo TermModuleDef.glob TermModuleDef.v.beautified: TermModuleDef.v BoolEqualitySigDef.vo TVarModuleDef.vo EVarModuleDef.vo KappaModuleDef.vo PhiModuleDef.vo PathModuleDef.vo TauModuleDef.vo CpdtTactics.vo Case.vo MoreTacticals.vo
+TermWeakeningProof.vo TermWeakeningProof.glob TermWeakeningProof.v.beautified: TermWeakeningProof.v LanguageModuleDef.vo TacticNotations.vo StaticSemanticsKindingAndContextWellFormednessLemmas.vo StaticSemanticsHeapObjectsLemmas.vo AlphaConversion.vo
+TestUtilities.vo TestUtilities.glob TestUtilities.v.beautified: TestUtilities.v LanguageModuleDef.vo
+TypeSafety.vo TypeSafety.glob TypeSafety.v.beautified: TypeSafety.v LanguageModuleDef.vo DynamicSemanticsTypeSubstitution.vo DynamicSemanticsHeapObjects.vo DynamicSemantics.vo StaticSemanticsKindingAndContextWellFormedness.vo StaticSemantics.vo
+UpsilonModuleDef.vo UpsilonModuleDef.glob UpsilonModuleDef.v.beautified: UpsilonModuleDef.v CpdtTactics.vo Case.vo ContextSigDef.vo BoolEqualitySigDef.vo EVarPathModuleDef.vo TauModuleDef.vo ContextFunDef.vo
+VariablesFunDef.vo VariablesFunDef.glob VariablesFunDef.v.beautified: VariablesFunDef.v CpdtTactics.vo Case.vo NatLemmas.vo NonceSigDef.vo VariablesSigDef.vo
+VariablesSigDef.vo VariablesSigDef.glob VariablesSigDef.v.beautified: VariablesSigDef.v BoolEqualitySetSigDef.vo

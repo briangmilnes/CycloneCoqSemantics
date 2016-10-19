@@ -1,0 +1,36 @@
+(* 
+ This is the definition of formal syntax for Dan Grossman's Thesis, 
+  "SAFE PROGRAMMING AT THE C LEVEL OF ABSTRACTION". 
+
+ This defines the formal syntax, pg. 57. 
+
+   TODO What the heck is really in memory? How are pointers built? We do have addresses. 
+
+   TODO We need to either go to partial maps or at least hide the variable lookup in a 
+     function. 
+
+   TODO Get the inductive cases for simultaneous induction worked out.
+    Have: term
+    Need: gettype (function induction may work)
+          typ*
+          S/R/L - 
+    Is not mutual:
+       gettype
+       WF*
+
+   TODO Think about alpha conversion.
+
+   TODO Think about context matching.
+
+   TODO Think through the SS 3.7 and 3.8 bugs.
+
+   TODO Finish every test case.
+
+   TODO Check test cases for validity. 
+
+   TODO Finish typed simply lambda calculus in SF. 
+
+   TODO Do I need syntactic sugar in here.    
+
+   TODO Should getU realy check paths?
+*)

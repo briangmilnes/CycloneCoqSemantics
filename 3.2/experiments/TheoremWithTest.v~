@@ -1,0 +1,20 @@
+(* Can I use Theorem with if I can get a clean induction? *)
+
+Inductive Fred : Prop -> Prop :=
+ | Fred1 : Fred True
+with Joe : Prop -> Prop := 
+ | Joe1  : Joe True.
+
+Theorem FredTrue:
+  Fred True ->
+  True
+with JoeTrue:
+  Joe False ->
+  True.
+Proof.
+  intros.
+  induction H.
+  admit.
+  admit.
+Admitted.
+(* Not clear to me that this works. *)

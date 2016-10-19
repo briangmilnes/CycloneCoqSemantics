@@ -1,0 +1,10 @@
+Get rid of ink in terms of map.
+
+
+left   strengthen  extends (Ctxt k t c) c' -> extends c c'.                        extends_l_strengthen, 
+
+left   weaken      extends c c' -> map c' k = Some t -> extends (Ctxt k t c) c'.   extends_l_weaken, extends_l_weaken_add. 
+right strengthen   extends c c' -> extends c (Ctxt k t c')                         extends_r_strengthen, extends_r_strengthen_add
+right weaken       extends c (Ctxt k t c') -> map c k = None -> extends c c'.      extends_r_weaken
+left weaken right strenghten  extends c c' = true ->  ink c' k = false  ->  extends (Ctxt k t c) (Ctxt k t c') = true. extends_l_weaken_r_strengthen
+
