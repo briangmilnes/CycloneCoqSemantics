@@ -1,0 +1,61 @@
+(* Cyclone Semantics using TLC/LN in Coq Version 4 *)
+(* "SAFE PROGRAMMING AT THE C LEVEL OF ABSTRACTION".   Daniel Grossman, August 2003 *)
+(* Brian Milnes Nov 2016 *)
+
+  Table of Contents
+
+  The files should be read in the following order:
+
+ i. 	Abstract
+ 1.	Cyclone Formal Syntax
+ 2.     LibPath
+ 3.     LibVarPath
+ 4.     LibVarPathEnv
+ 5.	Cyclone Dynamic Semantics Type Subsitutiton
+ 6.     Cyclone LN Infrastructure
+ 2. 	Cyclone Dynamic Semantics
+
+
+ i.	Abstract
+
+ Models of the Semantics of the Cyclone Language from Dan Grossman's
+ thesis
+
+ This is a near total restart to use the methods from Chargeurard's TLC
+and LN.
+
+ A previous restart attempted to use just an updated version of LN,
+but this was a serious mistake. Without adopting TLC the work to
+automate the proofs was too difficult. So this time I'll do the work
+to learn TLC and attempt to get it's automation and proof style in
+early.
+
+ As such this is using classical logic and the strong excluded middle.
+
+ The model is built in Coq 8.5 with TLC 
+
+commit 8e7d7abd2fac1ea3b85da38bbda58c58e3e7e17c
+Author: François Pottier <francois.pottier@inria.fr>
+Date:   Thu Oct 13 09:49:07 2016 +0200
+
+and LN as of 28 Oct 2016.
+
+	0.	Conventions
+
+	File_Test_WHATTESTED should be read and run after FILE.v and tests
+	 some feature of File.
+
+	1.	Cyclone Formal Syntax
+
+	Definitions from Section 3.5.1.
+
+	2.	Cyclone Dynamic Semantics
+
+	Definitions from Section 3.5.2
+
+
+	6.	Cyclone LN Infrastructure
+
+	Required definitions of open/close/body/lc/subst and free variables
+	 as well as fresh variable generation to make an LN approach work.
+
