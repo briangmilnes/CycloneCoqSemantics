@@ -1,0 +1,111 @@
+
+ I need to rethink the naming of my subst/open/close/lc/body
+fixpoints and the lemmas. As well as my selection of his
+lemmas.
+
+I don't need to work with his alternative defintions of
+LC/Body and those theorems.
+
+I do need his close theorems for implementing pack I think,
+unlike the STLC.
+
+The STLC set of theorems seems the best + the close theorems
+from the Jar paper.
+
+In Cyclone I have three types of substitution
+tau for tv in tau
+tau for tv in term
+tmvar for tmvar in term
+
+and one specializations:
+tvar for tvar in tau
+tvar for tvar in term.
+
+Possible Notation:
+ t  - type
+ tv - type variable
+ t  - v term variable
+ tm - term
+ __ - implies
+ _iff_ 
+
+ ttvt
+ tttm
+ vvtm
+ ttvt
+ ttvtm
+
+Subst
+subst_tau  (tau : Tau) (alpha : var) (t : Tau) {struct t} : Tau 
+subst_t_tv_t
+subst_tau_v (tau : Tau) (alpha : var) (v : V) {struct v} : V 
+subst_t_tv_tm_
+subst_evar_v (x y : var) (v : V) : V 
+subst_v_v_tm
+
+ [>] for a substitution
+
+ [t ttvt> alpha]t'
+ [t tttm> alpha]tm
+ [x vvtm> y]tm
+ [t ttvt> alpha]t'
+ [t ttvtm> alpha]tm
+
+FV
+ ftv_t
+ fv_tm_{v,st,e,f}
+ fv_tm
+ ftv_tm_{v,st,e,f}
+ ftv_tm
+ fv_CONTEXT
+ ftv_CONTEXT
+
+Plus rec/blank
+ {>} for an open
+ {<} for a close
+
+Open
+ open_t
+ open_ttm
+ open_tm
+And so on.
+"t ^^ttvt.. u" := (open t u) (at level 67).
+"t ^ x" := (open t (trm_fvar x)).
+
+Close
+ close_t
+ close_ttm
+ close_tm 
+
+body_t  - body type
+body_tm - body term
+
+LC
+ lc_t
+ lc_ttm
+ lc_tm
+
+Lemmas:
+ useless_open
+ lc_X__subst_identity
+ subst_X_fresh
+ subst_X_dist_open_X
+ subst_X_open_var_X_commutes
+ subst_intro
+ subst_preserves_lc
+ lc_dfun__body  - ?
+ body__lc_dfun  - ?
+ body_lc__lc_open  
+ typing__ok_and_lc
+ value__lc
+ fresh__close_open_identity
+ open_injective
+ open_close_var_on_open_var
+ lc__open_close_identity
+ close_var_inj
+ lc_defun_iff_body
+ fv_open
+ open_var_fv
+ close_var_fv
+
+and more from the Lambda paper.
