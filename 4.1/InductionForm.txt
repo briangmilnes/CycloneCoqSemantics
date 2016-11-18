@@ -1,0 +1,6 @@
+  apply (St_ind_mutual 
+           (fun t : St => 
+
+           (fun t : E  => 
+
+           (fun t : F  => 
