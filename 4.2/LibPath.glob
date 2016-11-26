@@ -1,0 +1,53 @@
+DIGEST 1d7569b34badbbdabda74a4447c7ac07
+FLibPath
+R80:93 TLC.LibTactics <> <> lib
+R95:108 TLC.LibReflect <> <> lib
+R110:120 TLC.LibBool <> <> lib
+R122:137 TLC.LibOperation <> <> lib
+R139:153 TLC.LibRelation <> <> lib
+R155:166 TLC.LibOrder <> <> lib
+R169:178 TLC.LibNat <> <> lib
+def 306:309 <> path
+R314:317 Coq.Init.Datatypes <> list ind
+R319:321 Coq.Init.Datatypes <> nat ind
+inst 333:342 <> path_inhab
+R346:350 TLC.LibLogic <> Inhab class
+R352:355 LibPath <> path def
+R386:396 TLC.LibLogic <> prove_Inhab thm
+R399:402 Coq.Init.Datatypes <> cons constr
+R406:408 Coq.Init.Datatypes <> nil constr
+R386:396 TLC.LibLogic <> prove_Inhab thm
+R399:402 Coq.Init.Datatypes <> cons constr
+R406:408 Coq.Init.Datatypes <> nil constr
+def 428:439 <> path_compare
+R448:451 LibPath <> path def
+R468:468 LibPath <> y var
+R465:465 LibPath <> x var
+R481:483 Coq.Init.Datatypes <> nil constr
+R486:488 Coq.Init.Datatypes <> nil constr
+R493:496 Coq.Init.Datatypes <> true constr
+R505:508 Coq.Init.Datatypes <> cons constr
+R516:518 Coq.Init.Datatypes <> nil constr
+R523:527 Coq.Init.Datatypes <> false constr
+R535:537 Coq.Init.Datatypes <> nil constr
+R541:544 Coq.Init.Datatypes <> cons constr
+R554:558 Coq.Init.Datatypes <> false constr
+R567:570 Coq.Init.Datatypes <> cons constr
+R580:583 Coq.Init.Datatypes <> cons constr
+R600:602 TLC.LibLogic <> :type_scope:'If'_x_'then'_x_'else'_x not
+R608:668 TLC.LibLogic <> :type_scope:'If'_x_'then'_x_'else'_x not
+R687:698 TLC.LibLogic <> :type_scope:'If'_x_'then'_x_'else'_x not
+R699:703 Coq.Init.Datatypes <> false constr
+R669:680 LibPath <> path_compare def
+R604:606 Coq.Init.Logic <> :type_scope:x_'='_x not
+inst 782:796 <> path_comparable
+R800:809 TLC.LibReflect <> Comparable class
+R811:814 LibPath <> path def
+R840:853 TLC.LibReflect <> comparable_beq thm
+R855:866 LibPath <> path_compare def
+R840:853 TLC.LibReflect <> comparable_beq thm
+R855:866 LibPath <> path_compare def
+R936:943 TLC.LibLogic <> classicT thm
+R947:949 Coq.Init.Logic <> :type_scope:x_'='_x not
+R936:943 TLC.LibLogic <> classicT thm
+R947:949 Coq.Init.Logic <> :type_scope:x_'='_x not

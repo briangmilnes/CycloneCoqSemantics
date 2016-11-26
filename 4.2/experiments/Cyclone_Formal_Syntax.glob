@@ -1,0 +1,156 @@
+DIGEST 05202958590325877ea749bef2f3271b
+FCyclone_Formal_Syntax
+R237:245 TLC.LibLN <> <> lib
+R247:256 TLC.LibNat <> <> lib
+R258:267 TLC.LibEnv <> <> lib
+R285:297 LibVarPathEnv <> <> lib
+ind 470:474 <> Kappa
+constr 488:488 <> B
+constr 537:537 <> A
+R489:489 Cyclone_Formal_Syntax <> Kappa ind
+R538:538 Cyclone_Formal_Syntax <> Kappa ind
+ind 594:596 <> Phi
+constr 610:623 <> witnesschanges
+constr 678:684 <> aliases
+R628:630 Cyclone_Formal_Syntax <> Phi ind
+R695:697 Cyclone_Formal_Syntax <> Phi ind
+ind 763:765 <> IPE
+constr 778:784 <> zero_pe
+constr 793:798 <> one_pe
+R785:785 Cyclone_Formal_Syntax <> IPE ind
+R799:799 Cyclone_Formal_Syntax <> IPE ind
+ind 812:813 <> PE
+constr 828:831 <> i_pe
+constr 853:856 <> u_pe
+R843:846 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R847:848 Cyclone_Formal_Syntax <> PE ind
+R840:842 Cyclone_Formal_Syntax <> IPE ind
+R865:866 Cyclone_Formal_Syntax <> PE ind
+def 932:935 <> Path
+R946:949 Coq.Init.Datatypes <> list ind
+R951:952 Cyclone_Formal_Syntax <> PE ind
+ind 966:966 <> I
+constr 983:985 <> i_i
+R998:1001 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1002:1002 Cyclone_Formal_Syntax <> I ind
+R995:997 Coq.Init.Datatypes <> nat ind
+ind 1086:1086 <> V
+constr 1100:1104 <> bevar
+constr 1195:1199 <> fevar
+R1116:1119 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1120:1120 Cyclone_Formal_Syntax <> V ind
+R1113:1115 Coq.Init.Datatypes <> nat ind
+R1211:1214 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1215:1215 Cyclone_Formal_Syntax <> V ind
+R1208:1210 TLC.LibVar Variables var defax
+ind 1279:1280 <> St
+constr 1341:1343 <> e_s
+constr 1418:1421 <> retn
+constr 1502:1504 <> seq
+constr 1571:1574 <> if_s
+constr 1648:1652 <> while
+constr 1714:1717 <> letx
+constr 1779:1783 <> openx
+constr 1880:1887 <> openstar
+ind 2000:2000 <> E
+constr 2068:2070 <> v_e
+constr 2172:2174 <> i_e
+constr 2254:2256 <> p_e
+constr 2371:2373 <> f_e
+constr 2471:2473 <> amp
+constr 2553:2556 <> star
+constr 2643:2647 <> cpair
+constr 2715:2717 <> dot
+constr 2785:2790 <> assign
+constr 2844:2847 <> appl
+constr 2930:2933 <> call
+constr 3018:3021 <> inst
+constr 3094:3097 <> pack
+ind 3174:3174 <> F
+constr 3188:3191 <> dfun
+constr 3256:3259 <> ufun
+R1354:1359 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1360:1361 Cyclone_Formal_Syntax <> St ind
+R1353:1353 Cyclone_Formal_Syntax <> E ind
+R1431:1436 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1437:1438 Cyclone_Formal_Syntax <> St ind
+R1430:1430 Cyclone_Formal_Syntax <> E ind
+R1516:1520 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1523:1526 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1527:1528 Cyclone_Formal_Syntax <> St ind
+R1521:1522 Cyclone_Formal_Syntax <> St ind
+R1514:1515 Cyclone_Formal_Syntax <> St ind
+R1584:1589 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1592:1595 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1598:1603 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1604:1605 Cyclone_Formal_Syntax <> St ind
+R1596:1597 Cyclone_Formal_Syntax <> St ind
+R1590:1591 Cyclone_Formal_Syntax <> St ind
+R1583:1583 Cyclone_Formal_Syntax <> E ind
+R1661:1666 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1669:1672 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1673:1674 Cyclone_Formal_Syntax <> St ind
+R1667:1668 Cyclone_Formal_Syntax <> St ind
+R1660:1660 Cyclone_Formal_Syntax <> E ind
+R1727:1732 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1735:1738 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1739:1740 Cyclone_Formal_Syntax <> St ind
+R1733:1734 Cyclone_Formal_Syntax <> St ind
+R1726:1726 Cyclone_Formal_Syntax <> E ind
+R1792:1797 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1800:1803 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1804:1805 Cyclone_Formal_Syntax <> St ind
+R1798:1799 Cyclone_Formal_Syntax <> St ind
+R1791:1791 Cyclone_Formal_Syntax <> E ind
+R1893:1898 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1901:1904 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1905:1906 Cyclone_Formal_Syntax <> St ind
+R1899:1900 Cyclone_Formal_Syntax <> St ind
+R1892:1892 Cyclone_Formal_Syntax <> E ind
+R2082:2085 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2086:2086 Cyclone_Formal_Syntax <> E ind
+R2081:2081 Cyclone_Formal_Syntax <> V ind
+R2186:2189 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2190:2190 Cyclone_Formal_Syntax <> E ind
+R2185:2185 Cyclone_Formal_Syntax <> I ind
+R2268:2271 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2279:2282 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2283:2283 Cyclone_Formal_Syntax <> E ind
+R2272:2275 Coq.Init.Datatypes <> list ind
+R2277:2278 Cyclone_Formal_Syntax <> PE ind
+R2267:2267 Cyclone_Formal_Syntax <> V ind
+R2385:2388 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2389:2389 Cyclone_Formal_Syntax <> E ind
+R2384:2384 Cyclone_Formal_Syntax <> F ind
+R2485:2488 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2489:2489 Cyclone_Formal_Syntax <> E ind
+R2484:2484 Cyclone_Formal_Syntax <> E ind
+R2567:2570 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2571:2571 Cyclone_Formal_Syntax <> E ind
+R2566:2566 Cyclone_Formal_Syntax <> E ind
+R2657:2660 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2662:2665 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2666:2666 Cyclone_Formal_Syntax <> E ind
+R2661:2661 Cyclone_Formal_Syntax <> E ind
+R2656:2656 Cyclone_Formal_Syntax <> E ind
+R2729:2732 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2736:2739 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2740:2740 Cyclone_Formal_Syntax <> E ind
+R2733:2735 Cyclone_Formal_Syntax <> IPE ind
+R2728:2728 Cyclone_Formal_Syntax <> E ind
+R2799:2802 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2804:2807 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2808:2808 Cyclone_Formal_Syntax <> E ind
+R2803:2803 Cyclone_Formal_Syntax <> E ind
+R2798:2798 Cyclone_Formal_Syntax <> E ind
+R2858:2861 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2863:2866 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2867:2867 Cyclone_Formal_Syntax <> E ind
+R2862:2862 Cyclone_Formal_Syntax <> E ind
+R2857:2857 Cyclone_Formal_Syntax <> E ind
+R2945:2948 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2949:2949 Cyclone_Formal_Syntax <> E ind
+R2943:2944 Cyclone_Formal_Syntax <> St ind
+R3032:3035 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3039:3042 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3043:3043 Cyclone_Formal_Syntax <> E ind

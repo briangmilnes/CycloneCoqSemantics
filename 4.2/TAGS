@@ -1,0 +1,360 @@
+
+Cyclone_Formal_Syntax.v,387
+Inductive Kappa13,461
+Inductive Phi17,585
+Inductive Tau21,754
+Inductive IPE31,1317
+Inductive PE35,1366
+Definition Path40,1485
+Inductive I42,1520
+Inductive V45,1640
+Inductive St49,1833
+Inductive Term76,3921
+Inductive Value90,4378
+Definition Heap122,5437
+Definition State123,5464
+Definition Delta124,5500
+Definition Gamma125,5531
+Definition Upsilon126,5560
+
+Cyclone_Formal_Syntax_Test_Env.v,476
+  Parameter aa49,1180
+  Parameter bb50,1203
+  Parameter cc51,1226
+  Parameter vv52,1249
+  Parameter EE53,1270
+  Parameter xx54,1293
+  Parameter KK55,1314
+  Parameter ZZ56,1337
+  Parameter QQ57,1363
+  Parameter aa73,1662
+  Parameter bb74,1685
+  Parameter cc75,1708
+  Parameter vv76,1731
+  Parameter EE77,1752
+  Parameter xx78,1775
+  Parameter KK79,1796
+ Parameter HH94,2171
+ Parameter II95,2194
+ Parameter xx96,2215
+ Parameter ee97,2235
+
+Cyclone_LN_FSET.v,117
+Lemma subset_remove_11subset_remove_1119,568
+Lemma subset_remove_2psubset_remove_2p26,776
+Ltac fsetLtac34,1144
+
+Cyclone_LN_Tactics.v,170
+Tactic Notation"inst_notin"30,919
+Tactic Notation"inst_notin" "~"37,1214
+Tactic Notation"inst_notin" "*"41,1362
+Ltac inversion_on_equated_constructorsLtac48,1655
+
+Cyclone_LN_Tactics_Test_Notin.v,373
+Lemma test_notin_varstest_notin_vars21,710
+Lemma test_notin_vartest_notin_var38,999
+Lemma test_notin_ttest_notin_t50,1146
+Lemma test_notin_t_tmtest_notin_t_tm64,1343
+Lemma test_notin_fv_delta_abstracttest_notin_fv_delta_abstract81,1664
+Lemma test_notin_ftv_delta_concretetest_notin_ftv_delta_concrete95,1899
+Lemma test_notin_fv_heaptest_notin_fv_heap111,2187
+
+Cyclone_LN_Terms.v,783
+Fixpoint subst_e37,1209
+Fixpoint open_rec_st93,3563
+Definition open134,5522
+Fixpoint close_rec_st153,6319
+Definition close201,8545
+Fixpoint fv_st215,8881
+Definition closed_c_tm261,10289
+Inductive lc_v265,10381
+Inductive lc_st270,10482
+Inductive lc320,12736
+Definition body_tm331,13203
+Fixpoint size_st336,13317
+Ltac inversion_on_lcLtac376,14730
+Ltac inversions_tilde_on_lc_of_concrete_termLtac385,15015
+Ltac gather_varsLtac400,15821
+Ltac pick_freshLtac416,16596
+Tactic Notation"pick_fresh"419,16666
+Tactic Notation"pick_fresh" ident(x) "from"422,16756
+Tactic Notation"apply_fresh"425,16868
+Tactic Notation"apply_fresh" constr(T) "as"428,16958
+Tactic Notation"apply_fresh" "*" constr(T) "as"431,17052
+Tactic Notation"exists_fresh"439,17268
+
+Cyclone_LN_Terms_Lemmas.v,0
+
+Cyclone_LN_Types.v,635
+Fixpoint subst13,390
+Fixpoint open_rec29,1008
+Definition open41,1498
+Fixpoint close_rec49,1813
+Definition close61,2296
+Fixpoint fv67,2447
+Definition closed81,2821
+Fixpoint size83,2857
+Inductive lc98,3240
+Definition body113,3878
+Ltac gather_varsLtac125,4216
+Ltac pick_freshLtac131,4427
+Tactic Notation"pick_fresh"134,4497
+Tactic Notation"pick_fresh" ident(x) "from"137,4587
+Tactic Notation"apply_fresh"140,4699
+Tactic Notation"apply_fresh" constr(T) "as"143,4789
+Tactic Notation"apply_fresh" "*" constr(T) "as"146,4883
+Tactic Notation"apply_fresh" "*"149,4978
+Tactic Notation"exists_fresh"152,5054
+
+Cyclone_LN_Types_In_Terms.v,655
+Fixpoint subst_e22,634
+Definition open_rec_v82,3356
+Fixpoint open_rec_st88,3487
+Definition open130,5502
+Fixpoint close_rec_st146,6224
+Definition close194,8606
+Fixpoint fv_st208,8935
+Definition closed254,10411
+Inductive lc_st258,10498
+Inductive lc292,12262
+Definition body302,12545
+Ltac gather_varsLtac307,12669
+Ltac pick_freshLtac323,13453
+Tactic Notation"pick_fresh"326,13523
+Tactic Notation"pick_fresh" ident(x) "from"329,13613
+Tactic Notation"apply_fresh"332,13725
+Tactic Notation"apply_fresh" constr(T) "as"335,13815
+Tactic Notation"apply_fresh" "*" constr(T) "as"338,13909
+Tactic Notation"exists_fresh"346,14125
+
+Cyclone_LN_Types_In_Terms_Lemmas.v,4280
+Lemma close_v_open_vclose_v_open_v25,849
+Ltac close_X_open_X_proofLtac60,1884
+Ltac close_X_open_X_inductionLtac67,1990
+Lemma close_st_open_stclose_st_open_st73,2130
+Lemma close_e_open_eclose_e_open_e80,2271
+Lemma close_f_open_fclose_f_open_f87,2407
+Lemma close_openclose_open94,2543
+Lemma open_rec_st_injopen_rec_st_inj108,2884
+Lemma open_rec_e_injopen_rec_e_inj121,3182
+Lemma open_rec_f_injopen_rec_f_inj134,3471
+Lemma open_rec_injopen_rec_inj147,3760
+Lemma open_rec_v_close_rec_v_on_open_rec_vopen_rec_v_close_rec_v_on_open_rec_v162,4107
+Ltac open_rec_X_close_rec_X_on_open_rec_X_inductionLtac202,5426
+Lemma open_rec_st_close_rec_st_on_open_rec_stopen_rec_st_close_rec_st_on_open_rec_st215,5923
+Lemma open_rec_e_close_rec_e_on_open_rec_eopen_rec_e_close_rec_e_on_open_rec_e222,6153
+Lemma open_rec_f_close_rec_f_on_open_rec_fopen_rec_f_close_rec_f_on_open_rec_f229,6376
+Lemma open_rec_close_rec_on_open_recopen_rec_close_rec_on_open_rec236,6599
+Lemma open_rec_v_close_rec_vopen_rec_v_close_rec_v252,7088
+Ltac open_rec_X_close_rec_X_inductionLtac278,7789
+Ltac open_rec_X_close_rec_X_proofLtac284,7970
+Lemma open_rec_st_close_rec_stopen_rec_st_close_rec_st299,8444
+Lemma open_rec_e_close_rec_eopen_rec_e_close_rec_e310,8692
+Lemma open_rec_f_close_rec_fopen_rec_f_close_rec_f321,8934
+Lemma open_rec_close_recopen_rec_close_rec332,9176
+Lemma close_on_var_injclose_on_var_inj347,9537
+Lemma lc_dfun_iff_bodylc_dfun_iff_body368,10040
+Lemma lc_open_iff_bodylc_open_iff_body391,10447
+Lemma lc_openstar_iff_bodylc_openstar_iff_body413,10808
+Lemma lc_letx_iff_bodylc_letx_iff_body434,11180
+Lemma fv_tm_v_openfv_tm_v_open460,11746
+Ltac fv_tm_X_open_proofLtac483,12394
+Ltac fv_tm_X_open_inductionLtac489,12518
+Lemma fv_tm_e_openfv_tm_e_open503,12823
+Lemma fv_tm_f_openfv_tm_f_open511,12988
+Lemma fv_tm_openfv_tm_open519,13153
+Lemma open_var_fvopen_var_fv531,13417
+Lemma close_tv_v_fvclose_tv_v_fv540,13618
+Ltac close_tv_X_fv_inductionLtac563,14216
+Ltac close_tv_X_fv_proofLtac569,14355
+Lemma close_tv_st_fvclose_tv_st_fv573,14447
+Lemma close_tv_e_fvclose_tv_e_fv581,14622
+Lemma close_tv_f_fvclose_tv_f_fv589,14792
+Lemma close_tv_fvclose_tv_fv597,14962
+Lemma open_rec_v_lc_indopen_rec_v_lc_ind612,15354
+Ltac open_rec_f_lc_ind_inductionLtac644,16204
+Ltac open_rec_f_lc_ind_proofLtac650,16362
+Lemma open_rec_st_lc_indopen_rec_st_lc_ind659,16532
+Lemma open_rec_e_lc_indopen_rec_e_lc_ind669,16769
+Lemma open_rec_f_lc_indopen_rec_f_lc_ind679,17000
+Lemma open_rec_lc_indopen_rec_lc_ind689,17231
+Lemma open_rec_v_lc_topen_rec_v_lc_t704,17563
+Ltac open_rec_X_lc_t_X_inductionLtac723,18111
+Ltac open_rec_X_lc_t_X_proofLtac729,18267
+Lemma open_rec_st_lc_topen_rec_st_lc_t738,18471
+Lemma open_rec_e_lc_topen_rec_e_lc_t749,18675
+Lemma open_rec_f_lc_topen_rec_f_lc_t760,18875
+Lemma open_rec_lc_topen_rec_lc_t771,19075
+Lemma close_rec_v_freshclose_rec_v_fresh820,20151
+Ltac close_rec_X_fresh_inductionLtac843,20733
+Ltac close_rec_X_fresh_proofLtac849,20888
+Lemma close_rec_st_freshclose_rec_st_fresh856,20998
+Lemma close_rec_e_freshclose_rec_e_fresh864,21177
+Lemma close_rec_f_freshclose_rec_f_fresh872,21352
+Lemma close_rec_freshclose_rec_fresh880,21527
+Lemma subst_v_close_rec_vsubst_v_close_rec_v892,21795
+Ltac subst_v_close_rec_X_inductionLtac932,22839
+Lemma subst_v_close_rec_stsubst_v_close_rec_st938,23003
+Lemma subst_v_close_rec_esubst_v_close_rec_e954,23340
+Lemma subst_v_close_rec_fsubst_v_close_rec_f970,23671
+Lemma subst_v_close_recsubst_v_close_rec986,24002
+Lemma subst_v_v_freshsubst_v_v_fresh1001,24372
+Ltac subst_v_X_fresh_inductionLtac1023,24938
+Ltac subst_v_X_fresh_proofLtac1029,25082
+Lemma subst_v_st_freshsubst_v_st_fresh1036,25188
+Lemma subst_v_e_freshsubst_v_e_fresh1044,25357
+Lemma subst_v_f_freshsubst_v_f_fresh1052,25521
+Lemma subst_v_freshsubst_v_fresh1060,25686
+Lemma subst_v_v_intro_alternativesubst_v_v_intro_alternative1125,26958
+Lemma close_renameclose_rename1151,27599
+Lemma subst_lcsubst_lc1167,28088
+Lemma subst_t_body_tsubst_t_body_t1180,28410
+Lemma open_rec_t_t_preserves_lc_topen_rec_t_t_preserves_lc_t1193,28689
+Lemma size_open_recsize_open_rec1208,29070
+Lemma size_close_varsize_close_var1217,29277
+
+Cyclone_LN_Types_Lemmas.v,1148
+Lemma close_openclose_open24,762
+Lemma open_var_injopen_var_inj37,1121
+Lemma open_close_var_on_open_varopen_close_var_on_open_var52,1488
+Lemma open_close_varopen_close_var67,1996
+Lemma close_var_injclose_var_inj90,2536
+Lemma lc_utype_iff_bodylc_utype_iff_body106,2962
+Lemma lc_etype_iff_bodylc_etype_iff_body115,3101
+Lemma fv_openfv_open136,3581
+Lemma open_var_fvopen_var_fv156,4024
+Lemma close_fvclose_fv168,4332
+Lemma open_rec_lc_indopen_rec_lc_ind192,4931
+Lemma open_rec_lcopen_rec_lc203,5171
+Lemma subst_open_recsubst_open_rec213,5388
+Lemma subst_open_varsubst_open_var227,5724
+Lemma close_rec_freshclose_rec_fresh245,6149
+Lemma subst_close_recsubst_close_rec254,6371
+Lemma subst_freshsubst_fresh271,6792
+Lemma subst_introsubst_intro280,7005
+Lemma subst_intro_alternativesubst_intro_alternative296,7326
+Lemma close_renameclose_rename310,7720
+Lemma subst_lcsubst_lc326,8229
+Lemma subst_bodysubst_body339,8545
+Lemma open_rec_preserves_lcopen_rec_preserves_lc352,8818
+Lemma size_open_recsize_open_rec367,9189
+Lemma size_close_recsize_close_rec376,9400
+Lemma lc_induct_sizelc_induct_size388,9699
+
+LibPath.v,30
+Fixpoint path_compare14,420
+
+LibVarPath.v,60
+Definition varpath10,333
+Fixpoint varpath_compare22,554
+
+LibVarPathEnv.v,3865
+Definition varpathenv42,1452
+Definition varpaths43,1506
+Variable AB48,1596
+Parameter emptyempty50,1618
+Parameter empty_defempty_def51,1650
+Parameter singlesingle53,1686
+Parameter single_defsingle_def54,1735
+Parameter concatconcat57,1793
+Parameter concat_defconcat_def58,1858
+Parameter singlessingles61,1912
+Parameter singles_defsingles_def62,1972
+Parameter keyskeys66,2111
+Parameter keys_defkeys_def67,2158
+Parameter valuesvalues70,2198
+Parameter values_defvalues_def71,2241
+Parameter fold_varsfold_vars74,2285
+Parameter fold_vars_defsfold_vars_defs75,2352
+Parameter domdom79,2464
+Parameter dom_defdom_def80,2506
+Parameter dom'dom'83,2578
+Parameter dom'_defdom'_def84,2617
+Parameter mapmap87,2697
+Parameter map_defmap_def88,2755
+Parameter map_keysmap_keys92,2844
+Parameter map_keys_defmap_keys_def93,2919
+Parameter getget97,3018
+Fixpoint get_impl98,3071
+Parameter get_defget_def103,3244
+Variable AB119,3520
+Definition empty121,3542
+Lemma empty_defempty_def122,3582
+Definition single125,3645
+Lemma single_defsingle_def126,3697
+Definition concat130,3782
+Lemma concat_defconcat_def131,3832
+Definition singles135,3913
+Lemma singles_defsingles_def137,4071
+Definition keys142,4236
+Lemma keys_defkeys_def144,4297
+Definition values148,4364
+Lemma values_defvalues_def150,4421
+Definition fold_vars154,4492
+Lemma fold_vars_defsfold_vars_defs156,4612
+Definition map160,4747
+Lemma map_defmap_def162,4838
+Definition map_keys166,4950
+Lemma map_keys_defmap_keys_def168,5058
+Definition dom172,5180
+Lemma dom_defdom_def174,5270
+Definition dom'178,5369
+Lemma dom'_defdom'_def180,5462
+Fixpoint get_impl184,5569
+Definition get189,5742
+Lemma get_defget_def190,5770
+Variable AA231,6851
+Inductive okp236,6971
+Definition binds245,7221
+Definition get_or_arbitrary250,7322
+Definition extends255,7456
+Definition ftv_tm_in_values260,7600
+Ltac rew_env_defsLtac272,7973
+Variable AB276,8048
+Lemma cons_to_pushcons_to_push283,8225
+Lemma env_indenv_ind287,8340
+Lemma map_emptymap_empty296,8556
+Lemma map_singlemap_single299,8653
+Lemma map_concatmap_concat302,8763
+Lemma map_pushmap_push310,8953
+Lemma map_keys_emptymap_keys_empty314,9096
+Lemma map_keys_singlemap_keys_single317,9208
+Lemma map_keys_concatmap_keys_concat320,9328
+Lemma map_keys_pushmap_keys_push328,9538
+Lemma get_emptyget_empty332,9706
+Lemma get_singleget_single335,9807
+Lemma get_concatget_concat340,9994
+Lemma dom_emptydom_empty351,10256
+Lemma dom_singledom_single354,10336
+Lemma dom_concatdom_concat360,10468
+Lemma dom_pushdom_push369,10731
+Variable AB379,10935
+Lemma singles_nilsingles_nil386,11104
+Lemma singles_conssingles_cons390,11199
+Lemma singles_onesingles_one394,11358
+Lemma singles_twosingles_two398,11497
+Lemma keys_singleskeys_singles402,11668
+Lemma values_singlesvalues_singles412,11953
+Lemma dom_singlesdom_singles423,12242
+Lemma map_singlesmap_singles434,12564
+Lemma map_keys_singlesmap_keys_singles444,12839
+Lemma concat_singlesconcat_singles454,13113
+Lemma singles_keys_valuessingles_keys_values465,13443
+Variable AA480,13800
+Lemma env_caseenv_case485,13905
+Lemma concat_empty_rconcat_empty_r489,14042
+Lemma concat_empty_lconcat_empty_l493,14144
+Lemma concat_assocconcat_assoc497,14246
+Lemma empty_single_invempty_single_inv501,14365
+Lemma empty_concat_invempty_concat_inv505,14483
+Lemma empty_push_invempty_push_inv509,14636
+Lemma empty_middle_invempty_middle_inv513,14759
+Lemma eq_single_inveq_single_inv517,14922
+Lemma eq_push_inveq_push_inv522,15066
+Variable AA534,15389
+Lemma dom_mapdom_map539,15494
+Lemma concat_assoc_map_pushconcat_assoc_map_push548,15766
+Lemma get_pushget_push555,15969
+Ltac simpl_domLtac564,16156
+Lemma get_someget_some568,16234
+Lemma get_some_invget_some_inv582,16682

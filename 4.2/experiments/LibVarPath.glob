@@ -1,0 +1,74 @@
+DIGEST b5192f76a225fff2fb312efb9282df0c
+FLibVarPath
+R116:129 TLC.LibTactics <> <> lib
+R131:144 TLC.LibReflect <> <> lib
+R146:156 TLC.LibBool <> <> lib
+R158:173 TLC.LibOperation <> <> lib
+R175:189 TLC.LibRelation <> <> lib
+R191:202 TLC.LibOrder <> <> lib
+R205:214 TLC.LibNat <> <> lib
+R216:225 TLC.LibVar <> <> lib
+R244:250 LibPath <> <> lib
+def 343:349 <> varpath
+R355:358 Coq.Init.Datatypes <> prod ind
+R364:367 LibPath <> path def
+R360:362 TLC.LibVar Variables var defax
+inst 413:425 <> varpath_inhab
+R429:433 TLC.LibLogic <> Inhab class
+R435:441 LibVarPath <> varpath def
+R477:485 TLC.LibVar Variables var_fresh defax
+R487:489 TLC.LibFset FsetSig :fset_scope:'\{}' not
+R477:485 TLC.LibVar Variables var_fresh defax
+R487:489 TLC.LibFset FsetSig :fset_scope:'\{}' not
+R515:525 TLC.LibLogic <> prove_Inhab thm
+R527:527 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R529:531 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R542:543 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R532:535 Coq.Init.Datatypes <> cons constr
+R539:541 Coq.Init.Datatypes <> nil constr
+R515:525 TLC.LibLogic <> prove_Inhab thm
+R527:527 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R529:531 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R542:543 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R532:535 Coq.Init.Datatypes <> cons constr
+R539:541 Coq.Init.Datatypes <> nil constr
+def 562:576 <> varpath_compare
+R585:591 LibVarPath <> varpath def
+R608:608 LibVarPath <> y var
+R605:605 LibVarPath <> x var
+R621:621 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R623:623 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R626:626 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R629:629 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R631:632 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R635:635 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R646:648 TLC.LibLogic <> :type_scope:'If'_x_'then'_x_'else'_x not
+R654:667 TLC.LibLogic <> :type_scope:'If'_x_'then'_x_'else'_x not
+R699:709 TLC.LibLogic <> :type_scope:'If'_x_'then'_x_'else'_x not
+R710:714 Coq.Init.Datatypes <> false constr
+R668:670 TLC.LibLogic <> :type_scope:'If'_x_'then'_x_'else'_x not
+R678:683 TLC.LibLogic <> :type_scope:'If'_x_'then'_x_'else'_x not
+R688:693 TLC.LibLogic <> :type_scope:'If'_x_'then'_x_'else'_x not
+R694:698 Coq.Init.Datatypes <> false constr
+R684:687 Coq.Init.Datatypes <> true constr
+R673:675 Coq.Init.Logic <> :type_scope:x_'='_x not
+R650:652 Coq.Init.Logic <> :type_scope:x_'='_x not
+R649:649 LibVarPath <> x var
+R653:653 LibVarPath <> y var
+inst 733:750 <> varpath_comparable
+R754:763 TLC.LibReflect <> Comparable class
+R765:771 LibVarPath <> varpath def
+R797:810 TLC.LibReflect <> comparable_beq thm
+R812:826 LibVarPath <> varpath_compare def
+R797:810 TLC.LibReflect <> comparable_beq thm
+R812:826 LibVarPath <> varpath_compare def
+R896:903 TLC.LibLogic <> classicT thm
+R907:909 Coq.Init.Logic <> :type_scope:x_'='_x not
+R925:932 TLC.LibLogic <> classicT thm
+R936:938 Coq.Init.Logic <> :type_scope:x_'='_x not
+R896:903 TLC.LibLogic <> classicT thm
+R907:909 Coq.Init.Logic <> :type_scope:x_'='_x not
+R925:932 TLC.LibLogic <> classicT thm
+R936:938 Coq.Init.Logic <> :type_scope:x_'='_x not
+R925:932 TLC.LibLogic <> classicT thm
+R936:938 Coq.Init.Logic <> :type_scope:x_'='_x not

@@ -1,0 +1,313 @@
+DIGEST ec9e84470bf8b4c0ce39fb9e3fe6fb99
+FCyclone_Formal_Syntax
+R237:245 TLC.LibLN <> <> lib
+R247:256 TLC.LibNat <> <> lib
+R258:267 TLC.LibEnv <> <> lib
+R285:297 LibVarPathEnv <> <> lib
+ind 470:474 <> Kappa
+constr 488:488 <> B
+constr 537:537 <> A
+R489:489 Cyclone_Formal_Syntax <> Kappa ind
+R538:538 Cyclone_Formal_Syntax <> Kappa ind
+ind 594:596 <> Phi
+constr 610:623 <> witnesschanges
+constr 678:684 <> aliases
+R628:630 Cyclone_Formal_Syntax <> Phi ind
+R695:697 Cyclone_Formal_Syntax <> Phi ind
+ind 763:765 <> Tau
+constr 779:783 <> btvar
+constr 868:872 <> ftvar
+constr 937:940 <> cint
+constr 1004:1008 <> cross
+constr 1058:1062 <> arrow
+constr 1123:1127 <> ptype
+constr 1188:1192 <> utype
+constr 1253:1257 <> etype
+R791:794 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R795:797 Cyclone_Formal_Syntax <> Tau ind
+R788:790 Coq.Init.Datatypes <> nat ind
+R880:883 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R884:886 Cyclone_Formal_Syntax <> Tau ind
+R877:879 TLC.LibVar Variables var defax
+R946:948 Cyclone_Formal_Syntax <> Tau ind
+R1016:1019 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1023:1026 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1027:1029 Cyclone_Formal_Syntax <> Tau ind
+R1020:1022 Cyclone_Formal_Syntax <> Tau ind
+R1013:1015 Cyclone_Formal_Syntax <> Tau ind
+R1070:1073 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1077:1080 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1081:1083 Cyclone_Formal_Syntax <> Tau ind
+R1074:1076 Cyclone_Formal_Syntax <> Tau ind
+R1067:1069 Cyclone_Formal_Syntax <> Tau ind
+R1135:1138 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1139:1141 Cyclone_Formal_Syntax <> Tau ind
+R1132:1134 Cyclone_Formal_Syntax <> Tau ind
+R1202:1205 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1209:1212 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1213:1215 Cyclone_Formal_Syntax <> Tau ind
+R1206:1208 Cyclone_Formal_Syntax <> Tau ind
+R1197:1201 Cyclone_Formal_Syntax <> Kappa ind
+R1265:1268 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1274:1277 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1281:1284 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1285:1287 Cyclone_Formal_Syntax <> Tau ind
+R1278:1280 Cyclone_Formal_Syntax <> Tau ind
+R1269:1273 Cyclone_Formal_Syntax <> Kappa ind
+R1262:1264 Cyclone_Formal_Syntax <> Phi ind
+ind 1326:1328 <> IPE
+constr 1341:1347 <> zero_pe
+constr 1356:1361 <> one_pe
+R1348:1348 Cyclone_Formal_Syntax <> IPE ind
+R1362:1362 Cyclone_Formal_Syntax <> IPE ind
+ind 1375:1376 <> PE
+constr 1391:1394 <> i_pe
+constr 1416:1419 <> u_pe
+R1406:1409 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1410:1411 Cyclone_Formal_Syntax <> PE ind
+R1403:1405 Cyclone_Formal_Syntax <> IPE ind
+R1428:1429 Cyclone_Formal_Syntax <> PE ind
+def 1495:1498 <> Path
+R1509:1512 Coq.Init.Datatypes <> list ind
+R1514:1515 Cyclone_Formal_Syntax <> PE ind
+ind 1529:1529 <> I
+constr 1546:1548 <> i_i
+R1561:1564 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1565:1565 Cyclone_Formal_Syntax <> I ind
+R1558:1560 Coq.Init.Datatypes <> nat ind
+ind 1649:1649 <> V
+constr 1663:1667 <> bevar
+constr 1758:1762 <> fevar
+R1679:1682 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1683:1683 Cyclone_Formal_Syntax <> V ind
+R1676:1678 Coq.Init.Datatypes <> nat ind
+R1774:1777 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1778:1778 Cyclone_Formal_Syntax <> V ind
+R1771:1773 TLC.LibVar Variables var defax
+ind 1842:1843 <> St
+constr 1904:1906 <> e_s
+constr 1981:1984 <> retn
+constr 2065:2067 <> seq
+constr 2134:2137 <> if_s
+constr 2211:2215 <> while
+constr 2277:2280 <> letx
+constr 2342:2346 <> openx
+constr 2443:2450 <> openstar
+ind 2563:2563 <> E
+constr 2631:2633 <> v_e
+constr 2735:2737 <> i_e
+constr 2817:2819 <> p_e
+constr 2934:2936 <> f_e
+constr 3034:3036 <> amp
+constr 3116:3119 <> star
+constr 3206:3210 <> cpair
+constr 3278:3280 <> dot
+constr 3348:3353 <> assign
+constr 3407:3410 <> appl
+constr 3493:3496 <> call
+constr 3581:3584 <> inst
+constr 3657:3660 <> pack
+ind 3737:3737 <> F
+constr 3751:3754 <> dfun
+constr 3819:3822 <> ufun
+R1917:1922 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R1923:1924 Cyclone_Formal_Syntax <> St ind
+R1916:1916 Cyclone_Formal_Syntax <> E ind
+R1994:1999 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2000:2001 Cyclone_Formal_Syntax <> St ind
+R1993:1993 Cyclone_Formal_Syntax <> E ind
+R2079:2083 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2086:2089 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2090:2091 Cyclone_Formal_Syntax <> St ind
+R2084:2085 Cyclone_Formal_Syntax <> St ind
+R2077:2078 Cyclone_Formal_Syntax <> St ind
+R2147:2152 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2155:2158 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2161:2166 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2167:2168 Cyclone_Formal_Syntax <> St ind
+R2159:2160 Cyclone_Formal_Syntax <> St ind
+R2153:2154 Cyclone_Formal_Syntax <> St ind
+R2146:2146 Cyclone_Formal_Syntax <> E ind
+R2224:2229 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2232:2235 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2236:2237 Cyclone_Formal_Syntax <> St ind
+R2230:2231 Cyclone_Formal_Syntax <> St ind
+R2223:2223 Cyclone_Formal_Syntax <> E ind
+R2290:2295 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2298:2301 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2302:2303 Cyclone_Formal_Syntax <> St ind
+R2296:2297 Cyclone_Formal_Syntax <> St ind
+R2289:2289 Cyclone_Formal_Syntax <> E ind
+R2355:2360 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2363:2366 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2367:2368 Cyclone_Formal_Syntax <> St ind
+R2361:2362 Cyclone_Formal_Syntax <> St ind
+R2354:2354 Cyclone_Formal_Syntax <> E ind
+R2456:2461 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2464:2467 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2468:2469 Cyclone_Formal_Syntax <> St ind
+R2462:2463 Cyclone_Formal_Syntax <> St ind
+R2455:2455 Cyclone_Formal_Syntax <> E ind
+R2645:2648 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2649:2649 Cyclone_Formal_Syntax <> E ind
+R2644:2644 Cyclone_Formal_Syntax <> V ind
+R2749:2752 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2753:2753 Cyclone_Formal_Syntax <> E ind
+R2748:2748 Cyclone_Formal_Syntax <> I ind
+R2831:2834 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2842:2845 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2846:2846 Cyclone_Formal_Syntax <> E ind
+R2835:2838 Coq.Init.Datatypes <> list ind
+R2840:2841 Cyclone_Formal_Syntax <> PE ind
+R2830:2830 Cyclone_Formal_Syntax <> V ind
+R2948:2951 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R2952:2952 Cyclone_Formal_Syntax <> E ind
+R2947:2947 Cyclone_Formal_Syntax <> F ind
+R3048:3051 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3052:3052 Cyclone_Formal_Syntax <> E ind
+R3047:3047 Cyclone_Formal_Syntax <> E ind
+R3130:3133 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3134:3134 Cyclone_Formal_Syntax <> E ind
+R3129:3129 Cyclone_Formal_Syntax <> E ind
+R3220:3223 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3225:3228 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3229:3229 Cyclone_Formal_Syntax <> E ind
+R3224:3224 Cyclone_Formal_Syntax <> E ind
+R3219:3219 Cyclone_Formal_Syntax <> E ind
+R3292:3295 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3299:3302 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3303:3303 Cyclone_Formal_Syntax <> E ind
+R3296:3298 Cyclone_Formal_Syntax <> IPE ind
+R3291:3291 Cyclone_Formal_Syntax <> E ind
+R3362:3365 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3367:3370 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3371:3371 Cyclone_Formal_Syntax <> E ind
+R3366:3366 Cyclone_Formal_Syntax <> E ind
+R3361:3361 Cyclone_Formal_Syntax <> E ind
+R3421:3424 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3426:3429 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3430:3430 Cyclone_Formal_Syntax <> E ind
+R3425:3425 Cyclone_Formal_Syntax <> E ind
+R3420:3420 Cyclone_Formal_Syntax <> E ind
+R3508:3511 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3512:3512 Cyclone_Formal_Syntax <> E ind
+R3506:3507 Cyclone_Formal_Syntax <> St ind
+R3595:3598 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3602:3605 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3606:3606 Cyclone_Formal_Syntax <> E ind
+R3599:3601 Cyclone_Formal_Syntax <> Tau ind
+R3594:3594 Cyclone_Formal_Syntax <> E ind
+R3673:3676 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3678:3681 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3685:3688 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3689:3689 Cyclone_Formal_Syntax <> E ind
+R3682:3684 Cyclone_Formal_Syntax <> Tau ind
+R3677:3677 Cyclone_Formal_Syntax <> E ind
+R3670:3672 Cyclone_Formal_Syntax <> Tau ind
+R3767:3770 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3774:3777 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3780:3783 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3784:3784 Cyclone_Formal_Syntax <> F ind
+R3778:3779 Cyclone_Formal_Syntax <> St ind
+R3771:3773 Cyclone_Formal_Syntax <> Tau ind
+R3764:3766 Cyclone_Formal_Syntax <> Tau ind
+R3837:3840 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3842:3845 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3846:3846 Cyclone_Formal_Syntax <> F ind
+R3841:3841 Cyclone_Formal_Syntax <> F ind
+R3832:3836 Cyclone_Formal_Syntax <> Kappa ind
+ind 3930:3933 <> Term
+constr 3949:3955 <> term_st
+constr 3975:3980 <> term_e
+constr 4000:4005 <> term_f
+R3961:3964 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3965:3968 Cyclone_Formal_Syntax <> Term ind
+R3959:3960 Cyclone_Formal_Syntax <> St ind
+R3986:3989 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R3990:3993 Cyclone_Formal_Syntax <> Term ind
+R3985:3985 Cyclone_Formal_Syntax <> E ind
+R4011:4014 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R4015:4018 Cyclone_Formal_Syntax <> Term ind
+R4010:4010 Cyclone_Formal_Syntax <> F ind
+def 4078:4090 <> St_ind_mutual
+R4109:4110 Cyclone_Formal_Syntax <> St ind
+def 4130:4141 <> E_ind_mutual
+R4160:4160 Cyclone_Formal_Syntax <> E ind
+def 4180:4191 <> F_ind_mutual
+R4210:4210 Cyclone_Formal_Syntax <> F ind
+def 4239:4253 <> Term_ind_mutual
+R4260:4272 Cyclone_Formal_Syntax <> St_ind_mutual scheme
+R4275:4286 Cyclone_Formal_Syntax <> E_ind_mutual scheme
+R4289:4300 Cyclone_Formal_Syntax <> F_ind_mutual scheme
+ind 4387:4391 <> Value
+constr 4411:4419 <> IIsAValue
+constr 4526:4536 <> AmpIsAValue
+constr 4597:4608 <> DfunIsAValue
+constr 4698:4709 <> UfunIsAValue
+constr 4780:4791 <> PairIsAValue
+constr 4889:4900 <> PackIsAValue
+R4396:4399 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R4395:4395 Cyclone_Formal_Syntax <> E ind
+R4438:4438 Cyclone_Formal_Syntax <> I ind
+R4455:4459 Cyclone_Formal_Syntax <> Value ind
+R4462:4464 Cyclone_Formal_Syntax <> i_e constr
+R4466:4466 Cyclone_Formal_Syntax <> i var
+R4553:4553 Cyclone_Formal_Syntax <> V ind
+R4561:4564 Cyclone_Formal_Syntax <> Path def
+R4570:4574 Cyclone_Formal_Syntax <> Value ind
+R4577:4579 Cyclone_Formal_Syntax <> amp constr
+R4582:4584 Cyclone_Formal_Syntax <> p_e constr
+R4588:4588 Cyclone_Formal_Syntax <> p var
+R4586:4586 Cyclone_Formal_Syntax <> v var
+R4628:4630 Cyclone_Formal_Syntax <> Tau ind
+R4638:4639 Cyclone_Formal_Syntax <> St ind
+R4668:4672 Cyclone_Formal_Syntax <> Value ind
+R4675:4677 Cyclone_Formal_Syntax <> f_e constr
+R4680:4683 Cyclone_Formal_Syntax <> dfun constr
+R4691:4691 Cyclone_Formal_Syntax <> s var
+R4688:4689 Cyclone_Formal_Syntax <> t2 var
+R4685:4686 Cyclone_Formal_Syntax <> t1 var
+R4731:4735 Cyclone_Formal_Syntax <> Kappa ind
+R4743:4743 Cyclone_Formal_Syntax <> F ind
+R4754:4758 Cyclone_Formal_Syntax <> Value ind
+R4761:4763 Cyclone_Formal_Syntax <> f_e constr
+R4766:4769 Cyclone_Formal_Syntax <> ufun constr
+R4773:4773 Cyclone_Formal_Syntax <> f var
+R4771:4771 Cyclone_Formal_Syntax <> k var
+R4816:4816 Cyclone_Formal_Syntax <> E ind
+R4836:4846 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R4855:4865 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R4866:4870 Cyclone_Formal_Syntax <> Value ind
+R4873:4877 Cyclone_Formal_Syntax <> cpair constr
+R4882:4883 Cyclone_Formal_Syntax <> v1 var
+R4879:4880 Cyclone_Formal_Syntax <> v0 var
+R4847:4851 Cyclone_Formal_Syntax <> Value ind
+R4853:4854 Cyclone_Formal_Syntax <> v1 var
+R4828:4832 Cyclone_Formal_Syntax <> Value ind
+R4834:4835 Cyclone_Formal_Syntax <> v0 var
+R4927:4929 Cyclone_Formal_Syntax <> Tau ind
+R4937:4937 Cyclone_Formal_Syntax <> E ind
+R4955:4966 Coq.Init.Logic <> :type_scope:x_'->'_x not
+R4967:4971 Cyclone_Formal_Syntax <> Value ind
+R4974:4977 Cyclone_Formal_Syntax <> pack constr
+R4985:4988 Cyclone_Formal_Syntax <> tau' var
+R4983:4983 Cyclone_Formal_Syntax <> v var
+R4979:4981 Cyclone_Formal_Syntax <> tau var
+R4948:4952 Cyclone_Formal_Syntax <> Value ind
+R4954:4954 Cyclone_Formal_Syntax <> v var
+def 5447:5450 <> Heap
+R5456:5458 TLC.LibEnv <> env def
+R5460:5460 Cyclone_Formal_Syntax <> E ind
+def 5474:5478 <> State
+R5483:5486 Coq.Init.Datatypes <> prod ind
+R5493:5494 Cyclone_Formal_Syntax <> St ind
+R5488:5491 Cyclone_Formal_Syntax <> Heap def
+def 5510:5514 <> Delta
+R5519:5521 TLC.LibEnv <> env def
+R5523:5527 Cyclone_Formal_Syntax <> Kappa ind
+def 5541:5545 <> Gamma
+R5550:5552 TLC.LibEnv <> env def
+R5554:5556 Cyclone_Formal_Syntax <> Tau ind
+def 5570:5576 <> Upsilon
+R5581:5595 LibVarPathEnv LVPE varpathenv def
+R5597:5597 Cyclone_Formal_Syntax <> E ind
