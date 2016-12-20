@@ -123,8 +123,14 @@ Instance LcTauEJudgement    : LcJudgement E    := { lc' := TTM.lc_e}.
 Instance LcTauFJudgement    : LcJudgement F    := { lc' := TTM.lc_f}.
 Instance LcTauTermJudgement : LcJudgement Term := { lc' := TTM.lc}.
 
+Class TypJudgement (In: Type) := { typ' : Delta -> Upsilon -> Gamma -> In -> Tau -> Prop }.
+
+Instance RtypJudgement : TypJudgement E  := {typ' := rtyp}.
+Instance LtypJudgement : TypJudgement E  := {typ' := ltyp}.
+Instance StypJudgement : TypJudgement St := {typ' := styp}.
+
 Hint Unfold lc'.
-Typeclasses Transparent LcVJudgement LcStJudgement LcEJudgement LcFJudgement LcTermJudgement LcTauVJudgement LcTauStJudgement LcTauEJudgement LcTauFJudgement LcTauTermJudgement.
+Typeclasses Transparent LcVJudgement LcStJudgement LcEJudgement LcFJudgement LcTermJudgement LcTauVJudgement LcTauStJudgement LcTauEJudgement LcTauFJudgement LcTauTermJudgement RtypJudgement LtypJudgement StypJudgement.
 End CC.
 
 (* Coq bug: only the first one of these works. *)
@@ -217,6 +223,14 @@ Ltac simpl_classes_prop:=
 
        | H : context[?P _ _ _ LcTauTermJudgement _] |- _  => unfold P in H
        |  |- context[?P _ _ _ LcTauTermJudgement _]       => unfold P
+
+       | H : context[?P _ RtypJudgement _ _ _ _ _ _]|- _  => unfold P in H
+       |  |- context[?P _ RtypJudgement _ _ _ _ _ _]      => unfold P
+
+       | H : context[?P _ LtypJudgement _ _ _ _ _ _]|- _  => unfold P in H
+       |  |- context[?P _ LtypJudgement _ _ _ _ _ _]      => unfold P                                                                  
+       | H : context[?P _ StypJudgement _ _ _ _ _ _]|- _  => unfold P in H
+       |  |- context[?P _ StypJudgement _ _ _ _ _ _]      => unfold P
 end.                                                      
 
 Ltac simpl_classes_funs :=
@@ -236,6 +250,9 @@ Ltac simpl_classes_funs :=
 
        | H : context[lc' _ ] |- _ => unfold lc' in H
        |  |- context[lc' _]      => unfold lc'
+
+       | H : context[typ' _ _ _ _ _] |- _ => unfold typ' in H
+       |  |- context[typ' _ _ _ _ _]      => unfold typ'
      end.
 
 Ltac simpl_classes_classes :=
@@ -320,141 +337,19 @@ Ltac simpl_classes_classes :=
        |  |- context[LcTauFJudgement ]       => unfold LcTauFJudgement
 
        | H : context[LcTauTermJudgement ] |- _ => unfold LcTauTermJudgement in H
-       |  |- context[LcTauTermJudgement ]       => unfold LcTauTermJudgement      end.
+       |  |- context[LcTauTermJudgement ]       => unfold LcTauTermJudgement
+
+       | H : context[RtypJudgement ] |- _ => unfold RtypJudgement in H
+       |  |- context[RtypJudgement ]      => unfold RtypJudgement
+
+       | H : context[StypJudgement ] |- _ => unfold StypJudgement in H
+       |  |- context[StypJudgement ]      => unfold StypJudgement
+
+       | H : context[LtypJudgement ] |- _ => unfold LtypJudgement in H
+       |  |- context[LtypJudgement ]      => unfold LtypJudgement
+end.
 
 Ltac simpl_classes := simpl_classes_prop; simpl_classes_funs; simpl_classes_classes.
-
-(* Old
-Ltac us_1 A := unfold A; simpl.
-Ltac us_2 P A := unfold P; unfold A; simpl.
-Ltac us_in_1 A H := unfold A in H; simpl in H.
-Ltac us_in_2 P A H := unfold P in H; unfold A in H; simpl in H.
-Ltac aus := autounfold in *; simpl in *.
-
-Ltac simpl_classes :=
-   repeat 
-     match goal with
-       | H : context[fv' _ ] |- _ => us_in_1 fv' H
-       |  |- context[fv' _]      => us_1 fv'
-
-       | H : context[open_rec' _ _  _ ] |- _ => us_in_1 open_rec' H
-       |  |- context[open_rec' _ _ _]      => us_1 open_rec'
-
-       | H : context[close_rec' _ _ _ ] |- _ => us_in_1 close_rec' H
-       |  |- context[close_rec' _ _ _ ]      => us_2 close_rec'
-
-       | H : context[subst' _ _ _] |- _ => us_in_1 subst' H
-       |  |- context[subst' _ _ _]      => us_1 subst'
-
-       | H : context[lc' _ ] |- _ => us_in_1 lc' H
-       |  |- context[lc' _]      => us_1 lc'
-
-       | H : context[?P _ TauLangFuns _] |- _ => us_in_2 P TauLangFuns H
-       |  |- context[?P _ TauLangFuns _]      => us_2 P TauLangFuns
-
-       | H : context[?P _ _ VLangFuns _] |- _  => us_in_2 P VLangFuns H
-       |  |- context[?P _ _ VLangFuns _]       => us_2 P VLangFuns
-
-       | H : context[?P _ _ StLangFuns _] |- _  => us_in_2 P StLangFuns H
-       |  |- context[?P _ _ StLangFuns _]       => us_2 P StLangFuns
-
-       | H : context[?P _ _ ELangFuns _] |- _  => us_in_2 P ELangFuns H
-       |  |- context[?P _ _ ELangFuns _]       => us_2 P ELangFuns
-
-       | H : context[?P _ _ FLangFuns _] |- _  => us_in_2 P FLangFuns H
-       |  |- context[?P _ _ FLangFuns _]       => us_2 P FLangFuns
-
-       | H : context[?P _ _ TermLangFuns _] |- _  => us_in_2 P TermLangFuns H
-       |  |- context[?P _ _ TermLangFuns _]       => us_2 P TermLangFuns
-
-       | H : context[?P _ VLangFuns _] |- _  => us_in_2 P VLangFuns H
-       |  |- context[?P _ VLangFuns _]       => us_2 P VLangFuns
-
-       | H : context[?P _ StLangFuns _] |- _  => us_in_2 P StLangFuns H
-       |  |- context[?P _ StLangFuns _]       => us_2 P StLangFuns
-
-       | H : context[?P _ ELangFuns _] |- _  => us_in_2 P ELangFuns H
-       |  |- context[?P _ ELangFuns _]       => us_2 P ELangFuns
-
-       | H : context[?P _ FLangFuns _] |- _  => us_in_2 P FLangFuns H
-       |  |- context[?P _ FLangFuns _]       => us_2 P FLangFuns
-
-       | H : context[?P _ TermLangFuns _] |- _  => us_in_2 P TermLangFuns H
-       |  |- context[?P _ TermLangFuns _]       => us_2 P TermLangFuns
-
-       | H : context[?P _ TauTermVLangFuns _] |- _  => us_in_2 P TauTermVLangFuns H
-       |  |- context[?P _ TauTermVLangFuns _]       => us_2 P TauTermVLangFuns
-
-       | H : context[?P _ TauTermStLangFuns _] |- _  => us_in_2 P TauTermStLangFuns H
-       |  |- context[?P _ TauTermStLangFuns _]       => us_2 P TauTermStLangFuns
-
-       | H : context[?P _ TauTermELangFuns _] |- _  => us_in_2 P TauTermELangFuns H
-       |  |- context[?P _ TauTermELangFuns _]       => us_2 P TauTermELangFuns
-
-       | H : context[?P _ TauTermFLangFuns _] |- _  => us_in_2 P TauTermFLangFuns H
-       |  |- context[?P _ TauTermFLangFuns _]       => us_2 P TauTermFLangFuns
-
-       | H : context[?P _ TauTermTauLangFuns _] |- _  => us_in_2 P TauTermTauLangFuns H
-       |  |- context[?P _ TauTermTauLangFuns _]       => us_2 P TauTermTauLangFuns
-
-       | H : context[?P _ TauTermLangFuns _] |- _  => us_in_2 P TauTermLangFuns H
-       |  |- context[?P _ TauTermLangFuns _]       => us_2 P TauTermLangFuns
-
-       | H : context[?P _ _ _ LcVJudgement _] |- _  => us_in_2 P LcVJudgement H
-       |  |- context[?P _ _ _ LcVJudgement _]       => us_2 P LcVJudgement
-
-       | H : context[?P _ _ _ LcStJudgement _] |- _  => us_in_2 P LcStJudgement H
-       |  |- context[?P _ _ _ LcStJudgement _]       => us_2 P LcStJudgement
-
-       | H : context[?P _ _ _ LcEJudgement _] |- _  => us_in_2 P LcEJudgement H
-       |  |- context[?P _ _ _ LcEJudgement _]       => us_2 P LcEJudgement
-
-       | H : context[?P _ _ _ LcFJudgement _] |- _  => us_in_2 P LcFJudgement H
-       |  |- context[?P _ _ _ LcFJudgement _]       => us_2 P LcFJudgement
-
-       | H : context[?P _ _ _ LcTermJudgement _] |- _  => us_in_2 P LcTermJudgement H
-       |  |- context[?P _ _ _ LcTermJudgement _]       => us_2 P LcTermJudgement
-                                                      
-     end.
-*) 
-
-(* 
-  match goal with 
-    |  |- context[?P _ _ _ ?X]      => 
-      match type of X with V => idtac "matched" end
-    end.
-
-Alas this won't match a class. 
-
-Ltac simpl_classes :=
-   repeat 
-     match goal with
-       | H : context[fv' _ ] |- _ => us_in_1 fv' H
-       |  |- context[fv' _]      => us_1 fv'
-
-       | H : context[open_rec' _ _  _ ] |- _ => us_in_1 open_rec' H
-       |  |- context[open_rec' _ _ _]      => us_1 open_rec'
-
-       | H : context[close_rec' _ _ _ ] |- _ => us_in_1 close_rec' H
-       |  |- context[close_rec' _ _ _ ]      => us_2 close_rec'
-
-       | H : context[subst' _ _ _] |- _ => us_in_1 subst' H
-       |  |- context[subst' _ _ _]      => us_1 subst'
-
-       | H : context[lc' _ ] |- _ => us_in_1 lc' H
-       |  |- context[lc' _]      => us_1 lc'
-
-       | H : context[?P _ _ ?X _] |- _ => 
-         match type of X with LangFuns => us_in_2 P X H end
-       |  |- context[?P _ _ ?X _]      => 
-         match type of X with LangFuns => us_in_2 P X end
-
-       | H : context[?P _ _ _ ?X _] |- _  => 
-         match type of X with LcJudgement => us_in_2 P X H end
-       |  |- context[?P _ _ _ ?X _]       => 
-         match type of X with LcJudgement => us_in_2 P X end
-end.
-*)
 
 Ltac auto_tilde ::= simpl_classes; try invert_x_notin_x; intuition eauto.
 Ltac auto_star  ::= simpl_classes; try invert_x_notin_x; auto_star_default.

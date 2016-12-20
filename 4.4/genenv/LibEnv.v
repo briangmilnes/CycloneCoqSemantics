@@ -512,7 +512,8 @@ Lemma dom_map : forall (B:Type) (f:A->B) E,
   dom (map f E) = dom E.
 Proof using.
   induction E using env_ind.
-  rewrite map_empty. do 2 rewrite dom_empty. auto.
+  rewrite map_empty. 
+  do 2 rewrite dom_empty. auto.
   rewrite map_concat. rewrite map_single.
   rewrite_all dom_concat. rewrite_all dom_single. congruence.
 Qed.
@@ -707,7 +708,8 @@ Lemma ok_map : forall E (f : A -> B),
 Proof using.
   induction E using env_ind; introv;
    autorewrite with rew_env_map; rew_env_concat; intros Ok.
-  auto. destruct* (ok_push_inv Ok).
+  auto. 
+  destruct* (ok_push_inv Ok).
 Qed.
 
 Lemma ok_concat_map: forall E F (f : A -> A),
@@ -1157,7 +1159,7 @@ Proof using.
   introv D B. unfolds binds.
   lets: get_some_inv A B.
   forwards M: get_none A x F.
-    applys~ disjoint_in_notin D.
+  applys~ disjoint_in_notin D.
   rewrite get_concat. rewrite~ M.
 Qed.
 

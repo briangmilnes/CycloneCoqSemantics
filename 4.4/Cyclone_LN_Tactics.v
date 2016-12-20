@@ -484,7 +484,7 @@ Hint Extern 4 (LVPE.V.get _ _ = _) => simpl_env.
 
 Ltac fv_of_static_goal :=
   match goal with
-    | |- styp ?d ?u ?g ?t ?s =>
+    | |- styp ?d ?u ?g ?s ?t =>
       constr:((fv_delta d) \u (fv_upsilon u) \u (fv_gamma g) \u (TTM.fv_st s)
                            \u (TM.fv_st s) \u (T.fv t)) 
     | |- ltyp ?d ?u ?g ?e ?t => 
@@ -497,101 +497,105 @@ Ltac fv_of_static_goal :=
 
 Ltac simpl_K :=
   timeout 2
-  ((*idtac "simpl_K";*) 
+  (idtac "simpl_K"; 
    repeat match goal with
   | |- Some ?b = Some ?b       =>
-    (*idtac "Some ?b Some ?b";*) trace_goal; reflexivity
+    idtac "Some ?b Some ?b"; trace_goal; reflexivity
 
   | |- K _ cint A              =>
-    (*idtac "K _ cint A";*) trace_goal; apply K_B_A; apply K_cint
+    idtac "K _ cint A"; trace_goal; apply K_B_A; apply K_cint
 
   | |- K _ cint B              =>
-    (*idtac "K _ cint B";*) trace_goal; apply K_cint
+    idtac "K _ cint B"; trace_goal; apply K_cint
 
   | |- K _ (ftvar _) B         =>
-    (*idtac "K _ (ftvar _) B";*) trace_goal; apply K_B; try simpl_env
+    idtac "K _ (ftvar _) B"; trace_goal; apply K_B; try simpl_env
 
   | |- K _ (ftvar _) A         =>
-    (*idtac "K _ (ftvar _) B";*) trace_goal; apply K_B_A; try simpl_env
+    idtac "K _ (ftvar _) B"; trace_goal; apply K_B_A; try simpl_env
 
   | |- K _ (ptype _) A         =>
-    (*idtac "K _ (ptype _) A";*) trace_goal; apply K_B_A; apply K_ptype
+    idtac "K _ (ptype _) A"; trace_goal; apply K_B_A; apply K_ptype
 
   | |- K _ (ptype (ftvar _)) B =>
-    (*idtac "K _ (ptype (ftvar _)) B";*) trace_goal; apply K_star_A; try simpl_env
+    idtac "K _ (ptype (ftvar _)) B"; trace_goal; apply K_star_A; try simpl_env
 
   | |- K _ (ptype _) B         =>
-    (*idtac "K _ (ptype _) B";*) trace_goal; apply K_ptype
+    idtac "K _ (ptype _) B"; trace_goal; apply K_ptype
 
   | |- K _ (cross _ _) A       =>
-    (*idtac "K _ (cross _ _) A";*) trace_goal; apply K_cross
+    idtac "K _ (cross _ _) A"; trace_goal; apply K_cross
 
   | |- K _ (arrow _ _) A       =>
-    (*idtac "K _ (arrow _ _) A";*) trace_goal; apply K_arrow
+    idtac "K _ (arrow _ _) A"; trace_goal; apply K_arrow
 
   | |- K _ (utype _ _) _ => 
-     (*idtac "K _ (utype _ _) _";*) trace_goal;
+     idtac "K _ (utype _ _) _"; trace_goal;
      apply_fresh_from K_utype with fv_of_kinding_goal;
      simpl; intros; try case_nat
 
   | |- K _ (etype _ _ _) _  =>
-     (*idtac "K _ (etype _ _ ?tau) _";*) trace_goal;
+     idtac "K _ (etype _ _ ?tau) _"; trace_goal;
        apply_fresh_from K_etype with fv_of_kinding_goal;
      simpl; intros; try case_nat
 end).
 Hint Extern 5 (K _ _ _) => 
-(*idtac "simpl_K_extern";*) trace_goal; try solve[simpl_K]. 
+idtac "simpl_K_extern"; trace_goal; try solve[simpl_K]. 
 
 
-Hint Extern 6 (styp _ _ _ _ (letx _ _))          
-	=> (*idtac "1";*) apply_fresh_from* styp_let_3_6 with fv_of_static_goal.
-Hint Extern 6 (styp _ _ _ _ (openx _ _))         
-	=> (*idtac "2";*) apply_fresh_from* styp_open_3_7 with fv_of_static_goal.
-Hint Extern 6 (styp _ _ _ _ (openstar _ _))      
-	=> (*idtac "3";*) apply_fresh_from* styp_openstar_3_8 with fv_of_static_goal.
+(*
+Hint Extern 6 (styp _ _ _ (letx _ _) _)          
+	=> idtac "1"; apply_fresh_from* styp_let_3_6 with fv_of_static_goal.
+Hint Extern 6 (styp _ _ _ (openx _ _) _)         
+	=> idtac "2"; apply_fresh_from* styp_open_3_7 with fv_of_static_goal.
+Hint Extern 6 (styp _ _ _ (openstar _ _) _)      
+	=> idtac "3"; apply_fresh_from* styp_openstar_3_8 with fv_of_static_goal.
 Hint Extern 6 (rtyp _ _ _ (pack _ _ _) _)       
-	=> (*idtac "4";*) apply_fresh_from* SR_3_12 with fv_of_static_goal.
+	=> idtac "4"; apply_fresh_from* SR_3_12 with fv_of_static_goal.
 Hint Extern 6 (rtyp _ _ _ (f_e (ufun _ _)) _)    
-	=> (*idtac "5";*) apply_fresh_from* SR_3_14 with fv_of_static_goal.
+	=> idtac "5"; apply_fresh_from* SR_3_14 with fv_of_static_goal.
 Hint Extern 6 (rtyp _ _ _ (f_e (dfun _ _ _ )) _) 
-	=> (*idtac "6";*) apply_fresh_from* SR_3_13 with fv_of_static_goal.
+	=> idtac "6"; apply_fresh_from* SR_3_13 with fv_of_static_goal.
+*)
 
-Hint Extern 6 (styp _ _ _ _ (TM.open_rec_st _ _ _)) =>
- (*idtac "7";*) simpls~; try case_nat~;try case_nat~.
+Hint Extern 6 (styp _ _ _ (TM.open_rec_st _ _ _) _) =>
+ idtac "7"; simpls*; try case_nat*;try case_nat*.
 Hint Extern 6 (rtyp _ _ _ _ (T.open_rec _ _ _))     =>
- (*idtac "8";*) simpls~; try case_nat~; try case_nat~.
+ idtac "8"; simpls*; try case_nat*; try case_nat*.
 Hint Extern 6 (rtyp _ _ _ (TTM.open_rec_f _ _ _) _) =>
- (*idtac "9";*) simpls~; try case_nat~; try case_nat~.
+ idtac "9"; simpls*; try case_nat*; try case_nat*.
 Hint Extern 6 (rtyp _ _ _ (f_e (TTM.open_rec_f _ _ _)) _) =>
- (*idtac "10";*)  simpl; try case_nat~; try case_nat~.
-Hint Extern 6 (styp _ _ _ _ (TM.open_rec_st _ _ _)) =>
- (*idtac "11";*) simpls~; try case_nat~; try case_nat~.
+ idtac "10";  simpl; try case_nat*; try case_nat*.
+Hint Extern 6 (styp _ _ _ (TM.open_rec_st _ _ _) _) =>
+ idtac "11"; simpls*; try case_nat*; try case_nat*.
 
+(*
 Hint Extern 4 (ltyp _ _ _ (p_e _ _) _) =>
- (*idtac "12";*) applys~ SL_3_1.
+ idtac "12"; applys* SL_3_1.
 Hint Extern 4 (rtyp ?a ?b ?c (p_e ?d ?e) ?f) =>
- (*idtac "13 a b c d e f";*) applys~ SR_3_1.
+ idtac "13 a b c d e f"; applys* SR_3_1.
 Hint Extern 4 (ltyp _ _ _  (dot (p_e _ _) zero_pe) _) =>
- (*idtac "14";*) applys~ SL_3_3.
+ idtac "14"; applys* SL_3_3.
 Hint Extern 4 (ltyp _ _ _ (dot (p_e _ _) one_pe)  _)  =>
- (*idtac "15";*) applys~ SL_3_4.
+ idtac "15"; applys* SL_3_4.
 Hint Extern 4 (rtyp _ _ _ (dot _ zero_pe) _)          =>
- (*idtac "16";*) applys~ SR_3_3.
+ idtac "16"; applys* SR_3_3.
 Hint Extern 4 (rtyp _ _ _ (dot _ one_pe)  _)          =>
- (*idtac "17";*) applys~ SR_3_4.
-Hint Extern 4 (styp _ _ _ _ (e_s _))                  =>
- (*idtac "18";*) applys~ styp_e_3_1.
+ idtac "17"; applys* SR_3_4.
+Hint Extern 4 (styp _ _ _ (e_s _) _)                  =>
+ idtac "18"; applys* styp_e_3_1.
 Hint Extern 6 (rtyp _ _ _ (appl _ _) _)               =>
- (*idtac "19";*) applys~ SR_3_9.
+ idtac "19"; applys* SR_3_9.
+*)
 
 Hint Extern 6 (ASGN ?d (utype _ ?tau))   =>
-(*idtac "22";*) apply_fresh_from ASGN_utype with fv_of_kinding_goal;
-  try simpl; try case_nat~.
+idtac "22"; apply_fresh_from ASGN_utype with fv_of_kinding_goal;
+  try simpl; try case_nat*.
 Hint Extern 6 (ASGN ?d (etype _ _ ?tau)) =>
-(*idtac "23";*) apply_fresh_from ASGN_etype with fv_of_kinding_goal;
-  try simpl; try case_nat~.
+idtac "23"; apply_fresh_from ASGN_etype with fv_of_kinding_goal;
+  try simpl; try case_nat*.
 Hint Extern 6 (WFU _) =>
- (*idtac "24";*) constructor~; simpl_env.
+ idtac "24"; constructor*; simpl_env.
 
 (* Some missing notations from LibTactics. *)
 Tactic Notation "destruct" "*" constr(T) :=

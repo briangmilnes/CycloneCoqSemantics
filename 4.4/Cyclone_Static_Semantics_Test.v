@@ -35,8 +35,8 @@ bit easier.
 
 Example p63_1:
   styp ddot udot gdot
-       cint
-       (letx (i_e (i_i 0)) (e_s (p_e (bevar 0) nil))).
+       (letx (i_e (i_i 0)) (e_s (p_e (bevar 0) nil)))
+       cint.
 Proof.
   apply_fresh_from styp_let_3_6 with fv_of_static_goal; auto.
   (* But I'm not really solving the undirected type issues. *)
@@ -44,9 +44,9 @@ Qed.
 
 Example p63_2:
     styp ddot udot gdot
-         (ptype cint)
          (letx (i_e (i_i 0))
-               (letx (amp (p_e (bevar 1) nil)) (e_s (p_e (bevar 0) nil)))).
+               (letx (amp (p_e (bevar 1) nil)) (e_s (p_e (bevar 0) nil))))
+         (ptype cint).
 Proof.
   apply_fresh_from' styp_let_3_6 with (fv_of_static_goal) also cint; auto.
 (*
@@ -59,13 +59,13 @@ Qed.
 
 Example p62_3:
     styp ddot udot gdot
-         (etype aliases B (cross (ptype (btvar 0)) (btvar 0)))
          (letx (i_e (i_i 0))
                (letx (amp (p_e (bevar 1) nil)) 
                      (letx (pack cint
                                  (cpair (amp (p_e (bevar 2) nil)) (p_e (bevar 2) nil))
                                  (etype aliases B (cross (ptype (btvar 0)) (btvar 0))))
-                        (e_s (p_e (bevar 0) nil))))).
+                        (e_s (p_e (bevar 0) nil)))))
+         (etype aliases B (cross (ptype (btvar 0)) (btvar 0))).
 Proof.
   apply_fresh_from' styp_let_3_6 with (fv_of_static_goal) also cint;
   [simpl_env; try simpl_K | auto | auto].
@@ -81,14 +81,14 @@ Qed.
   
 Example p63_4:
     styp ddot udot gdot
-         (ptype (etype aliases B (cross (ptype (btvar 0)) (btvar 0))))
          (letx (i_e (i_i 0))
                (letx (amp (p_e (bevar 1) nil)) 
                      (letx (pack cint
                                  (cpair (amp (p_e (bevar 2) nil)) (p_e (bevar 2) nil))
                                  (etype aliases B (cross (ptype (btvar 0)) (btvar 0))))
                            (openstar (p_e (bevar 1) nil)
-                                     (e_s (p_e (bevar 0) nil)))))).
+                                     (e_s (p_e (bevar 0) nil))))))
+         (ptype (etype aliases B (cross (ptype (btvar 0)) (btvar 0)))).
 Proof.
   apply_fresh_from' styp_let_3_6 with (fv_of_static_goal) also cint;
     try simpl_env; try simpl_K;
@@ -115,14 +115,14 @@ Qed.
 
 Example p63_4_open:
     styp ddot udot gdot
-         (etype aliases B (cross (ptype (btvar 0)) (btvar 0)))
          (letx (i_e (i_i 0))
                (letx (amp (p_e (bevar 1) nil)) 
                      (letx (pack cint
                                  (cpair (amp (p_e (bevar 2) nil)) (p_e (bevar 2) nil))
                                  (etype aliases B (cross (ptype (btvar 0)) (btvar 0))))
                            (openx (p_e (bevar 1) nil)
-                                     (e_s (p_e (bevar 0) nil)))))).
+                                     (e_s (p_e (bevar 0) nil))))))
+         (etype aliases B (cross (ptype (btvar 0)) (btvar 0))).
 Proof.
   apply_fresh_from' styp_let_3_6 with (fv_of_static_goal) also cint;
     try simpl_env; try simpl_K;
@@ -239,7 +239,7 @@ Qed.
 (* Test styp *)
 (* Return at the end of a program, any old type will do. *)
 Example styp_e_test:
-  styp ddot udot gdot tau (e_s e).
+  styp ddot udot gdot (e_s e) tau.
 Proof.
   unfold_test_utilities.
   auto.
@@ -252,7 +252,7 @@ Proof.
 Qed.
 
 Example styp_return_test:
-  styp ddot udot gdot tau (retn e).
+  styp ddot udot gdot (retn e) tau.
 Proof.
   unfold_test_utilities.
   auto.
@@ -260,7 +260,7 @@ Proof.
 Qed.
 
 Example styp_seq_test:
-  styp ddot udot gdot tau (seqx s1 s2).
+  styp ddot udot gdot (seqx s1 s2) tau.
 Proof.
   unfold_test_utilities.
   auto.
@@ -268,7 +268,7 @@ Proof.
 Qed.
 
 Example styp_while_test:
-  styp ddot udot gdot tau (while e s).
+  styp ddot udot gdot (while e s) tau.
 Proof.
   unfold_test_utilities.
   auto.
@@ -276,7 +276,7 @@ Proof.
 Qed.
 
 Example styp_if_test:
-  styp ddot udot gdot tau (if_s e s1 s2).
+  styp ddot udot gdot (if_s e s1 s2) tau.
 Proof.
   unfold_test_utilities.
   auto.
@@ -285,7 +285,7 @@ Qed.
    
 
 Example styp_let_test:
-  styp ddot udot gdot tau (letx e s).
+  styp ddot udot gdot (letx e s) tau.
 Proof.
   unfold_test_utilities.
   auto.

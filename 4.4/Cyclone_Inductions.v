@@ -64,3 +64,9 @@ Ltac LCSt_Tau_Induction M P :=
            (P F TauTermFLangFuns  LcTauFJudgement));
   simpl_classes.
 
+Ltac Typ_Induction M P :=
+  apply (M
+           (P St StypJudgement)
+           (P E LtypJudgement) 
+           (P E RtypJudgement));
+  simpl_classes.

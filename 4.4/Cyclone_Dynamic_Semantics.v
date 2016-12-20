@@ -48,7 +48,8 @@ Inductive S : Heap -> St -> Heap -> St -> Prop :=
  | S_openstar_3_8: forall (tau tau' : Tau) (v v' : E) (x : var) (q : Phi) (k : Kappa)
                           (h : Heap) (s : St) (p : Path),
                     Value v ->
-                    get x h = Some v' ->
+                    binds x v' h  ->
+                    (* get x h = Some v' -> *)
                     get' v' p (pack tau' v (etype q k tau)) ->
                     (* S is part of the context not the heap, overloading ; in DS3.8 *)
                     (* x' is right, openstar uses *x' but I am eliding it in the syntax. *)
@@ -87,7 +88,8 @@ Inductive S : Heap -> St -> Heap -> St -> Prop :=
                           h' (openstar e' s)
 with R : Heap -> St -> Heap -> St -> Prop :=
  | R_get_3_1 : forall (h  : Heap) (x : var) (p : Path) (v v' : E),
-                    get x h = Some v' -> 
+                    binds x v' h ->
+                    (* get x h = Some v' ->  *)
                     get' v' p v ->
                     Value v ->
                     Value v' ->
@@ -95,7 +97,8 @@ with R : Heap -> St -> Heap -> St -> Prop :=
                       h (e_s v)
  | R_assign_3_2:
      forall (h : Heap) (v v' v'' : E) (x : var) (p : Path),
-       get x h = Some v' ->
+       binds x v' h ->
+       (* get x h = Some v' -> *)
        set' v' p v v'' ->
        Value v   ->
        Value v'  ->

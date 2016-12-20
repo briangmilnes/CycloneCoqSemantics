@@ -598,6 +598,7 @@ Proof using. (* beautify *)
     forwards*: IHE'.
 Qed.
 
+(* Dont' need these. 
 Lemma get_none : forall x E,
   x #p E -> get x E = None.
 Proof using.
@@ -605,11 +606,8 @@ Proof using.
   rewrite~ get_empty.
   rewrite~ get_push. case_if.
     simpl_dom. subst. 
-(* BUG: admitted until LibGenEnv works.    
-    notin_false. simpl_dom. auto.
+    LV.lvpe_notin_false. simpl_dom. auto.
 Qed.
- *)
-Admitted.
 
 Lemma get_none_inv : forall x E,
   get x E = None -> x #p E.
@@ -618,11 +616,12 @@ Proof using.
   simpl_dom. auto.
   rewrite get_push in Eq. case_if~.
    simpl_dom. auto.
-(* BUG: admitted until LibGenEnv works. *)
-Admitted.
+Qed.
+*)
 
 End MoreProperties.
 
+(*
 Lemma binds_get_or_arbitrary : forall `{Inhab A} x v (E:varpathenv A),
   binds x v E -> get_or_arbitrary x E = v.
 Proof using. introv M. unfold get_or_arbitrary. rewrite~ M. Qed.
@@ -671,7 +670,7 @@ Hint Extern 1 (_ #p _) => simpl_dom; notin_solve.
 
 (* ---------------------------------------------------------------------- *)
 (** ** Properties of well-formedness and freshness *)
-
+(*
 Section OkpProperties.
 
 Variable A B : Type.
@@ -696,14 +695,8 @@ Lemma okp_concat_inv : forall E F,
 Proof using.
   induction F using env_ind; rew_env_concat; introv Okp. auto.
   destruct (okp_push_inv Okp). 
-  destruct IHF.
-  auto.
-(* BUG: admitted until LibGenEnv works. *)
-(* 
+  destruct~ IHF.
 Qed.
-*)
-Admitted.
-
 
 Lemma okp_concat_inv_l : forall E F,
   okp (E &p F) -> okp E.
@@ -728,8 +721,7 @@ Proof using.
    destruct (okp_push_inv Okp).
   split~.
   forwards~ [? ?]: IHF H.
-(* BUG: admitted until LibGenEnv works. *)
-Admitted.
+Qed.
 
 Lemma okp_middle_inv_l : forall E F x v,
   okp (E &p x ~p v &p F) -> x #p E.
@@ -745,8 +737,7 @@ Proof using.
   induction G using env_ind; rew_env_concat; introv Okp.
   lets*: okp_concat_inv Okp.
   lets*: okp_push_inv Okp.
-(* BUG: admitted until LibGenEnv works. *)
-Admitted.
+Qed.
 
 Lemma okp_map : forall E (f : A -> B),
   okp E -> okp (map f E).
@@ -762,8 +753,7 @@ Proof using.
   induction F using env_ind; introv;
    autorewrite with rew_env_map; rew_env_concat; intros Okp.
   auto. destruct* (okp_push_inv Okp).
-(* BUG: admitted until LibGenEnv works. *)
-Admitted.
+Qed.
 
 Fixpoint freshp (L : varpaths) (n : nat) (xs : list varpath) {struct xs} : Prop :=
   match xs, n with
@@ -865,10 +855,11 @@ Hint Extern 1 (okp (_ &p ?xs ~p* ?vs)) =>
   end end.
 *)
 
+*)
 
 (* ---------------------------------------------------------------------- *)
 (** ** Properties of the binds relation *)
-
+(*
 Section BindsProperties.
 Variable A B : Type.
 Implicit Types E F : varpathenv A.
@@ -1138,16 +1129,19 @@ Proof using.
     right. forwards~ N: (binds_concat_left_inv M).
 Qed.
 
-Lemma fv_in_values_binds : forall y fv x v E,
-  binds x v E -> y \notin fv_in_values fv E -> y \notin fv v.
-Proof using.
-  unfold fv_in_values. introv H.
+Lemma fv_tm_in_values_binds : forall y fv x v E,
+  binds x v E -> y \notin fv_tm_in_values fv E -> y \notin fv v.
+Proof using
+  in_values. introv H.
   induction E using env_ind; introv M.
   false. applys* binds_empty_inv.
   rewrite values_def in M,IHE.
   rewrite concat_def, single_def in M. rew_list in M. simpl in M.
+(*
   lets [[? ?]|[? ?]]: (binds_push_inv H);  subst~. 
 Qed.
+ *)
+Admitted.
 
 (* unused -- requires a precondition on f
 Lemma binds_keys : forall x v f E,
@@ -1174,7 +1168,6 @@ Proof using.
        left. applys~ binds_push_neq.
        right~....
 Qed.
-*)
 
 End BindsProperties.
 (* ---------------------------------------------------------------------- *)
@@ -1328,4 +1321,9 @@ Ltac binds_cases_base H :=
   | _ => idtac
   end.
 *)
+*)
+*)
+
+*)
+
 End LVPE.

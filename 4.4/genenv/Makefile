@@ -1,7 +1,7 @@
 -include coq.depends
 all: TAGS src tactic lemma test proof experiment 
 
-SRCFILES=LibNotIn.vo LibGenEnv.vo
+SRCFILES= LibVar.vo LibEnv.vo LibPath.vo LibVarPath.vo LibVarPathEnv.vo Cyclone_Formal_Syntax.vo LibNotIn.vo LibFresh.vo LibKeyType.vo LibValueType.vo LibGenEnv.vo LibVarKey.vo LibEValue.vo LibTauValue.vo LibKappaValue.vo Environments.vo
 
 TESTFILES=
 

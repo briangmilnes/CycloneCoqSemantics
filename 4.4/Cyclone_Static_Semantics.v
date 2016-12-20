@@ -44,46 +44,46 @@ Inductive ret : St -> Prop :=
                        ret (openstar e s).
 Hint Constructors ret.
 
-Inductive styp : Delta -> Upsilon -> Gamma -> Tau -> St   -> Prop :=
+Inductive styp : Delta -> Upsilon -> Gamma -> St -> Tau -> Prop :=
   | styp_e_3_1    : forall (d : Delta) (u : Upsilon) (g : Gamma) 
                            (tau: Tau) (e : E),      
                       rtyp d u g e  tau -> 
-                      styp d u g tau (e_s e)
+                      styp d u g (e_s e) tau
 
 (* This is correct, return at end of program. *)
   | styp_return_3_2 : forall (d : Delta) (u : Upsilon) (g : Gamma)
                              (tau : Tau) (e : E),
                          rtyp d u g e tau ->
-                         styp d u g tau (retn e)
+                         styp d u g (retn e) tau
 
   | styp_seq_3_3    : forall (d : Delta) (u : Upsilon) (g : Gamma)
                              (tau : Tau) (s1 s2 : St),
-                         styp d u g tau s1 ->
-                         styp d u g tau s2 ->
-                         styp d u g tau (seqx s1 s2)
-
-  | styp_while_3_4  : forall (d : Delta) (u : Upsilon) (g : Gamma) 
-                             (tau : Tau) (e: E) (s : St),
-                         rtyp d u g e cint ->
-                         styp d u g tau s ->
-                         styp d u g tau (while e s)
+                         styp d u g s1 tau ->
+                         styp d u g s2 tau ->
+                         styp d u g (seqx s1 s2) tau
 
   | styp_if_3_5     :  forall (d : Delta) (u : Upsilon) (g : Gamma) 
                               (tau : Tau) (e: E) (s1 s2 : St),
                           rtyp d u g e cint ->
-                          styp d u g tau s1 ->
-                          styp d u g tau s2 ->
-                          styp d u g tau (if_s e s1 s2)
+                          styp d u g s1 tau ->
+                          styp d u g s2 tau ->
+                          styp d u g (if_s e s1 s2) tau
+
+  | styp_while_3_4  : forall (d : Delta) (u : Upsilon) (g : Gamma) 
+                             (tau : Tau) (e: E) (s : St),
+                         rtyp d u g e cint ->
+                         styp d u g s tau ->
+                         styp d u g (while e s) tau
 
   | styp_let_3_6    :  forall (L : vars) (d : Delta) (u : Upsilon) (g : Gamma)
                                (tau tau' : Tau) 
                                (s : St) (e : E),
                           (forall (x : var),
                             x \notin L -> 
-                            styp d u (g & (x ~ tau')) tau (TM.open_rec_st 0 x s)) ->
+                            styp d u (g & (x ~ tau')) (TM.open_rec_st 0 x s) tau) ->
                             rtyp d u g e tau' ->
                             K d tau' A ->  (* Thesis change. *)
-                            styp d u g tau  (letx e s)
+                            styp d u g (letx e s) tau
 
   | styp_open_3_7   :  forall (L : vars) (d : Delta) (u : Upsilon) (g : Gamma)
                                (k : Kappa) (tau tau' : Tau)
@@ -94,12 +94,12 @@ Inductive styp : Delta -> Upsilon -> Gamma -> Tau -> St   -> Prop :=
                              styp ((alpha ~ k) & d)
                                   u
                                   (g & (x ~ (T.open_rec 0 (ftvar alpha) tau')))
-                                  tau 
                                   (TTM.open_rec_st 0 (ftvar alpha)
-                                                   (TM.open_rec_st 0 x s)) ) ->
+                                                   (TM.open_rec_st 0 x s))
+                                  tau) ->
                          rtyp d u g e tau' ->
                          K d tau A      ->
-                         styp d u g tau (openx e s)
+                         styp d u g (openx e s) tau
 
   | styp_openstar_3_8 :  forall (L : vars) (d : Delta) (u : Upsilon) (g : Gamma)
                                (k : Kappa) (tau tau' : Tau)
@@ -110,18 +110,19 @@ Inductive styp : Delta -> Upsilon -> Gamma -> Tau -> St   -> Prop :=
                              styp (d & (alpha ~ k))
                                   u
                                   (g & (x ~ (T.open_rec 0 (ftvar alpha) (ptype tau')))) 
-                                  tau
                                   (TTM.open_rec_st 0 (ftvar alpha)
-                                                   (TM.open_rec_st 0 x s))) ->
+                                                   (TM.open_rec_st 0 x s))
+                                  tau) ->
                           ltyp d u g e tau' ->
                           K d tau A      ->
-                          styp d u g tau (openstar e s)
+                          styp d u g (openstar e s) tau 
 
 with      ltyp :   Delta -> Upsilon -> Gamma -> E -> Tau -> Prop := 
 
   | SL_3_1     : forall (d : Delta) (g : Gamma) (u : Upsilon) 
                            (x : var) (p : Path) (tau tau': Tau),
-                      get x g = Some tau' ->
+                      binds x tau' g ->
+                      (* get x g = Some tau' -> *)
                       gettype u x nil tau' p tau ->
                       WFC d u g ->
                       K d tau' A -> 
@@ -144,7 +145,8 @@ with      ltyp :   Delta -> Upsilon -> Gamma -> E -> Tau -> Prop :=
 with      rtyp :  Delta -> Upsilon -> Gamma -> E   -> Tau -> Prop := 
   | SR_3_1  : forall (d : Delta) (g : Gamma) (u : Upsilon) 
                         (x  : var) (p : Path) (tau tau': Tau),
-                   get x g = Some tau' -> 
+                   binds x tau' g ->
+                   (* get x g = Some tau' ->  *)
                    gettype u x nil tau' p tau ->
                    K d tau' A ->
                    WFC d u g ->
@@ -189,7 +191,7 @@ with      rtyp :  Delta -> Upsilon -> Gamma -> E   -> Tau -> Prop :=
                    rtyp d u g (appl e1 e2) tau
 
   | SR_3_10 : forall (d : Delta) (u : Upsilon) (g : Gamma) (tau : Tau) (s : St),
-                   styp d u g tau s ->
+                   styp d u g s tau ->
                    ret s ->
                    rtyp d u g (call s) tau
 
@@ -214,7 +216,7 @@ with      rtyp :  Delta -> Upsilon -> Gamma -> E   -> Tau -> Prop :=
                      (s : St),
                (forall (x : var),
                    x \notin L ->
-                   styp d u (g & (x ~ tau)) tau' (TM.open_rec_st 0 x s)) ->
+                   styp d u (g & (x ~ tau)) (TM.open_rec_st 0 x s) tau') ->
                    ret s ->
                    rtyp d u g (f_e (dfun tau tau' s)) (arrow tau tau')
 
@@ -262,7 +264,8 @@ Inductive refp  : Heap -> Upsilon -> Prop :=
 
   | refp_pack  : forall (h : Heap) (u : Upsilon) (x : var) (p : Path)
                         (tau tau' : Tau) (k : Kappa) (v v' : E),
-                      get x h = Some v' -> 
+                      binds x v' h ->
+                      (* get x h = Some v' ->  *)
                       get' v' p (pack tau' v (etype aliases k tau)) ->
                       refp h u ->
                       refp h (u &p ((x,p) ~p tau')).
@@ -273,7 +276,7 @@ Inductive prog  : Heap -> St -> Prop :=
   | program  : forall (h : Heap) (u : Upsilon) (g : Gamma) (tau : Tau) (s : St),
                     htyp u g h g ->
                     refp h u     ->
-                    styp ddot u g tau s ->
+                    styp ddot u g s tau ->
                     ret s -> 
                     prog h s.
 Hint Constructors prog.

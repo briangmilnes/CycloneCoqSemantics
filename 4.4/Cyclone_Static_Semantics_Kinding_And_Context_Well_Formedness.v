@@ -13,6 +13,7 @@ Import LVPE.LibVarPathEnvNotations.
 
 (* TODO Not in the thesis. I need it and in K when the context is formed. *)
       
+(* This is equivalent to OK from LibEnv. *)
 Inductive WFD : Delta -> Prop :=
   | WFD_ddot   : WFD ddot
   | WFD_xtau   : forall (d : Delta) (alpha : var) (k : Kappa),
@@ -20,17 +21,20 @@ Inductive WFD : Delta -> Prop :=
                  WFD  d ->
                  WFD (d & alpha ~ k).
 Hint Constructors WFD.
+Hint Extern 1 (WFD ddot) => unfold ddot.
 
 Inductive K : Delta -> Tau -> Kappa -> Prop :=
  | K_cint   : forall (d : Delta),
                   K d cint B
 
  | K_B     : forall (d : Delta) (alpha : var),
+              (* binds alpha B d -> *)
                get alpha d = Some B ->
                K d (ftvar alpha) B
 
  | K_star_A  : forall (d : Delta) (alpha : var),
-                 get alpha d = Some A -> 
+                 (* binds  alpha A d -> *)
+                  get alpha d = Some A -> 
                  K  d (ptype (ftvar alpha)) B
 
  | K_cross   : forall (d : Delta) (t0 t1 : Tau),
@@ -50,22 +54,29 @@ Inductive K : Delta -> Tau -> Kappa -> Prop :=
  | K_utype  : forall (L : vars) (d : Delta) (k : Kappa) (tau : Tau),
                 (forall (alpha : var),
                    alpha \notin L ->
-                   WFD (alpha ~ k & d) ->
-                   K  ((alpha ~ k) & d) (T.open_rec 0 (ftvar alpha) tau) A) ->
+                   ok (d & alpha ~ k) ->
+                   K  (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A) ->
                 K d (utype k tau) A
 
  | K_etype  : forall (L : vars) (d : Delta) (k : Kappa) (tau : Tau) (p : Phi),
               (forall (alpha : var),
                  alpha \notin L ->
-                 WFD ((alpha ~ k) & d) ->
-                 K ((alpha ~ k) & d) (T.open_rec 0 (ftvar alpha) tau) A) ->
+                 ok (d & alpha ~ k) ->
+                 K (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A) ->
               K d (etype p k tau) A
                 
  | K_B_A     : forall (d : Delta) (tau : Tau),
      K d tau B ->
      K d tau A.
 
-(* Hint Constructors K. *)
+Ltac K_constructors :=
+  match goal with
+   | H: K _ ?t B |- K _ ?t A => try apply K_B_A
+   | |-  (K _ _ _)  => 
+    try apply K_cint; try apply K_B; try apply K_star_A; try apply K_cross; 
+    try apply K_arrow; try apply K_ptype
+  end.
+Hint Extern 3 (K _ _ _) => try K_constructors.
 
 Inductive AK : Delta -> Tau -> Kappa -> Prop :=
 
@@ -74,10 +85,12 @@ Inductive AK : Delta -> Tau -> Kappa -> Prop :=
                    AK d tau k
 
  | AK_A     : forall (d : Delta) (alpha : var),
-                get alpha d = Some A ->
+                (* binds alpha A d -> *)
+                get alpha d = Some A -> 
                 AK d (ftvar alpha) A.
 
 Hint Constructors AK.
+Hint Extern 1 (AK ddot) => unfold ddot.
 
 Inductive ASGN : Delta -> Tau -> Prop :=
 
@@ -85,6 +98,7 @@ Inductive ASGN : Delta -> Tau -> Prop :=
                       ASGN d cint
 
   | ASGN_B     : forall (d : Delta) (alpha : var),
+                   (* binds alpha B d -> *)
                    get alpha d = Some B ->
                    ASGN d (ftvar alpha)
 
@@ -104,15 +118,16 @@ Inductive ASGN : Delta -> Tau -> Prop :=
   | ASGN_utype : forall (L : vars) (d : Delta)  (k : Kappa) (tau : Tau),
                  (forall (alpha : var),
                      alpha \notin L ->
-                   ASGN ((alpha ~ k) & d) (T.open_rec 0 (ftvar alpha) tau)) ->
+                   ASGN (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau)) ->
                    ASGN d (utype k tau)
 
   | ASGN_etype : forall (L : vars) (d : Delta) (k : Kappa) (tau : Tau),
                  (forall (alpha : var),
                      alpha \notin L ->
-                     ASGN ((alpha ~ k) & d) (T.open_rec 0 (ftvar alpha) tau)) ->
+                     ASGN (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau)) ->
                    ASGN d (etype witnesschanges k tau).
 Hint Constructors ASGN.
+Hint Extern 1 (ASGN ddot) => unfold ddot.
 
 Inductive WFU : Upsilon -> Prop :=
   | WFU_udot : WFU udot
@@ -120,8 +135,9 @@ Inductive WFU : Upsilon -> Prop :=
                  LVPE.V.get (x,p) u = None ->
                  WFU  u ->
                  K ddot tau A ->
-                 WFU (((x,p) ~p tau) &p u).
+                 WFU (u &p ((x,p) ~p tau)).
 Hint Constructors WFU.
+Hint Extern 1 (WFU udot) => unfold udot.
 
 Inductive WFDG : Delta -> Gamma -> Prop :=
   | WFDG_d_gdot : forall (d: Delta),
@@ -138,20 +154,23 @@ Inductive WFDG : Delta -> Gamma -> Prop :=
                      WFDG (d & (alpha ~ k)) g.
 
 Hint Constructors WFDG.
-Hint Extern 6 (WFDG _ _) =>
-try apply WFDG_xt; auto.
+Hint Extern 6 (WFDG _ _) => try apply WFDG_xt; auto.
+Hint Extern 1 (WFDG ddot _) => unfold ddot.
+Hint Extern 1 (WFDG _ gdot) => unfold gdot.
 
 (* Thesis change, we really need to know that kinding contexts are unique,
    so we're adding it here. Another option is to add it inside WFDG. *)
 Inductive WFC : Delta -> Upsilon -> Gamma -> Prop :=
   | WFC_DUG : forall (d : Delta) (g: Gamma) (u : Upsilon),
-                WFD d -> 
+                ok d -> 
                 WFDG d g ->
-                WFU u ->
+                LVPE.okp u ->
                 WFC d u g.
 Hint Constructors WFC.
-Hint Extern 10 (WFC _ _ _) =>
-  try solve[constructor; auto].
+Hint Extern 10 (WFC _ _ _) => try solve[constructor; auto].
+Hint Extern 1  (WFC ddot _ _) => unfold ddot.
+Hint Extern 1  (WFC _ udot _) => unfold udot.
+Hint Extern 1  (WFC _ _ gdot) => unfold udot.
 
 (* Automation for judgements with LN constructors. *)
 

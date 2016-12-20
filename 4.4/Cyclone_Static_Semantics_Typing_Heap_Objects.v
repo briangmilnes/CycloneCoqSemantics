@@ -35,7 +35,8 @@ Inductive gettype : Upsilon -> var -> Path -> Tau -> Path -> Tau -> Prop :=
   | gettype_etype: 
       forall (u : Upsilon) (x : var) (p p': Path) (tau tau' tau'': Tau) 
              (k : Kappa),
-        LVPE.V.get (x,p) u = Some tau'' -> 
+        LVPE.binds (x,p) tau'' u ->
+        (* LVPE.V.get (x,p) u = Some tau'' ->  *)
         gettype u x (app p (cons u_pe nil)) (T.open tau'' tau') p' tau ->
         gettype u x p (etype aliases k tau') (app (cons u_pe nil) p') tau.
 

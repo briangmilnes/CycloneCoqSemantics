@@ -6,9 +6,7 @@
 
 Set Implicit Arguments.
 Require Import TLC.LibTactics TLC.LibOption TLC.LibList TLC.LibProd TLC.LibLogic TLC.LibReflect.
-Require Import LibNotIn.
-Generalizable Variable A.
-Generalizable Variable K.
+Require Import LibNotIn LibFresh LibKeyType LibValueType.
 
 
 (* ********************************************************************** *)
@@ -20,58 +18,61 @@ Generalizable Variable K.
 (* ---------------------------------------------------------------------- *)
 (** ** Abstract definitions *)
 
-Definition env (K A :Type) := list (K * A).
+Module GenEnv(K : KeyType) (V : ValueType).
+Import K.
+Import V.
+
+Definition env := list (key * value).
 
 Module Type EnvOpsSig.
 
 Section Definitions.
-Variable K A B : Type.
 
-Parameter empty : env K A.
+Parameter empty : env.
 Parameter empty_def : empty = nil.
 
-Parameter single : K -> A -> env K A.
+Parameter single : key -> value -> env.
 Parameter single_def :
   single = fun x v => (x,v)::nil.
 
-Parameter concat : env K A -> env K A -> env K A.
+Parameter concat : env -> env -> env.
 Parameter concat_def :
   concat = fun E F => F ++ E.
 
-Parameter singles : list K -> list A -> env K A.
+Parameter singles : list key -> list value -> env.
 Parameter singles_def :
   singles = fun xs vs =>
     fold_right (fun p acc => concat acc (single (fst p) (snd p))) empty (combine xs vs).
 
-Parameter keys : env K A -> list K.
+Parameter keys : env -> list key.
 Parameter keys_def :
   keys = map fst.
 
-Parameter values : env K A -> list A.
+Parameter values : env -> list value.
 Parameter values_def :
   values = map snd.
 
-Parameter fold_keys : (A -> fset K) -> env K A -> fset K.
+Parameter fold_keys : (value -> fset key) -> env -> fset key.
 Parameter fold_keys_defs :
   fold_keys = fun fv E =>
     fold_right (fun v acc => fv v \u acc) \{} (values E).
 
-Parameter dom : env K A -> fset K.
+Parameter dom : env -> fset key.
 Parameter dom_def :
   dom = fold_right (fun p E => \{fst p} \u E) \{}.
 
-Parameter map : (A -> B) -> env K A -> env K B.
+Parameter map : (value -> value) -> env -> env.
 Parameter map_def :
   map = fun f E =>
     LibList.map (fun p => (fst p, f (snd p))) E.
 
-Parameter map_keys : (K -> K) -> env K A -> env K A.
+Parameter map_keys : (key -> key) -> env -> env.
 Parameter map_keys_def :
   map_keys = fun f E =>
     LibList.map (fun p => (f (fst p), snd p)) E.
 
-Parameter get : K -> env K A -> option A.
-Fixpoint get_impl (k : K) (E : env K A) {struct E} : option A :=
+Parameter get : key -> env -> option value.
+Fixpoint get_impl (k : key) (E : env) {struct E} : option value :=
   match E with
   | nil => None
   | (x,v) :: E' => If k = x then Some v else get_impl k E'
@@ -80,78 +81,69 @@ Parameter get_def :
   get = get_impl.
 
 End Definitions.
-
-Arguments empty [K A].
-
 End EnvOpsSig.
 
-
-(* ---------------------------------------------------------------------- *)
-(** ** Concrete definitions *)
-
 Module Export EnvOps : EnvOpsSig.
-
 Section Concrete.
-Variable K A B : Type.
 
-Definition empty : env K A := nil.
+Definition empty : env := nil.
 Lemma empty_def : empty = nil.
 Proof using. reflexivity. Qed.
 
-Definition single x v : env K A := (x,v)::nil.
+Definition single x v : env := (x,v)::nil.
 Lemma single_def :
   single = fun x v => (x,v)::nil.
 Proof using. reflexivity. Qed.
 
-Definition concat (E F : env K A) := F ++ E.
+Definition concat (E F : env) := F ++ E.
 Lemma concat_def :
   concat = fun E F => F ++ E.
 Proof using. reflexivity. Qed.
 
-Definition singles (xs : list K) (vs : list A) : env K A :=
+Definition singles (xs : list key) (vs : list value) : env :=
   fold_right (fun p acc => concat acc (single (fst p) (snd p))) empty (combine xs vs).
 Lemma singles_def :
   singles = fun xs vs =>
    fold_right (fun p acc => concat acc (single (fst p) (snd p))) empty (combine xs vs).
 Proof using. reflexivity. Qed.
 
-Definition keys : env K A -> list K :=
+Definition keys : env -> list key :=
   map fst.
 Lemma keys_def :
   keys = map fst.
 Proof using. reflexivity. Qed.
 
-Definition values : env K A -> list A :=
+Definition values : env -> list value :=
   map snd.
 Lemma values_def :
   values = map snd.
 Proof using. reflexivity. Qed.
 
-Definition fold_keys (fv : A -> fset K) (E : env K A) :=
+Definition fold_keys (fv : value -> fset key) (E : env) :=
   fold_right (fun v acc => fv v \u acc) \{} (values E).
 Lemma fold_keys_defs :
   fold_keys = fun fv E => fold_right (fun v acc => fv v \u acc) \{} (values E).
 Proof using. reflexivity. Qed.
 
-Definition map (f:A->B) (E:env K A) :=
+Definition map (f:value -> value) (E:env) :=
   LibList.map (fun p => (fst p, f (snd p))) E.
 Lemma map_def :
   map = fun f E => LibList.map (fun p => (fst p, f (snd p))) E.
 Proof using. reflexivity. Qed.
 
-Definition map_keys (f:K->K) (E:env K A) :=
+Definition map_keys (f:key -> key) (E:env) :=
   LibList.map (fun p => (f (fst p), snd p)) E.
 Lemma map_keys_def :
   map_keys = fun f E => LibList.map (fun p => (f (fst p), snd p)) E.
 Proof using. reflexivity. Qed.
 
-Definition dom : env K A -> fset K :=
+Definition dom : env -> fset key :=
   fold_right (fun p E => \{fst p} \u E) \{}.
 Lemma dom_def :
   dom = fold_right (fun p E => \{fst p} \u E) \{}.
 Proof using. reflexivity. Qed.
 
-Fixpoint get_impl (k : K) (E : env K A) {struct E} : option A :=
+Fixpoint get_impl (k : key) (E : env) {struct E} : option value :=
   match E with
   | nil => None
   | (x,v) :: E' => If k = x then Some v else get_impl k E'
@@ -162,8 +154,6 @@ Lemma get_def :
 Proof using. reflexivity. Qed.
 
 End Concrete.
-
-Arguments empty [K A].
 
 End EnvOps.
 
@@ -202,12 +192,11 @@ Open Scope env_scope.
 (** ** Additional definitions *)
 
 Section MoreDefinitions.
-Variable K A : Type.
-Implicit Types E F : env K A.
+Implicit Types E F : env.
 
 (** Well-formed environments contains no duplicate bindings. *)
 
-Inductive ok : env K A -> Prop :=
+Inductive ok : env -> Prop :=
   | ok_empty :
       ok empty
   | ok_push : forall E x v,
@@ -221,7 +210,7 @@ Definition binds x v E :=
 
 (** Read the value associated to a bound variable *)
 
-Definition get_or_arbitrary `{Inhab A} `{Inhab K} x (E:env K A) :=
+Definition get_or_arbitrary x (E:env) :=
   unsome (get x E).
 
 (** Inclusion of an environment in another one. *)
@@ -231,7 +220,7 @@ Definition extends E F :=
 
 (** Gathering free variables contained in the values of an environment *)
 
-Definition fv_in_values (fv:A-> fset K) (E:env K A) :=
+Definition fv_in_values (fv: value -> fset key) (E:env) :=
   fold_right (fun v L => (fv v) \u L) \{} (values E).
 
 End MoreDefinitions.
@@ -247,18 +236,16 @@ Ltac rew_env_defs := autorewrite with env_defs in *.
 
 Section Properties.
 
-Variable K A B : Type.
-Implicit Types k x : K.
-Implicit Types v : A.
-Implicit Types E F G : env K A.
-Implicit Types f : A -> B.
-Implicit Types r : K -> K.
+Implicit Types k x : key.
+Implicit Types v : value.
+Implicit Types E F G : env.
+Implicit Types r : key -> key.
 
 Lemma cons_to_push : forall x v E,
   (x, v) :: E = E & x ~ v.
 Proof using. intros. rew_env_defs. rew_app~. Qed.
 
-Lemma env_ind : forall (P : env K A -> Prop),
+Lemma env_ind : forall (P : env -> Prop),
   (P empty) ->
   (forall E x v, P E -> P (E & x ~ v)) ->
   (forall E, P E).
@@ -268,11 +255,14 @@ Proof using.
 Qed.
 
 Lemma map_empty : forall f,
-  map f (@empty K A) = empty.
+  map f empty = empty.
 Proof using. intros. rew_env_defs. auto. Qed.
+
+
 Lemma map_single : forall f x v,
   map f (x ~ v) = (x ~ (f v)).
 Proof using. intros. rew_env_defs. auto. Qed.
+
 Lemma map_concat : forall f E F,
   map f (E & F) = map f E & map f F.
 Proof using.
@@ -281,12 +271,13 @@ Proof using.
   rew_list~.
   rew_list. fequals.
 Qed.
+
 Lemma map_push : forall f x v E,
   map f (E & x ~ v) = map f E & x ~ (f v).
 Proof using. intros. rewrite map_concat, map_single. auto. Qed.
 
 Lemma map_keys_empty : forall r,
-  map_keys r (@empty K A) = empty.
+  map_keys r empty = empty.
 Proof using. intros. rew_env_defs. auto. Qed.
 Lemma map_keys_single : forall r x v,
   map_keys r (x ~ v) = ((r x) ~ v).
@@ -304,7 +295,7 @@ Lemma map_keys_push : forall r x v E,
 Proof using. intros. rewrite map_keys_concat, map_keys_single. auto. Qed.
 
 Lemma get_empty : forall k,
-  get k (@empty K A) = None.
+  get k empty = None.
 Proof using. intros. rew_env_defs. auto. Qed.
 Lemma get_single : forall k x v,
   get k (x ~ v) = If k = x
@@ -323,7 +314,7 @@ Proof using.
 Qed.
 
 Lemma dom_empty :
-  dom (@empty K A) = \{}.
+  dom empty = \{}.
 Proof using. rew_env_defs. auto. Qed.
 Lemma dom_single : forall x v,
   dom (x ~ v) = \{x}.
@@ -350,15 +341,14 @@ Qed.
 End Properties.
 
 Section SinglesProperties.
-Variable K A B : Type.
-Implicit Types x : K.
-Implicit Types v : A.
-Implicit Types xs : list K.
-Implicit Types vs : list A.
-Implicit Types E F : env K A.
+Implicit Types x : key.
+Implicit Types v : value.
+Implicit Types xs : list key.
+Implicit Types vs : list value.
+Implicit Types E F : env.
 
 Lemma singles_nil :
-  nil ~* nil = (@empty K A).
+  nil ~* nil = empty.
 Proof using. intros. rew_env_defs. auto. Qed.
 
 Lemma singles_cons : forall x v xs vs,
@@ -405,7 +395,7 @@ Proof using.
    applys IHxs. inverts~ E.
 Qed.
 
-Lemma map_singles : forall (f : A -> B) xs vs,
+Lemma map_singles : forall (f : value -> value) xs vs,
   length xs = length vs ->
   map f (xs ~* vs) = xs ~* (LibList.map f vs).
 Proof using.
@@ -451,10 +441,9 @@ End SinglesProperties.
 
 Section StructProperties.
 
-Variable K A : Type.
-Implicit Types x : K.
-Implicit Types v : A.
-Implicit Types E F : env K A.
+Implicit Types x : key.
+Implicit Types v : value.
+Implicit Types E F : env.
 
 Lemma env_case : forall E,
   E = empty \/ exists x v E', E = E' & x ~ v.
@@ -506,15 +495,17 @@ End StructProperties.
 Section MoreProperties.
 
 Variable K A : Type.
-Implicit Types x : K.
-Implicit Types v : A.
-Implicit Types E F : env K A.
+Implicit Types x : key.
+Implicit Types v : value.
+Implicit Types E F : env.
 
-Lemma dom_map : forall (B:Type) (f:A->B) E,
+Lemma dom_map : forall (f: value -> value) E,
   dom (map f E) = dom E.
 Proof using.
   induction E using env_ind.
-  rewrite map_empty. do 2 rewrite dom_empty. auto.
+  rewrite map_empty. 
+  (* Funny bug in rewrite, with A :Type it has to rewrite twice in the old. *)
+  rewrite dom_empty. auto.
   rewrite map_concat. rewrite map_single.
   rewrite_all dom_concat. rewrite_all dom_single. congruence.
 Qed.
@@ -587,14 +578,14 @@ Qed.
 
 End MoreProperties.
 
-Lemma binds_get_or_arbitrary : forall `{Inhab A} `{Inhab K} x v (E:env K A),
+Lemma binds_get_or_arbitrary : forall x v (E:env),
   binds x v E -> get_or_arbitrary x E = v.
 Proof using. introv M. unfold get_or_arbitrary. rewrite~ M. Qed.
 
-Definition indom_dec K A (E:env K A) x :=
+Definition indom_dec (E:env) x :=
   match get x E with None => false | Some _ => true end.
 
-Global Instance indom_decidable : forall K A (E:env K A) x,
+Global Instance indom_decidable : forall (E:env) x,
   Decidable (x \in dom E).
 Proof using.
   intros. applys decidable_make (indom_dec E x).
@@ -624,8 +615,9 @@ Tactic Notation "rew_env_concat" "in" "*" :=
   autorewrite_in_star_patch ltac:(fun tt => autorewrite with rew_env_concat).
   (* autorewrite with rew_env_concat in *. *)
 
+
 Ltac simpl_dom :=
-  rewrite_all dom_map in *;
+  rewrite_all dom_map in *; 
   rewrite_all dom_push in *;
   rewrite_all dom_concat in *;
   rewrite_all dom_single in *;
@@ -633,15 +625,15 @@ Ltac simpl_dom :=
 
 Hint Extern 1 (_ # _) => simpl_dom; notin_solve.
 
+
 (* ---------------------------------------------------------------------- *)
 (** ** Properties of well-formedness and freshness *)
 
 Section OkProperties.
 
-Variable K A B : Type.
-Implicit Types k x : K.
-Implicit Types v : A.
-Implicit Types E F : env K A.
+Implicit Types k x : key.
+Implicit Types v : value.
+Implicit Types E F : env.
 
 Lemma ok_push_inv : forall E x v,
   ok (E & x ~ v) -> ok E /\ x # E.
@@ -704,15 +696,16 @@ Proof using.
   lets*: ok_push_inv Ok.
 Qed.
 
-Lemma ok_map : forall E (f : A -> B),
+Lemma ok_map : forall E (f : value -> value),
   ok E -> ok (map f E).
 Proof using.
   induction E using env_ind; introv;
    autorewrite with rew_env_map; rew_env_concat; intros Ok.
-  auto. destruct* (ok_push_inv Ok).
+  auto. 
+  destruct* (ok_push_inv Ok).
 Qed.
 
-Lemma ok_concat_map: forall E F (f : A -> A),
+Lemma ok_concat_map: forall E F (f : value -> value),
   ok (E & F) -> ok (E & map f F).
 Proof using.
   induction F using env_ind; introv;
@@ -720,23 +713,21 @@ Proof using.
   auto. destruct* (ok_push_inv Ok).
 Qed.
 
-(* Bug missing freshness. 
-Lemma ok_singles : forall n E xs (vs:list A),
-  fresh (dom E) n xs ->
+Lemma ok_singles : forall n E xs (vs:list value),
+  fresh key (dom E) n xs ->
   length xs = length vs ->
   ok E ->
   ok (E & xs ~* vs).
 Proof using.
   introv F EQ O. gen E n vs.
-  induction xs; destruct vs; destruct n; intros; tryfalse.
-  rewrite singles_nil. rewrite~ concat_empty_r.
+  induction xs; destruct vs; destruct n; intros; tryfalse;
+  try rewrite singles_nil; try rewrite~ concat_empty_r. (* change *)
   rew_length in EQ. inverts EQ.
-   simpl in F. destruct F as [Fr F']. lets [? M]: (fresh_union_r F').
+   simpl in F. destruct F as [Fr F']. lets [? M]: (fresh_union_r _ F').
    rewrite singles_cons. rewrite concat_assoc. applys ok_push.
      applys~ IHxs n.
      simpl_dom. rewrite~ dom_singles. lets~: fresh_single_notin M.
 Qed.
-*)
 
 (* LATER: not used
 Lemma singles_ok : forall xs vs E,
@@ -773,6 +764,7 @@ Qed.
 
 End OkProperties.
 
+(*
 Implicit Arguments ok_push_inv [K A E x v].
 Implicit Arguments ok_concat_inv [K A E F].
 Implicit Arguments ok_remove [K A F E G].
@@ -780,11 +772,11 @@ Implicit Arguments ok_map [K A E f].
 Implicit Arguments ok_middle_inv_l [K A E F x v].
 Implicit Arguments ok_middle_inv_r [K A E F x v].
 Implicit Arguments ok_middle_inv [K A E F x v].
-
+*)
 
 (** Automation *)
 
-Hint Resolve ok_middle_inv_l ok_map ok_concat_map. (* BUG ok_singles.*)
+Hint Resolve ok_middle_inv_l ok_map ok_concat_map ok_singles.
 
 Hint Extern 1 (ok (?E & ?G)) =>
   match goal with H: ok (E & ?F & G) |- _ =>
@@ -816,9 +808,9 @@ Hint Extern 1 (ok (_ & ?xs ~* ?vs)) =>
 
 Section BindsProperties.
 Variable K A B : Type.
-Implicit Types E F : env K A.
-Implicit Types x : K.
-Implicit Types v : A.
+Implicit Types E F : env.
+Implicit Types x : key.
+Implicit Types v : value.
 
 Lemma binds_get : forall x v E,
   binds x v E -> get x E = Some v.
@@ -897,7 +889,7 @@ Proof using.
        right~.
 Qed.
 
-Lemma binds_map : forall x v (f : A -> B) E,
+Lemma binds_map : forall x v (f : value -> value) E,
   binds x v E -> binds x (f v) (map f E).
 Proof using.
   introv H. unfolds binds. rew_env_defs.
@@ -1131,9 +1123,9 @@ Tactic Notation "binds_push" "*" constr(H) :=
 
 Section ExtendsProperties.
 Variable K A : Type.
-Implicit Types x : K.
-Implicit Types v : A.
-Implicit Types E F : env K A.
+Implicit Types x : key.
+Implicit Types v : value.
+Implicit Types E F : env.
 
 Lemma extends_refl : forall E,
   extends E E.
@@ -1159,9 +1151,9 @@ Lemma extends_concat_r : forall E F,
   extends E (E & F).
 Proof using.
   introv D B. unfolds binds.
-  lets: get_some_inv A B.
-  forwards M: get_none A x F.
-    applys~ disjoint_in_notin D.
+  lets: get_some_inv x v E. (* Difference. *)
+  forwards M: get_none x F.
+  applys~ disjoint_in_notin D.
   rewrite get_concat. rewrite~ M.
 Qed.
 
@@ -1220,16 +1212,14 @@ Ltac binds_single H :=
   [binds x a (E & F)] two subcases: [B1: binds x a E] (with a freshness
   condition [x # F]) and [B2: binds x a F]. *)
 
-Lemma binds_concat_inv' : forall (K A : Type), forall x (v:A) (E1 E2 : env K A),
+Lemma binds_concat_inv' :  forall x (v: value) (E1 E2 : env),
   binds x v (E1 & E2) ->
      (x # E2 /\ binds x v E1)
   \/ (binds x v E2).
 Proof using. intros. 
- Check binds_concat_inv.
- (* Bug: why is forwards K: (>> binds_concat_inv K A x v E1 E2 H) failing? *)
- lets* B: binds_concat_inv.
- specialize (B K A x v E1 E2 H).
- destruct* B.
+ lets: binds_concat_inv.
+ forwards K: binds_concat_inv x v H. (* Difference. *)
+ destruct* K.
 Qed.
 
 Tactic Notation "binds_case" constr(H) "as" ident(B1) ident(B2) :=
@@ -1260,5 +1250,4 @@ Ltac binds_cases_base H :=
   end.
 *)
 
-
-
+End GenEnv.

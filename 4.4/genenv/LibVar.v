@@ -7,57 +7,219 @@ Set Implicit Arguments.
 Require Import TLC.LibTactics TLC.LibList TLC.LibLogic TLC.LibNat TLC.LibEpsilon TLC.LibReflect.
 Require Export TLC.LibFset.
 
+
+(* ********************************************************************** *)
+(** * Abstract Definition of Variables *)
+
+Module Type VariablesType.
+
+(** We leave the type of variables abstract. *)
+
+Parameter var : Set.
+
+(** This type is inhabited. *)
+
+Parameter var_inhab : Inhab var.
+
+(** This type is comparable. *)
+Parameter var_comp : Comparable var.
+Instance var_comparable : Comparable var := var_comp.
+
+(** We can build sets of variables. *)
+
+Definition vars := fset var.
+
+(** Finally, we have a means of generating fresh variables. *)
+
+Parameter var_gen : vars -> var.
+Parameter var_gen_spec : forall E, (var_gen E) \notin E.
+Parameter var_fresh : forall (L : vars), { x : var | x \notin L }.
+
+End VariablesType.
+
+
+(* ********************************************************************** *)
+(** * Concrete Implementation of Variables *)
+
+Module Export Variables : VariablesType.
+
+Definition var := nat.
+
+Lemma var_inhab : Inhab var.
+Proof using. apply (prove_Inhab 0). Qed.
+
+Lemma var_comp : Comparable var.
+Proof using. apply nat_comparable. Qed.
+
+Instance var_comparable : Comparable var := var_comp.
+
+Definition vars := fset var.
+
+Definition var_gen_list (l : list nat) :=
+  1 + fold_right plus O l.
+
+Lemma var_gen_list_spec : forall n l,
+  n \in from_list l -> n < var_gen_list l.
+Proof using.
+  unfold var_gen_list. induction l; introv I.
+  rewrite from_list_nil in I. false (in_empty_elim I).
+  rewrite from_list_cons in I. rew_list.
+   rewrite in_union in I. destruct I as [H|H].
+     rewrite in_singleton in H. subst. nat_math.
+     specializes IHl H. nat_math.
+Qed.
+
+Definition var_gen (E : vars) : var :=
+  var_gen_list (epsilon (fun l => E = from_list l)).
+
+Lemma var_gen_spec : forall E, (var_gen E) \notin E.
+Proof using.
+  intros. unfold var_gen. spec_epsilon as l.
+  applys fset_finite. rewrite Hl. introv H.
+  forwards M: var_gen_list_spec H. nat_math.
+Qed.
+
+Lemma var_fresh : forall (L : vars), { x : var | x \notin L }.
+Proof using. intros L. exists (var_gen L). apply var_gen_spec. Qed.
+
+End Variables.
+
+
+(* ********************************************************************** *)
+(** ** Lists of variables of given length and given freshness *)
+
+(** Freshness of n variables from a set L and from one another. *)
+
+Fixpoint fresh (L : vars) (n : nat) (xs : list var) {struct xs} : Prop :=
+  match xs, n with
+  | nil, O => True
+  | x::xs', S n' => x \notin L /\ fresh (L \u \{x}) n' xs'
+  | _,_ => False
+  end.
+
+Hint Extern 1 (fresh _ _ _) => simpl.
+
+(* It is possible to build a list of n fresh variables. *)
+
+Lemma var_freshes : forall L n,
+  { xs : list var | fresh L n xs }.
+Proof using. 
+ intros. gen L. induction n; intros L.
+  exists* (nil : list var).
+  destruct (var_fresh L) as [x Fr].
+   destruct (IHn (L \u \{x})) as [xs Frs].
+   exists* (x::xs).
+Qed.
+
+
+(* ********************************************************************** *)
+(** ** Picking fresh names *)
+
+(** [gather_vars_for_type T F] return the union of all the finite sets
+  of variables [F x] where [x] is a variable from the context such that
+  [F x] type checks. In other words [x] has to be of the type of the
+  argument of [F]. The resulting union of sets does not contain any
+  duplicated item. This tactic is an extreme piece of hacking necessary
+  because the tactic language does not support a "fold" operation on
+  the context. *)
+
+Ltac gather_vars_with F :=
+  let rec gather V :=
+    match goal with
+    | H: ?S |- _ =>
+      let FH := constr:(F H) in
+      match V with
+      | \{} => gather FH
+      | context [FH] => fail 1
+      | _ => gather (FH \u V)
+      end
+    | _ => V
+    end in
+  let L := gather (\{}:vars) in eval simpl in L.
+
+(** [beautify_fset V] assumes that [V] is built as a union of finite
+  sets and return the same set cleaned up: empty sets are removed and
+  items are laid out in a nicely parenthesized way *)
+
+Ltac beautify_fset V :=
+  let rec go Acc E :=
+     match E with
+     | ?E1 \u ?E2 => let Acc1 := go Acc E1 in
+                     go Acc1 E2
+     | \{}  => Acc
+     | ?E1 => match Acc with
+              | \{} => E1
+              | _ => constr:(Acc \u E1)
+              end
+     end
+  in go (\{}:vars) V.
+
+(** [pick_fresh_gen L Y] expects [L] to be a finite set of variables
+  and adds to the context a variable with name [Y] and a proof that
+  [Y] is fresh for [L]. *)
+
+Ltac pick_fresh_gen L Y :=
+  let Fr := fresh "Fr" in
+  let L := beautify_fset L in
+  (destruct (var_fresh L) as [Y Fr]).
+
+(** [pick_fresh_gens L n Y] expects [L] to be a finite set of variables
+  and adds to the context a list of variables with name [Y] and a proof
+  that [Y] is of length [n] and contains variable fresh for [L] and
+  distinct from one another. *)
+
+Ltac pick_freshes_gen L n Y :=
+  let Fr := fresh "Fr" in
+  let L := beautify_fset L in
+  (destruct (var_freshes L n) as [Y Fr]).
+
+
+
+
 (* ********************************************************************** *)
 (** ** Tactics for notin *)
 
-(* Can I and must I generalize x here? Generalization by Brian Milnes.*) 
+(* Can I and must I generalize x here? *) 
 (** For efficiency, we avoid rewrites by splitting equivalence. *)
 
-(*
-Generalizable Variable K.
-Variable K : Type.
-Implicit Types x y : K.
-*)
+Implicit Types x : var.
 
-Lemma notin_singleton_r : forall (K : Type) (x y : K),
+Lemma notin_singleton_r : forall x y,
   x \notin \{y} -> x <> y.
 Proof using. intros. rewrite~ <- notin_singleton. Qed.
 
-Lemma notin_singleton_l : forall (K : Type) (x y : K),
+Lemma notin_singleton_l : forall x y,
   x <> y -> x \notin \{y}.
 Proof using. intros. rewrite~ notin_singleton. Qed.
 
-Lemma notin_singleton_swap : forall (K : Type) (x y : K),
+Lemma notin_singleton_swap : forall x y,
   x \notin \{y} -> y \notin \{x}.
 Proof using.
   intros. apply notin_singleton_l.
   apply sym_not_eq. apply~ notin_singleton_r.
 Qed.
 
-Lemma notin_union_r : forall (K : Type) (x : K) (E F : fset K),
+Lemma notin_union_r : forall x E F,
   x \notin (E \u F) -> (x \notin E) /\ (x \notin F).
 Proof using. intros. rewrite~ <- notin_union. Qed.
 
-Lemma notin_union_r1 : forall (K : Type) (x : K) (E F : fset K),
+Lemma notin_union_r1 : forall x E F,
   x \notin (E \u F) -> (x \notin E).
 Proof using. introv. rewrite* notin_union. Qed.
 
-Lemma notin_union_r2 : forall (K : Type) (x : K) (E F : fset K),
+Lemma notin_union_r2 : forall x E F,
   x \notin (E \u F) -> (x \notin F).
 Proof using. introv. rewrite* notin_union. Qed.
 
-Lemma notin_union_l : forall (K : Type) (x : K) (E F : fset K),
+Lemma notin_union_l : forall x E F,
   x \notin E -> x \notin F -> x \notin (E \u F).
 Proof using. intros. rewrite~ notin_union. Qed.
 
-(* This should be in LibGenEnv? 
 Lemma notin_var_gen : forall E F,
   (forall x, x \notin E -> x \notin F) ->
   (var_gen E) \notin F.
 Proof using. intros. autos~ var_gen_spec. Qed.
-*)
 
-(*
 Implicit Arguments notin_singleton_r    [x y].
 Implicit Arguments notin_singleton_l    [x y].
 Implicit Arguments notin_singleton_swap [x y].
@@ -65,7 +227,6 @@ Implicit Arguments notin_union_r  [x E F].
 Implicit Arguments notin_union_r1 [x E F].
 Implicit Arguments notin_union_r2 [x E F].
 Implicit Arguments notin_union_l  [x E F].
-*)
 
 (** Tactics to deal with notin.  *)
 
@@ -143,19 +304,17 @@ Ltac notin_false :=
   | _ => intros_all; false; notin_solve_false
   end.
 
-(* BUG: Weakening not in solver by not giving it an understanding of fresh. 
 Ltac notin_from_fresh_in_context :=
   repeat (match goal with H: fresh _ _ _ |- _ =>
     progress (simpl in H; destructs H) end).
-*)
 
 Ltac notin_solve :=
-  (* notin_from_fresh_in_context; *)
+  notin_from_fresh_in_context;
   first [ notin_simpl; try notin_solve_one
         | notin_false ].
 
 Hint Extern 1 (_ \notin _) => notin_solve.
-Hint Extern 1 (_ <> _) => notin_solve. (* Will this work without :> K? *)
+Hint Extern 1 (_ <> _ :> var) => notin_solve.
 Hint Extern 1 ((_ \notin _) /\ _) => splits.
 
 (*
@@ -170,7 +329,6 @@ LATER:
 (** ** Tactics for fresh *)
 
 (* todo: cleanup proofs of fresh using calc_fset *)
-(* BUG weakening notin by not giving it fresh yet. -bgm 
 
 Lemma fresh_union_r : forall xs L1 L2 n,
   fresh (L1 \u L2) n xs -> fresh L1 n xs /\ fresh L2 n xs.
@@ -315,5 +473,5 @@ Hint Extern 1 (fresh _ _ _) => fresh_solve.
 
 (* LATER: more automation of fresh_length properties *)
 
-*)
+
 

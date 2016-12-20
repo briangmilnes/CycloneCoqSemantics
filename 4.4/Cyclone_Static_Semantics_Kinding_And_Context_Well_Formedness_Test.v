@@ -69,10 +69,14 @@ Proof.
   (* apply_fresh_from* K_utype with fv_of_goal. *)
 Qed.
 
+(* Restart here on automation *)
 Example K_utype_test_fresh:
+  ok (ddot & (beta_ ~ B)) ->
   K (ddot & (beta_ ~ B)) (utype k (ftvar beta_)) A.
 Proof.
+  intros.
   auto.
+  apply_fresh_from* K_utype with fv_of_kinding_goal.
   (* apply_fresh_from* K_utype with fv_of_goal. *)
 Qed.
 
