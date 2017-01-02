@@ -27,11 +27,11 @@ Inductive K : Delta -> Tau -> Kappa -> Prop :=
  | K_cint   : forall (d : Delta),
                   K d cint B
 
- | K_B     : forall (d : Delta) (alpha : var),
+ | K_B     : forall (alpha : var) (d : Delta),
                get alpha d = Some B ->
                K d (ftvar alpha) B
 
- | K_star_A  : forall (d : Delta) (alpha : var),
+ | K_star_A  : forall (alpha : var) (d : Delta), 
                  get alpha d = Some A -> 
                  K  d (ptype (ftvar alpha)) B
 

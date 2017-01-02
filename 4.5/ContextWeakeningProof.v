@@ -66,7 +66,7 @@ Qed.
 
 (* I have to strengthen this to kill the Magic K or get it elsewhere. *)
 
-Lemma A_1_Context_Weakening_2:
+Lemma A_1_Context_Weakening_3:
   forall (u : Upsilon),
     WFU u ->
     forall x p d tau, 

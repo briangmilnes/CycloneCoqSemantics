@@ -262,11 +262,18 @@ Lemma get_fv_delta:
 Proof.
   intros.
   unfold fv_delta.
-  induction d.
-  rewrite <- empty_def in H.
+  induction d using env_ind.
   rewrite get_empty in H.
   inversion H.
-  (* working, list vs env issues. *)
+  rewrite get_push in H.
+  case_var.
+  inversion H.
+  subst.
+  rewrite dom_push.
+  fset.
+  apply IHd in H.
+  rewrite dom_push.
+  (* need some trivial set theory *)
 Admitted.
 Ltac get_fv_delta :=
   match goal with 
@@ -290,8 +297,8 @@ Proof.
 Admitted.
 
 Lemma K_empty_closed:
-  forall tau,
-    K empty tau A ->
+  forall tau k,
+    K empty tau k ->
     T.fv tau = \{}.
 Proof.
   intros.
@@ -299,15 +306,22 @@ Proof.
   apply H0 in H.
   unfold fv_delta in H.
   rewrite dom_empty in H.
-  (* where is X \c \{} -> x = \{} *)
-Admitted.
-
+  admit. (* trivial set theory *)
+  auto.
+Qed.
 Lemma ok_strengthing:
   forall (d' : Delta) y k, 
     ok(d' & y ~ k) ->
     forall d, 
       extends d d' ->                
       ok(d & y ~ k).
+Proof.
+  intros.
+  induction d using env_ind.
+  apply* ok_push.
+  apply ok_push.
+  apply ok_push.
+  inversion H.
 Admitted.
 
 Lemma K_weakening:
@@ -825,6 +839,86 @@ Proof.
   apply refp_pack with (tau:=tau) (k:=k)(v:=v)(v':=v'); auto.
 Qed.
 
+Lemma subset_weakening:
+  forall A (a : fset A) b c,
+    a \c c ->
+    a \c b \u c.
+Admitted.
+
+Lemma get_dom:
+  forall A alpha (d : env A)  k,
+    get alpha d = Some k ->
+    \{alpha} \c dom d.
+Proof.
+  intros.
+  induction d using env_ind.
+  rewrite get_empty in H.
+  inversion H.
+  destruct (classicT(alpha = x)).
+  subst.
+  rewrite dom_push.
+  fset.
+  rewrite get_push in H.
+  rewrite* If_r in H.
+  apply IHd in H.
+  rewrite dom_push.
+  apply* subset_weakening.
+Qed.
+Ltac get_dom :=
+  match goal with
+  | H: get ?a ?d = Some ?k' 
+  |- \{?a} \c dom ?d =>
+    apply get_dom with (k:= k')
+  end.
+Hint Extern 1 (\{_} \c dom _) => get_dom.
+
+Lemma singleton_empty:
+  forall A (v :A),
+    \{v} = \{} -> False.
+Admitted.
+
+Lemma fv_subst:
+  forall tau alpha tau',
+    T.fv tau' = \{} ->
+    T.subst tau alpha tau' = tau'.
+Proof.
+  intros.
+  induction tau'; auto;
+    try solve[simpl in H; simpl; fequals*].
+  simpl in H.
+  apply singleton_empty in H.
+  inversion H.
+
+  simpl in H.
+  simpl.
+  assert(T.fv tau'1 = \{}). admit.
+  assert(T.fv tau'2 = \{}). admit.
+  fequals*.
+
+  simpl in H.
+  simpl.
+  assert(T.fv tau'1 = \{}). admit.
+  assert(T.fv tau'2 = \{}). admit.
+  fequals*.  
+Qed.
+
+Lemma open_rec_fv:
+  forall alpha tau n, 
+    T.fv (T.open_rec n (ftvar alpha) tau) = T.fv tau \u \{alpha} \/
+    T.fv (T.open_rec n (ftvar alpha) tau) = T.fv tau.
+Proof.
+  intros.
+  induction tau; simpl; auto.
+  case_nat.
+  simpl.
+  left.
+  rewrite* union_empty_l.
+
+  simpl.
+  right*.
+  admit.
+  admit.
+Admitted.
 
 Lemma K_fv_delta:
   forall tau d k,
@@ -833,26 +927,83 @@ Lemma K_fv_delta:
     T.fv tau \c dom d.
 Proof.
   introv OKd Kd.
-  induction Kd; simpl; auto; auto with fset.
+  induction Kd; simpl; auto with fset.
   admit.
   admit.
-  (* We definitely want a strong subset prover. *)
-  admit.
-  admit.
-  (* We definitely want some LN lemmas on FV of the base set. *)
   pick_fresh alpha.
-  assert(NI: alpha \notin L); auto.
-  assert(NId: alpha \notin dom d); auto.
-  assert(OK: ok (d & alpha ~ k)); auto.
-  specialize (H0 alpha NI OK).
-  specializes* H0.
-  (* Just not strong enough, one must be able to parameterize about judgments. *)
-  apply TP.open_var_fv in H0.
+  lets I: open_rec_fv alpha tau 0.
+  assert(ANI: alpha \notin L); auto.
+  assert(KO: ok( d & alpha ~ k)); auto.
+  specialize (H0 alpha ANI KO KO).
+  inversion I.
+  rewrite H1 in H0.
+  rewrite dom_push in H0.
+  admit. (* set *)
+Admitted. (* should work *)
 
+Lemma punt:
+  forall d alpha alpha' k k' tau tau0,  
+    alpha' \notin T.fv tau -> 
+    K (d & alpha' ~ k) (T.open_rec 0 (ftvar alpha') tau) k' -> (* perhaps exists k' *)
+    T.subst tau0 alpha (T.open_rec 0 (ftvar alpha') tau) =
+                        T.open_rec 0 (ftvar alpha') tau -> 
+    T.subst tau0 alpha tau = tau.
+Proof.
+  intros.
+  induction tau; auto; simpl; fequals;
+  try solve[simpl in H1;
+  inversion H1;
+  inversion H0; subst;
+  try apply IHtau1; auto;
+  try apply IHtau1; auto;
+  try apply IHtau2; auto;
+  try apply IHtau2; auto;
+  inversion H2].
 
-  
+  simpl in H0.
+  inversion H0; subst.
+  apply IHtau; auto.
+  inversion H2; subst.
+Admitted.
 
-Lemma A_4_Useless_Substitution_1:
+Lemma A_4_Useless_Substitutions_1':
+  forall alpha d,
+    alpha \notin dom d ->
+    ok d ->
+    forall tau',
+     (exists k, K d tau' k) ->
+      forall tau, 
+        T.subst tau alpha tau' = tau'.
+Proof.
+  intros.
+  induction tau'; auto.
+  intros.
+  simpl.
+  case_var*.
+  inversion H1; subst.
+(*
+  rewrite get_none in H4; auto.
+  inversion H4.
+  inversion H2; subst.
+  rewrite get_none in H5; auto.
+  inversion H5.
+
+  admit.
+  admit.
+  simpl; fequals.
+  inversion H1; subst.
+  admit. (* exists k problem ?*)
+  admit.
+  admit.
+  simpl; fequals.
+  apply IHtau'.
+  inversion H1; subst.
+  Admitted.
+*)
+  (* Stuck here too. *)
+Admitted.
+
+Lemma A_4_Useless_Substitutions_1:
   forall alpha d,
     alpha \notin dom d ->
     ok d ->
@@ -877,4 +1028,780 @@ Proof.
   specialize (H0 alpha' N P Q P tau0).
   assert(R: alpha' \notin (T.fv tau)).
   auto.
-  SearchAbout(_ -> T.open_rec _ _ _ = _).
+
+  apply punt with (d:= d) (alpha':=alpha') (k:= k) (k':= A); try assumption.
+Admitted.
+
+Lemma A_4_Useless_Substitutions_2:
+  forall alpha d g,
+    alpha \notin dom d ->
+    WFDG d g ->
+    forall tau, 
+      EnvOps.map (fun tau' =>  (T.subst tau alpha tau')) g = g.
+Proof.  
+  introv NI WFDGd.
+  induction WFDGd.
+  intros.
+  rewrite* map_empty.
+  intros.
+  rewrite map_push.
+  rewrite* IHWFDGd.
+  rewrite A_4_Useless_Substitutions_1 with (d:=d) (k:=A); auto.
+Qed.
+
+(* This formulation builds a useless induction principle. *)
+(* A formulation of the theorem as above is necessary. *)
+Lemma A_4_Useless_Substitutions_3:
+  forall u,
+    WFU u ->
+    forall tau alpha, 
+      LVPE.V.map (fun tau' => (T.subst tau alpha tau')) u = u.
+Proof.  
+  introv WFUd.
+  induction WFUd; intros.
+  rewrite* LVPE.map_empty.
+
+  rewrite LVPE.map_push.
+  rewrite IHWFUd.
+  rewrite A_4_Useless_Substitutions_1 with (d:= empty) (k:=A); auto.
+Qed.
+
+Lemma subst_var:
+  forall t1 v,
+    T.subst t1 v (ftvar v) = t1.
+Proof.
+  intros; simpl; case_var*.
+Qed.
+
+Lemma A_5_Commuting_Substitutions:
+  forall beta t2,
+    beta \notin T.fv t2 ->
+    forall t0 t1 alpha,
+      (T.subst t2 alpha (T.subst t1 beta t0)) =
+      (T.subst (T.subst t2 alpha t1) beta (T.subst t2 alpha t0)).
+Proof.
+  induction t0; intros; try solve[auto]; try solve[simpl;try case_var*; fequals*].
+  admit. (* Var case wrong? Theorem wrong? *)
+Qed.
+
+Require Export Coq.Program.Equality.
+
+(* Dependent induction does OK but it puts me into JMeq which I'd rather avoid,
+ and has to have functional equivalence of environments. *)
+Lemma A_6_Subsititution_JMeq:
+  forall d t k,
+    AK d t k ->
+    forall alpha t' k', 
+      K (d & alpha ~ k) t' k' ->
+      K d (T.subst t alpha t') k'.
+Proof.
+  introv AKd Kd.
+  dependent induction Kd;
+    try solve[simpl; auto; try apply K_cross; try apply K_arrow; 
+              try applys* IHKd1;
+              try applys* IHKd2].
+  simpl.
+  case_var.
+  rewrite get_push in H.
+  case_var.
+  inversion H.
+  inversions* AKd.
+  inversion H4.
+  apply K_B.
+  (* What's my automation?*)
+  rewrite get_push in H.
+  case_var*.
+
+  admit.
+  admit.
+
+  simpl.
+  apply_fresh K_utype; intros.
+  assert(NI: y \notin L); auto.
+  assert(D: ok (d & alpha ~ k & y ~ k0)).
+  admit.
+  assert(AK': AK (d & y ~ k0) t k).
+  admit.
+  assert(Q:  d & alpha ~ k & y ~ k0 ~= d & y ~ k0 & y ~ k).
+  admit. (* doubtful *)
+  lets SOV: TP.subst_open_var alpha y.
+  rewrite <- SOV.
+  specialize (H0 y NI D (d & y ~ k0) k AK' alpha).
+  apply H0.
+  (* Works but modulo JMeq on misordered d, which is functionally equivalent. *)
+Admitted.
+
+(* Trying specialized induction schema, but going to prove the general one first. *)
+
+Lemma K_ind_proven:
+  forall P : Delta -> Tau -> Kappa -> Prop,
+    (forall d : Delta, P d cint B) ->
+    (forall (d : Delta) (alpha : var), get alpha d = Some B -> P d (ftvar alpha) B) ->
+    (forall (d : Delta) (alpha : var),
+        get alpha d = Some A -> P d (ptype (ftvar alpha)) B) ->
+    (forall (d : Delta) (t0 t1 : Tau),
+        K d t0 A -> P d t0 A -> K d t1 A -> P d t1 A -> P d (cross t0 t1) A) ->
+    (forall (d : Delta) (t0 t1 : Tau),
+        K d t0 A -> P d t0 A -> K d t1 A -> P d t1 A -> P d (arrow t0 t1) A) ->
+    (forall (d : Delta) (tau : Tau), K d tau A -> P d tau A -> P d (ptype tau) B) ->
+    (forall (L : vars) (d : Delta) (k : Kappa) (tau : Tau),
+        (forall alpha : var,
+            alpha \notin L ->
+            ok (d & alpha ~ k) -> K (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A) ->
+        (forall alpha : var,
+            alpha \notin L ->
+            ok (d & alpha ~ k) -> P (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A) ->
+        P d (utype k tau) A) ->
+    (forall (L : vars) (d : Delta) (k : Kappa) (tau : Tau) (p : Phi),
+        (forall alpha : var,
+            alpha \notin L ->
+            ok (d & alpha ~ k) -> K (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A) ->
+        (forall alpha : var,
+            alpha \notin L ->
+            ok (d & alpha ~ k) -> P (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A) ->
+        P d (etype p k tau) A) ->
+    (forall (d : Delta) (tau : Tau), K d tau B -> P d tau B -> P d tau A) ->
+    forall (d : Delta) (t : Tau) (k : Kappa), K d t k -> P d t k.
+Proof.  
+  intros.
+  induction H8; auto.
+  pick_fresh alpha.
+  applys* H5.
+  pick_fresh alpha.
+  applys* H6.
+Qed.
+
+Lemma K_dep_ind:
+  forall P : Delta -> Tau -> Kappa -> var -> Kappa -> Prop,
+    (forall (d : Delta) beta k',
+         P d cint B beta k') ->
+    forall (d : Delta) (t : Tau) (k : Kappa),
+      AK d t k ->
+      forall beta k',
+        K (d & beta ~ k) t k' -> P d t k' beta k.
+Proof.  
+Admitted.
+
+(* Does not work inside the induction hypotheses. *)
+Lemma tst:
+  forall d' d t alpha k,
+    AK d t k ->
+    d' = (d & alpha ~ k) ->
+    forall t',
+      K d' t' k ->
+      K d t' k.
+Proof.
+  introv AKd d'd Kd.
+  induction Kd.
+  Focus 7.
+Admitted.
+
+Check K_ind.
+
+(* I'm just not buying that this should be so hard. *)
+Lemma K_dep_ind2:
+  forall P : Delta -> Tau -> Kappa -> var -> Kappa -> Prop,
+    (forall (d : Delta) t t' k beta k',
+      AK d t k ->
+      K (d & beta ~ k) t' k' -> 
+      P d cint B beta k') ->
+    (forall (d : Delta) (alpha : var) beta k',  
+        get alpha d = Some B ->
+        P d (ftvar alpha) B beta k') ->
+    forall (d : Delta) (t : Tau) (k : Kappa),
+      AK d t k ->
+      forall beta k',
+        K (d & beta ~ k) t k' ->
+        P d t k' beta k.
+Proof.  
+Admitted.
+
+(* Also failing as d' is larger because I am not
+  substituting everything in. 
+Lemma A_6_Subsititution_ind3:
+  forall d t k,
+      AK d t k ->
+      forall d',
+        extends d d' ->
+        forall t' k',
+          K d' t' k' ->
+          forall alpha, 
+          K d (T.subst t alpha t') k'.
+Proof.
+  introv AKd Ed Kd.
+  induction Kd; intros; auto.
+  simpl; case_var.
+Admitted.
+*)
+
+Function P d t (k : Kappa) alpha k':=
+  forall t', 
+    K d (T.subst t alpha t') k'.
+
+Lemma A_6_Subsititution_ind2:
+  forall d t k alpha k',
+      AK d t k ->
+        forall t',
+          K (d & alpha ~ k) t' k' ->
+          K d (T.subst t alpha t') k'.
+Proof.
+  introv AKd Kd.
+(*  apply (K_dep_ind2  P). *)
+Admitted.
+  
+Lemma K_dep_ind3:
+  forall P : Delta -> Tau -> Kappa -> var -> Tau -> Kappa -> Prop,
+    (forall d beta t' k',
+         P d cint B beta t' k') ->
+    (forall d alpha beta t' k',
+        get alpha d = Some A -> P d (ptype (ftvar alpha)) B beta t' k') ->
+    (forall (d : Delta) beta t' k' (alpha : var),
+        get alpha d = Some B ->
+        P d (ftvar alpha) B beta t' k') ->
+    (forall d t0 t1 beta t' k', 
+        K d t0 A -> P d t0 A beta t' k'->
+        K d t1 A -> P d t1 A beta t' k'-> P d (cross t0 t1) A beta t' k') ->
+    (forall d t0 t1 beta t' k', 
+        K d t0 A -> P d t0 A beta t' k'->
+        K d t1 A -> P d t1 A beta t' k'-> P d (arrow t0 t1) A beta t' k') ->
+    (forall d tau beta t' k',
+        K d tau A -> P d tau A beta t' k' -> P d (ptype tau) B beta t' k') ->
+    (forall (L : vars) (d : Delta) (k : Kappa) (tau : Tau) beta t' k',
+        (forall alpha : var,
+            alpha \notin L ->
+            ok (d & alpha ~ k) ->
+            K (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A) ->
+        (forall alpha : var,
+            alpha \notin L ->
+            ok (d & alpha ~ k) ->
+            P (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A beta t' k') ->
+        P d (utype k tau) A beta t' k') ->
+    (forall (L : vars) (d : Delta) (k : Kappa) (tau : Tau) (p : Phi) beta t' k',
+        (forall alpha : var,
+            alpha \notin L ->
+            ok (d & alpha ~ k) -> 
+            K (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A) ->
+        (forall alpha : var,
+            alpha \notin L ->
+            ok (d & alpha ~ k) -> 
+            P (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A beta t' k') ->
+        P d (etype p k tau) A beta t' k') ->
+    (forall d tau beta t' k', K d tau B -> P d tau B beta t' k' -> P d tau A beta t' k') ->
+    forall (d : Delta) (t : Tau) (k : Kappa),
+       K d t k ->
+       forall t' k' k'' beta,
+        K (d & beta ~ k) t' k' ->
+        P d t k'' beta t' k'.
+Proof.
+  introv P H0 H1 H2 H3 H4 H5 H6 H7.
+  intros d t k Kd.
+  induction Kd; intros.
+  admit.
+  admit.
+  admit.
+  admit.
+  admit.
+  (* case ptype tau *)
+  assert(FOO: P0 d (ptype tau) B beta t' k').
+  apply* H4.
+  apply* IHKd.
+  (* but beta B vs beta A in the context issue. *)
+(*
+(* can solve binding cases. *)
+  pick_fresh alpha.
+  applys H5; intros.
+  assert(NI: alpha \notin L); auto.
+  apply* H8.
+  apply* H10.
+  admit. (* K weakening. *)
+
+  skip.
+
+  apply* H7.
+  apply* IHK.
+  admit. (* B_A conversion of some type. *)
+
+  apply H7.
+*)
+Admitted.  
+
+(* Works bug fugly, custom induction keeping AK around.  *)
+Lemma A_6_Subsititution_ind3:
+  forall d t k,
+      AK d t k ->
+      forall alpha t' k',
+        K (d & alpha ~ k) t' k' ->
+        K d (T.subst t alpha t') k'.
+Proof.
+  Function P3 d t (k : Kappa):=
+      AK d t k ->
+      forall alpha t' k',
+        K (d & alpha ~ k) t' k' ->
+        K d (T.subst t alpha t') k'.
+(* Works
+  lets I: K_dep_ind3.
+  specialize (I P3).
+  apply I.
+  unfold P3.
+*)
+(*
+  apply (K_dep_ind3 P3); unfold P3 in *; auto; intros.
+  Focus 3.
+  (* non-axiom case = non simple, done by induction on t' *)
+  induction t'0; auto.
+
+  assert(NIE: alpha \notin L). admit.
+  assert(OK: ok (d0 & alpha ~k0)). admit.
+  specialize (H alpha NIE OK).
+  apply AK_AK_K in H.
+  assert(KWeakend: K (d0 & alpha ~ k0 & beta ~ A) (btvar n) k'0). admit.
+  (* from H2 and alpha # *)
+  specialize (H0 alpha NIE OK H KWeakend).
+  simpl.
+  simpl in H0.
+
+  SearchAbout(_ -> K _ _ _).
+  admit. (* K strengthening *)
+  (* not sure I can prove things but its interesting. *)
+  assert(NIE: alpha \notin L). admit.
+  assert(OK: ok (d0 & alpha ~k0)). admit.
+  specialize (H alpha NIE OK).
+  apply AK_AK_K in H.
+  assert(KWeakend: K (d0 & alpha ~ k0 & beta ~ A) (ftvar v) k'0). admit.
+  (* from H2 and alpha # *)
+  specialize (H0 alpha NIE OK H KWeakend).
+  simpl.
+  case_var.
+  simpl in H0.
+  case_var.
+  admit. (* not sure *)
+  simpl in H0.
+  case_var.
+  admit. (* From H0 strengthend free. *)
+  
+*)
+
+(*
+ Is this really nested induction AK -> K ? NO. 
+
+Lemma A_6_Subsititution_nested_induction:
+  forall d t k,
+      AK d t k ->
+      forall alpha t' k',
+        K (d & alpha ~ k) t' k' ->
+        K d (T.subst t alpha t') k'.
+Proof.
+  introv AKd.
+  induction AKd; introv Kd.
+induction Kd; intros.
+  admit.
+  (* No loss of K d/d0 again. *)
+*)
+Admitted.
+
+
+Check K_ind.
+
+(* This remembers the d connection but one of the IH requires a false assumption. *)
+Lemma A_6_Subsititution_4:
+  forall d t k,
+      AK d t k ->
+      forall alpha t' k',
+        K (d & alpha ~ k) t' k' ->
+        K d (T.subst t alpha t') k'.
+Proof.
+  introv AKd Kd.
+  inversions AKd.
+  remember (d & alpha ~ k) as d'.
+  induction Kd; subst; auto.
+  admit.
+  admit.
+  simpl.
+  apply_fresh K_utype; intros.
+  assert(NI: y \notin L); auto.
+  assert(OK: ok (d & alpha ~ k & y ~ k0)). admit.
+  specialize (H0 y NI OK).
+  SearchAbout (T.open_rec _ _ (T.subst _ _ _)).
+  rewrite <- TP.subst_open_var.
+Admitted.
+
+(* No, alpha ~ k lost. *)
+
+Lemma A_6_Subsititution_5:
+  forall d t k,
+      AK d t k ->
+      forall alpha t' k',
+        extends d (d & alpha ~k) ->
+        K (d & alpha ~ k) t' k' ->
+        K d (T.subst t alpha t') k'.
+Proof.
+  introv AKd E Kd.
+  remember (d & alpha ~ k) as d'.  
+  inversions AKd.
+  induction Kd; subst; auto.
+Admitted.
+
+Inductive extends1 : Delta -> var -> Kappa -> Delta -> Prop :=
+  | extends_1:
+      forall alpha k d d', 
+        d = d' ->
+        extends1 d alpha k (d' & alpha ~ k).
+
+Lemma A_6_Subsititution_6:
+  forall d t k,
+      AK d t k ->
+      forall alpha d',  
+        extends1 d alpha k d' ->
+        forall  t' k',
+          K d' t' k' ->
+          K d (T.subst t alpha t') k'.
+Proof.
+  introv AKd Ed Kd.
+  induction Kd; auto.
+  admit.
+  admit.
+  inversions Ed.
+  (* Where is extends1 d' alpha k (d' & alpha ~ k & alpha1 ~ k0)  in utype/etype
+   coming from? It's not in the K definition so it's in K_ind.*)
+Admitted.
+
+
+
+Section GetProperties.
+Variable A B' : Type.
+Implicit Types E F : env A.
+Implicit Types x : var.
+Implicit Types v : A.
+
+(** Constructor forms *)
+
+Lemma get_empty_inv : forall x v,
+  get x empty = Some v -> False.
+Proof using.
+  introv H. rewrite get_empty in H. false.
+Qed.
+
+Lemma get_single_eq : forall x v,
+  get x (x ~ v) = Some v.
+Proof using.
+  intros.  rewrite get_single. case_if~.
+Qed.
+
+Lemma get_single_inv : forall x1 x2 v1 v2,
+  get x1 (x2 ~ v2) = Some v1 ->
+  x1 = x2 /\ v1 = v2.
+Proof using.
+   introv H. rewrite get_single in H.
+  case_if; inversions~ H.
+Qed.
+
+Lemma get_push_inv : forall x1 v1 x2 v2 E,
+  get x1 (E & x2 ~ v2) = Some v1 ->
+     (x1 = x2 /\ v1 = v2)
+  \/ (x1 <> x2 /\ get x1 E = Some v1).
+Proof using.
+  introv H.  rewrite get_push in H. case_if.
+  inverts~ H. auto.
+Qed.
+
+Lemma get_push_eq : forall x v E,
+  get x (E & x ~ v) = Some v.
+Proof using. intros.  rewrite get_push. case_if~. Qed.
+
+Lemma get_push_eq_inv : forall x v1 v2 E,
+  get x (E & x ~ v2) = Some v1 -> v1 = v2.
+Proof using.
+  introv H. forwards [|]: get_push_inv H. autos*. intros [? _]. false.
+Qed.
+
+Lemma get_push_neq_inv : forall x1 x2 v1 v2 E,
+  get x1 (E & x2 ~ v2) = Some v1 -> x1 <> x2 -> get x1 E = Some v1.
+Proof using.
+  introv H. forwards [|]: get_push_inv H.
+  intros [? ?] ?. false. autos*.
+Qed.
+
+Lemma get_tail : forall x v E,
+  get x (E & x ~ v) = Some v.
+Proof using. intros. rewrite get_push. cases_if~. Qed.
+
+Lemma get_push_neq : forall x1 x2 v1 v2 E,
+  get x1 E = Some v1 -> x1 <> x2 -> get x1 (E & x2 ~ v2) = Some v1.
+Proof using.
+  introv H N.  rewrite get_push. case_if~.
+Qed.
+
+Lemma get_concat_inv : forall x v E1 E2,
+  get x (E1 & E2) = Some v ->
+     (get x E2 = Some v)
+  \/ (x # E2 /\ get x E1 = Some v).
+Proof using.
+  introv H. induction E2 using env_ind.
+  rewrite~ concat_empty_r in H.
+  rewrite concat_assoc in H.
+   forwards [[? ?]|[? M]]: get_push_inv H.
+     subst. left. apply get_tail.
+     forwards [?|[? ?]]: IHE2 M.
+       left. applys~ get_push_neq.
+       right.
+       auto.
+Qed.
+
+(* Typing env vs list issues. 
+Lemma get_map : forall x v (f : A -> B) E,
+  get x E = Some v -> get x (map f E) = Some (f v).
+Proof using.
+  introv H.  rew_env_defs.
+  induction E as [|[x' v'] E']; simpls.
+  false.
+  cases_if~. inverts~ H.
+Qed.
+*)
+
+Lemma get_func : forall x v1 v2 E,
+  get x E = Some v1 -> get x E = Some v2 -> v1 = v2.
+Proof using.
+  introv H1 H2.
+  induction E as [|E' x' v'] using env_ind.
+  rewrite get_empty in H1. false.
+  rewrite get_push in H1,H2. case_if~.
+   inverts H1. inverts~ H2.
+Qed.
+
+Lemma get_fresh_inv : forall x v E,
+  get x E = Some v -> x # E -> False.
+Proof using.
+  introv H F.
+  induction E as [|E' x' v'] using env_ind.
+  rewrite get_empty in H. false.
+  rewrite get_push in H. case_if~. subst.
+   simpl_dom; notin_false.
+Qed.
+
+(** Derived forms *)
+
+Lemma get_single_eq_inv : forall x v1 v2,
+  get x (x ~ v2) = Some v1 ->
+  v1 = v2.
+Proof using.
+  introv H. rewrite get_single in H.
+  case_if. inverts~ H.
+Qed.
+
+Lemma get_concat_left : forall x v E1 E2,
+  get x E1 = Some v ->
+  x # E2 ->
+  get x (E1 & E2) = Some v.
+Proof using.
+  introv H F. induction E2 using env_ind.
+  rewrite~ concat_empty_r.
+  rewrite concat_assoc.
+  applys~ get_push_neq.
+  subst.
+  simpl_dom.
+  apply notin_union in F.
+  inversion F.
+  apply notin_same in H0.
+  inversion H0.
+Qed.
+
+Lemma get_concat_left_ok : forall x v E1 E2,
+  ok (E1 & E2) ->
+  get x E1 = Some v ->
+  get x (E1 & E2) = Some v.
+Proof using.
+  introv O H. induction E2 using env_ind.
+  rewrite~ concat_empty_r.
+  rewrite concat_assoc in O|-*. lets [_ ?]: ok_push_inv O.
+  applys~ get_push_neq. subst. applys~ get_fresh_inv H.
+Qed.
+
+Lemma get_concat_left_inv : forall x v E1 E2,
+  get x (E1 & E2) = Some v ->
+  x # E2 ->
+  get x E1 = Some v.
+Proof using.
+  introv H F. lets~ [M|[? ?]]: get_concat_inv H.
+    false. applys~ get_fresh_inv M.
+Qed.
+
+Lemma get_concat_right : forall x v E1 E2,
+  get x E2 = Some v ->
+  get x (E1 & E2) = Some v.
+Proof using.
+  introv H. induction E2 using env_ind.
+  Check get_empty_inv.
+  false. apply get_empty_inv with (x:=x) (v:=v); auto.
+  rewrite concat_assoc. lets [[? ?]|[? ?]]: get_push_inv H.
+    subst. applys get_tail.
+    applys* get_push_neq.
+Qed.
+
+Lemma get_concat_right_inv : forall x v E1 E2,
+  get x (E1 & E2) = Some v ->
+  x # E1 ->
+  get x E2 = Some v.
+Proof using.
+  introv H F. lets~ [?|[? M]]: get_concat_inv H.
+    false. applys~ get_fresh_inv M.
+Qed.
+
+Lemma get_middle_eq : forall x E1 E2 v,
+  x # E2 ->
+  get x (E1 & x ~ v & E2) = Some v.
+Proof using.
+  introv F. applys~ get_concat_left.
+Qed.
+
+(** Metatheory proof forms *)
+
+(** Interaction between binds and the insertion of bindings.
+  In theory we don't need this lemma since it would suffice
+  to use the get_cases tactics, but since weakening is a
+  very common operation we provide a lemma for it. *)
+
+Lemma get_weaken : forall x a E F G,
+  get x (E & G) = Some a -> ok (E & F & G) ->
+  get x (E & F & G) = Some a.
+Proof using.
+  introv H O. lets [?|[? ?]]: get_concat_inv H.
+    applys~ get_concat_right.
+    applys~ get_concat_left. applys~ get_concat_left_ok.
+Qed.
+
+Lemma get_remove : forall E2 E1 E3 x v,
+  get x (E1 & E2 & E3) = Some v ->
+  x # E2 ->
+  get x (E1 & E3) = Some v.
+Proof using.
+  introv H F. lets [?|[? M]]: get_concat_inv H.
+    applys~ get_concat_right.
+    forwards: get_concat_left_inv M; auto.
+    applys~ get_concat_left.
+Qed.
+
+Lemma get_subst : forall x2 v2 x1 v1 E1 E2,
+  get x1 (E1 & x2 ~ v2 & E2) = Some v1 ->
+  x1 <> x2 ->
+  get x1 (E1 & E2) = Some v1.
+Proof using.
+  introv H N.
+  applys~ get_remove H. 
+  unfolds.
+  rewrite dom_single.
+  rewrite in_singleton.
+  assumption.
+Qed.
+
+Lemma get_middle_eq_inv : forall x E1 E2 v1 v2,
+  get x (E1 & x ~ v2 & E2) = Some v1 ->
+  ok (E1 & x ~ v2 & E2) ->
+  v1 = v2.
+Proof using.
+  introv H O. lets [? ?]: ok_middle_inv O.
+  forwards~ M: get_concat_left_inv H.
+  applys~ get_push_eq_inv M.
+Qed.
+
+Lemma get_middle_inv : forall x1 v1 x2 v2 E1 E2,
+  get x1 (E1 & x2 ~ v2 & E2) = Some v1 ->
+     (get x1 E2 = Some v1)
+  \/ (x1 # E2 /\ x1 = x2 /\ v1 = v2)
+  \/ (x1 # E2 /\ x1 <> x2 /\ get x1 E1 = Some v1).
+Proof using.
+  introv H. lets [?|[? M]]: (get_concat_inv H).
+    left~.
+    right. lets [N|[? N]]: (get_concat_inv M).
+      lets [? ?]: (get_single_inv N). subst~.
+      right. simpl_dom. split~.
+      apply notin_singleton in H1.
+      contradiction.
+Qed.
+
+Lemma get_not_middle_inv : forall x v E1 E2 E3,
+  get x (E1 & E2 & E3) = Some v ->
+  x # E2 ->
+     (get x E3 = Some v)
+  \/ (x # E3 /\ get x E1 = Some v).
+Proof using.
+  introv H F. lets [?|[? M]]: (get_concat_inv H).
+    left~.
+    right. forwards~ N: (get_concat_left_inv M).
+Qed.
+
+Lemma fv_in_values_binds : forall y fv x v E,
+  get x E = Some v -> y \notin fv_in_values fv E -> y \notin fv v.
+Proof using.
+  unfold fv_in_values. introv H.
+  induction E using env_ind; introv M.
+  false. apply get_empty_inv with (x:= x) (v:= v); auto.
+  rewrite values_def in M,IHE.
+  rewrite concat_def, single_def in M. rew_list in M. simpl in M.
+  lets [[? ?]|[? ?]]: (get_push_inv H); subst~.
+Qed.
+
+End GetProperties.
+
+Lemma ok_commutes: 
+forall A (E : env A) F G, 
+  ok (E & F & G) = ok (E & (F & G)).
+Admitted.
+
+Lemma K_context_commutes:
+forall E F G tau k, 
+  K (E & F & G) tau k = K (E & (F & G)) tau k.
+Admitted.
+
+Lemma K__lc:
+  forall d t k,
+    K d t k ->
+    T.lc t.
+Admitted.
+
+Lemma A_6_Subsititution_7:
+  forall d d' t k,
+      ok (d & d') ->
+      K (d & d') t k ->
+      forall alpha t' k',
+        ok (d & alpha ~ k & d') ->
+        K (d & alpha ~ k & d') t' k' ->
+        K (d & d')  (T.subst t alpha t') k'.
+Proof.
+  introv okdd' Kd okdakd' Kdakd'.
+  gen_eq G: (d & alpha ~ k & d'). gen d'.
+  induction Kdakd'; intros; subst; auto.
+  simpl.
+  case_var.
+  apply get_middle_eq_inv in H; subst; auto.
+  apply get_subst in H; subst; auto.
+
+  simpl.
+  case_var.
+  apply K_ptype.
+  (* yes k is A! *) 
+  admit.
+  apply K_star_A.
+  admit.
+
+  apply get_middle_eq_inv in H; subst; auto.
+  apply get_subst in H; subst; auto.
+
+  simpl.
+  apply_fresh K_utype.
+  intros.
+  assert(NI: y \notin L). admit.
+  assert(OKB: ok (d & alpha ~ k & d' & y ~ k0)). admit.
+  specialize (H y NI OKB).
+  specialize (H0 y NI OKB OKB (d' & y ~ k0)).
+  rewrite <- ok_commutes in H0.
+  rewrite <- K_context_commutes in H0.
+  rewrite <- K_context_commutes in H0.
+  assert(KW: K (d & d' & y ~ k0) t k). admit. (* k weakening *)
+  assert(CC: d & alpha ~ k & d' & y ~ k0 = d & alpha ~ k & (d' & y ~ k0)). admit.
+  (* contexts commute, meta theorem I must accept. *)
+  specialize (H0 H1 KW CC).
+  rewrite* <- TP.subst_open_var.
+  apply K__lc with (d:= (d&d')) (k:=k); auto.
+  apply K_B_A.
+  apply* IHKdakd'.
+Qed.
