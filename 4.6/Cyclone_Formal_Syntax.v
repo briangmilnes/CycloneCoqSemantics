@@ -125,10 +125,7 @@ Hint Constructors Value.
 Hint Extern 3 (Value _) => (* idtac "(Value _)";*) trace_goal; constructor~.
 
 Definition Heap  := env E.
-Definition State := prod Heap St.  
+Definition State := prod Heap St. 
 Definition Delta := env Kappa.
 Definition Gamma := env Tau.
 Definition Upsilon := LVPE.varpathenv Tau.
-
-
-
