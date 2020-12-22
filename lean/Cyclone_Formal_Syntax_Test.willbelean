@@ -1,0 +1,78 @@
+import .Cyclone_Formal_Syntax
+
+/- We have to build these clumsy representations to run actual evaluations
+ and print their output. There should be a represent command to do this. -/
+
+instance : has_repr Kappa :=
+⟨λ k, match k with 
+| A := "A" 
+| B := "B" end⟩
+
+instance : has_repr Phi :=
+⟨λ k, match k with 
+| witnesschanges := "witnesschanges"
+| aliases := "aliases"
+end⟩
+
+instance : has_repr V :=
+⟨λ k, match k with
+| (bevar n) := "(bevar " ++ repr n ++ ")" 
+| (fevar s) := "(fevar " ++ repr s ++ ")"
+end⟩
+
+set trace.eqn_compiler.elim_match true
+
+instance : has_repr St :=
+⟨λ s,
+ match s with
+| (e_s e)            := "(e_s "      ++ repr e ++ ")"
+| (retn e)           := "(retn "     ++ repr e ++ ")"
+| (seqx st_1 st_2)   := "(seqx "     ++ repr st_1 ++ repr st_2 ++ ")"
+| (if_s e st_1 st_2) := "(ifs "      ++ repr e ++ repr st_1 ++ repr st_2 ++ ")"
+| (while e st)       := "(while "    ++ repr e ++ repr st ++ ")"
+| (letx e st)        := "(letx "     ++ repr e ++ repr st ++ ")"
+| (openx e st)       := "(openx "    ++ repr e ++ repr st ++ ")"
+| (openstar e st)    := "(openstar " ++ repr e ++ repr st ++ ")"
+end⟩
+
+instance : has_repr E :=
+⟨λ e, match e with
+| (ve v)             := "(ve " ++ repr v ++ ")"
+| (ie z)             := "(ie " ++ repr z ++ ")"
+| (pe v lpe)         := "(pe " ++ repr v ++ repr lpe ++ ")"
+| (f_e f)            := "(f_e " ++ repr f ++ ")"
+| (amp e)            := "(amp " ++ repr e ++ ")"
+| (star e)           := "(star " ++ repr e ++ ")"
+| (cpair e_1 e_2)    := "(cpair " ++ repr e ++ repr e ++ ")"
+| (dot e ipe)        := "(dot " ++ repr e ++ repr ipe ++ ")"
+| (assign e_1 e_2)   := "(assign " ++ repr e ++ repr e ++ ")"
+| (appl e_1 e_2)     := "(appl " ++ repr e ++ repr e ++ ")"
+| (call st)          := "(call " ++ repr st ++ ")"
+| (inst e tau)       := "(inst " ++ repr e ++ repr tau ++ ")"
+| (pack t_1 e t_2)   := "(pack " ++ repr t_1++ repr e ++ repr t_2 ++ ")"
+end⟩
+
+instance : has_repr F :=
+⟨λ f, match f with
+| (dfun t_1 t-2 st) := "(dfun " ++ repr t_1 ++ repr t_2 ++ repr st ++ ")"
+| (ufun kappa f)    := "(ufun " ++ repr kappa ++ repr f ++ ")"
+end⟩
+
+instance : has_repr Tau :=
+⟨λ t, match t with
+| (btvar n)             := "(btvar " ++ repr n ++ ")"
+| (ftvar string)        := "(ftvar " ++ repr string ++ ")"
+| cint                  := "cint"
+| (cross tau tau)       := "(cross " ++ repr tau ++ repr tau ++ ")"
+| (arrow tau tau)       := "(arrow " ++ repr tau ++ repr tau ++ ")"
+| (ptype tau)           := "(ptype " ++ repr tau ++ ")"
+| (utype kappa tau)     := "(utype " ++ repr kappa ++ repr tau ++ ")"
+| (etype phi kappa tau) := "(etype " ++ repr phi ++repr  kappa ++repr  tau ++ ")"
+end⟩
+
+instance : has_repr Term := 
+⟨λ t, match t with
+| (term_st st) := "(term_st " ++ repr st ++ ")"
+| (term_e e)   := "(term_e "  ++ repr e   ++ ")"
+| (term_f f)   := "(term_f "  ++ repr f  ++ ")"
+end⟩
