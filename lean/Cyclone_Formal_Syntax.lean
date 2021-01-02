@@ -18,11 +18,13 @@ inductive Phi : Type
 export Phi
 
 /- Path elements -/
+@[derive decidable_eq]
 inductive IPE: Type
 | zero_pe    
 | one_pe
 export IPE
 
+@[derive decidable_eq]
 inductive PE : Type 
 | i_pe      : IPE -> PE
 | u_pe      : PE
@@ -70,8 +72,10 @@ with Tau : Type
  | cross  : Tau -> Tau -> Tau            /- Pairs. -/
  | arrow  : Tau -> Tau -> Tau            /- Function    type. -/
  | ptype  : Tau -> Tau                   /- Pointer     type. -/
+/-
  | utype  : Kappa -> Tau -> Tau          /- Universal   type. -/
  | etype  : Phi -> Kappa -> Tau -> Tau   /- Existential type. -/
+-/
 
 export St
 export E 
@@ -92,16 +96,11 @@ inductive Value : E -> Prop
 | PairIsAValue : forall (v0 v1 : E), Value v0 -> Value v1 -> Value (E.cpair v0 v1)
 | PackIsAValue : forall (tau tau': Tau) (v : E), Value v -> Value (E.pack tau v tau')
 
-/- TODO I'm pretty sure these are not correct. -/
-/- Environments are forwards at the moment: the last is the latest binding. -/
-/- This is going to take lots of dereferncing which is going to be annoying notation. -/
-/- I'm going to expand these to start, these are then only notational. -/
-structure Binding := (var : string) (e : E) 
-structure Env     := (bindings : list Binding)
-structure Heap    := (env : list Binding) (exp : E)
-structure State   := (h : Heap) (st : St)
-/- These should be type abbreviations, but I don't see that in lean 3. -/ 
-structure Delta   := (env : list (string × Kappa))
-structure Gamma   := (env : list (string × Tau))
-/- I don't even remember what this was in Coq. -/
-structure Upsilon := (vpe : list ((string × list PE) × Tau))
+notation `Var`     := string
+notation `Path`    := list PE
+notation `Binding` := string × E 
+notation `Heap`    := list Binding
+notation `State`   := Heap × St
+notation `Delta`   := list (Var × Kappa) 
+notation `Gamma`   := list (Var × Tau)
+notation `Upsilon` := list ((Var × Path) × Tau)

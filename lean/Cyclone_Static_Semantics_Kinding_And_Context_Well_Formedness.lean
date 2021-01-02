@@ -8,9 +8,9 @@
 import .Cyclone_Formal_Syntax
 import .Environments
 
-inductive WFD : list (string × Kappa) → Prop
+inductive WFD : Delta → Prop
 | empty : WFD []
-| xtau   : forall (d : list (string × Kappa)) (alpha : string) (k : Kappa),
+| xtau   : ∀ (d : Delta) (alpha : Var) (k : Kappa),
             binds alpha d = none →
             ok d →
             WFD  d →
@@ -20,103 +20,103 @@ inductive WFD : list (string × Kappa) → Prop
   WFD [] := 
 begin
   apply WFD.empty,
-end 
+end
 
 lemma WFD_empty₂ : WFD [] :=
 begin
  simp, 
 end
 
-inductive K : list (string × Kappa) → Tau → Kappa → Prop 
- | cint   : forall (d : list (string × Kappa)), K d cint B
- | B      : forall (alpha : string) (d : list (string × Kappa)),
+inductive K : Delta → Tau → Kappa → Prop 
+ | cint   : ∀ (d : Delta), K d cint B
+ | B      : ∀ (alpha : Var) (d : Delta),
                binds alpha d = some B →
                K d (ftvar alpha) B
- | star_A  : forall (alpha : string) (d : list (string × Kappa)), 
+ | star_A  : ∀ (alpha : Var) (d : Delta), 
                  binds alpha d = some A → 
                  K  d (ptype (ftvar alpha)) B
- | cross   : forall (d : list (string × Kappa)) (t0 t1 : Tau),
+ | cross   : forall (d : Delta) (t0 t1 : Tau),
                     K d t0 A →
                     K d t1 A →
                     K d (cross t0 t1) A
- | arrow   : forall (d : list (string × Kappa)) (t0 t1 : Tau),
+ | arrow   : forall (d : Delta) (t0 t1 : Tau),
                     K d t0 A →
                     K d t1 A →
                     K d (arrow t0 t1) A
 
- | ptype   : forall (d : list (string × Kappa)) (tau : Tau),
+ | ptype   : forall (d : Delta) (tau : Tau),
                     K d tau A →
                     K d (ptype tau) B
 /-
- | utype  : forall (L : set string) (d : list (string × Kappa)) (k : Kappa) (tau : Tau),
-            (forall (alpha : string),
+ | utype  : forall (L : set Var) (d : Delta) (k : Kappa) (tau : Tau),
+            (forall (alpha : Var),
               ¬ has_mem alpha L →
-              ok (d :: [(alpha, k)]) →
-              K (d :: (alpha, k)) (T.open_rec 0 (ftvar alpha) tau) A) →
+              ok (d ++ [(alpha, k)]) →
+              K (d ++ [(alpha, k)]) (T.open_rec 0 (ftvar alpha) tau) A) →
               K d (utype k tau) A
- | etype  : forall (L : set string) (d : list (string × Kappa)) (k : Kappa) (tau : Tau) (p : Phi),
-              (forall (alpha : string),
+ | etype  : forall (L : set Var) (d : Delta) (k : Kappa) (tau : Tau) (p : Phi),
+              (forall (alpha : Var),
               ¬ has_mem alpha L →
                 ok (d & alpha ~ k) →
                 K (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau) A) →
               K d (etype p k tau) A
 -/
- | B_A     : forall (d : list (string × Kappa)) (tau : Tau),
+ | B_A     : forall (d : Delta) (tau : Tau),
               K d tau B →
               K d tau A
 
-inductive AK : list (string × Kappa) → Tau → Kappa → Prop
- | AAK  : forall (d : list (string × Kappa)) (tau : Tau) (k : Kappa),
+inductive AK : Delta → Tau → Kappa → Prop
+ | AAK  : forall (d : Delta) (tau : Tau) (k : Kappa),
            K  d tau k →
            AK d tau k
- | AA   : forall (d : list (string × Kappa)) (alpha : string),
+ | AA   : forall (d : Delta) (alpha : Var),
            binds alpha d = some A → 
            AK d (ftvar alpha) A
 
-inductive ASGN : list (string × Kappa) → Tau → Prop
-  | ASGN_cint  : forall (d : list (string × Kappa)),
+inductive ASGN : Delta → Tau → Prop
+  | ASGN_cint  : forall (d : Delta),
                       ASGN d cint
-  | ASGN_B     : forall (d : list (string × Kappa)) (alpha : string),
+  | ASGN_B     : forall (d : Delta) (alpha : Var),
                    binds alpha d = some B →
                    ASGN d (ftvar alpha)
-  | ASGN_ptype : forall (d : list (string × Kappa)) (tau : Tau),
+  | ASGN_ptype : forall (d : Delta) (tau : Tau),
                    ASGN d (ptype tau)
-  | ASGN_cross : forall (d : list (string × Kappa)) (t0 t1 : Tau),
+  | ASGN_cross : forall (d : Delta) (t0 t1 : Tau),
                    ASGN d t0 → 
                    ASGN d t1 → 
                    ASGN d (cross t0 t1)
-  | ASGN_arrow : forall (d : list (string × Kappa)) (t0 t1 : Tau),
+  | ASGN_arrow : forall (d : Delta) (t0 t1 : Tau),
                    ASGN d t0 → 
                    ASGN d t1 → 
                    ASGN d (arrow t0 t1)
 /-
-  | ASGN_utype : forall (L : strings) (d : list (string × Kappa))  (k : Kappa) (tau : Tau),
-                 (forall (alpha : string),
-                     alpha \notin L →
+  | ASGN_utype : forall (L : Vars) (d : Delta)  (k : Kappa) (tau : Tau),
+                 (forall (alpha : Var),
+                   alpha \notin L →
                    ASGN (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau)) →
                    ASGN d (utype k tau)
 
-  | ASGN_etype : forall (L : strings) (d : list (string × Kappa)) (k : Kappa) (tau : Tau),
-                 (forall (alpha : string),
-                     alpha \notin L →
-                     ASGN (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau)) →
+  | ASGN_etype : forall (L : Vars) (d : Delta) (k : Kappa) (tau : Tau),
+                 (forall (alpha : Var),
+                   alpha \notin L →
+                   ASGN (d & alpha ~ k) (T.open_rec 0 (ftvar alpha) tau)) →
                    ASGN d (etype witnesschanges k tau)
 -/
 
-inductive WFU : list ((string × list PE) × Tau) → Prop 
+inductive WFU : Upsilon → Prop 
   | empty : WFU []
-  | A   : forall (u : list ((string × list PE) × Tau)) (tau : Tau) (p : list PE) (x : string),
+  | A   : forall (u : Upsilon) (tau : Tau) (p : Path) (x : Var),
            ok u →
            binds (x,p) u = none →
            WFU  u →
            K [] tau A →
            WFU (u ++ [((x,p),tau)])
 
-inductive WFDG : list (string × Kappa) → list (string × Tau) → Prop 
-  | d_empty : forall (d: list (string × Kappa)),
+inductive WFDG : Delta → Gamma → Prop 
+  | d_empty : forall (d: Delta),
                      ok d →
                      WFDG d []
-  | xt      : forall (d: list (string × Kappa)) (g: list (string × Tau)) (x : string) (tau : Tau),
+  | xt      : forall (d: Delta) (g: Gamma) (x : Var) (tau : Tau),
                      ok g →
                      ok d →
                      binds x g = none → 
@@ -124,9 +124,9 @@ inductive WFDG : list (string × Kappa) → list (string × Tau) → Prop
                      WFDG d g →
                      WFDG d (g ++ [(x, tau)])
 
-inductive WFC : list (string × Kappa) → list Tau → list (string × Tau) → Prop 
-  | DUG : forall (d : list (string × Kappa)) (g: list (string × Tau)) (u : list Tau),
+inductive WFC : Delta → Upsilon → Gamma → Prop 
+  | DUG : forall (d : Delta) (g: Gamma) (u : Upsilon),
                 WFDG d g →
                 WFU u →
                 WFC d u g
--/
+
