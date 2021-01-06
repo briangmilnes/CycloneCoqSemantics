@@ -3,90 +3,84 @@ import .Cyclone_Formal_Syntax
 /- 
  This is the most general binds and ok that I can make, 
  involving an instance of a decidable type class that 
- Lean must find. 
- So I'll need typeclasses and instances to make this work.
- Do I want this that general or as in the coq model with different specializations.
+ Lean must find and not functions but inductive properties.
+ Unlike Coq functional induction is not in this Lean but it
+ was difficult in Coq anyway.
+
+ @[derive decideable_eq] made the few typeclasses we need for
+ Path element lists.  
  Not sure what lemmas and meta programming we'll need for ok and binds. 
  Will have to see them in action in a theorem. 
 
+ This is three definitions and supporting lemmas: binds, ok and extends.
 -/
 
-def binds {key : Type} [eq : decidable_eq key] {value : Type} : key → list (key × value) → option value
-| _ [] := none
-| v ((v',a) :: r) := if v = v' then some a else binds v r
+inductive binds {key : Type} [eq : decidable_eq key] {value : Type} : key → list (key × value) → option value → Prop 
+| nil  : ∀ (k : key), binds k [] none
+| eq   : ∀ (k k' : key) (v : value) (d' : list (key × value)),
+           k = k' ->
+           binds k ((k',v) :: d') (some v)
+| ne  : ∀ (k k' : key) (v : value) (ov : option value) (d' : list (key × value)),
+           k ≠ k' →
+           binds k d' ov -> 
+           binds k ((k',v) :: d') ov
 
-@[simp] lemma binds_empty_is_none {key : Type} {value : Type} [eq : decidable_eq key] (k : key) :
-  @binds key eq value k [] = @none value := by refl
+@[simp] lemma binds_empty_is_none {key : Type} [eq : decidable_eq key] {value : Type}  (k : key) :
+  binds k [] (@none value) := by apply binds.nil
 
-lemma binds_empty_is_none₂ {key : Type} {value : Type} [eq : decidable_eq key] (k : key) :
-  binds k [] = @none value := by simp 
-
-@[simp] lemma binds_some_first {key : Type} {value : Type} [eq : decidable_eq key] (k : key) (v : value) (b : list (key × value)) :
-  binds k ((k,v) :: b) = some v :=
+@[simp] lemma binds_nil_not_some 
+{key : Type} [eq : decidable_eq key] {value : Type}  
+(k : key) (v : value) :
+  ¬ binds k [] (some v) := 
 begin
- unfold binds,
- cc,
+  intros n,
+  cases n,
+end
+
+@[simp] lemma binds_some_first {key : Type} {value : Type} [eq : decidable_eq key] 
+  (k : key) (v : value) (b : list (key × value)) :
+  binds k ((k,v) :: b) (some v) := 
+begin
+ apply binds.eq,
+ refl,
 end
  
-@[simp] lemma binds_none_first {key : Type} {value : Type} [eq : decidable_eq key] (k k': key) (v : value) (b : list (key × value)) :
+@[simp] lemma binds_none_first {key : Type} {value : Type} [eq : decidable_eq key] 
+  (k k': key) (v : value) (b : list (key × value)) (ov : option value) :
   k ≠ k' →
-  binds k ((k',v) :: b) = binds k b := 
+  binds k b ov → 
+  binds k ((k',v) :: b) ov :=
 begin
- intros vnev',
- unfold binds,
- cc,
+ intros knek' bkbov, 
+ apply binds.ne; assumption,
 end
 
-lemma binds_string_none {value : Type}: 
- binds "fred" [] = @none value := 
+@[simp] lemma binds_cons_none_ne {key : Type} {value : Type} [eq : decidable_eq key] 
+  (k k': key) (v : value) (b : list (key × value)) :
+  binds k ((k',v) :: b) none →
+  k ≠ k' :=
 begin
-  simp,
+  intros bkk'vnone,
+  cases bkk'vnone,
+  assumption
 end 
 
-/- Check which binds's can find a type instance, they all work with
- a simple @[derive decidable_eq]
+/- Try addding a domain of an environment to decouple OK from binds. -/
 
-lemma binds_Heap_some (v : Var) (h : Heap) (e : E) :
-   binds v h = some e := 
-sorrycharlie
+inductive dom {key : Type} [eq : decidable_eq key] {value : Type} : 
+list (key × value) → list key → Prop
+| nil_nil : dom [] []
+| nil_d : ∀ (d : list key), dom [] d
+| e_d   : ∀ (k : key) (v : value) (e : list (key × value)) (d : list key), 
+  dom ((k,v) :: e) d ->
+  dom e (k :: d)
 
-lemma binds_Heap_none (v : Var) (h : Heap):
-   binds v h = none := 
-sorrycharlie
-
-lemma binds_Delta_some (v : Var) (d : Delta) (k : Kappa) :
-   binds v d = some k := 
-sorrycharlie
-
-lemma binds_Delta_none (v : Var) (d : Delta) :
-   binds v d = none := 
-sorrycharlie
-
-lemma binds_Gamma_some (v : Var) (g : Gamma) (t : Tau) : 
-   binds v g = some t := 
-sorrycharlie
-
-lemma binds_Gamma_none (v : Var) (g : Gamma) : 
-   binds v g = none := 
-sorrycharlie
-
-lemma binds_Upsilon_some (v : Var) (p : Path) (u : Upsilon) (t : Tau) : 
-   binds (v,p) u = some t := 
-sorrycharlie
-
-lemma binds_Upsilon_none (v : Var) (p : Path) (u : Upsilon) : 
-   binds (v,p) u = none := 
-sorrycharlie
--/
-
-/- Evals don't work as you can't print a prop. -/
-
-#check binds "fred" [] = @none string
+/- Ok i.e., no duplicate keys -/
 
 inductive ok {key : Type} [eq : decidable_eq key] {value : Type} : list (key × value) → Prop
-| empty {} : ok []
+| empty : ok []
 | notin : forall (k : key) (v : value) (d : list (key × value)), 
-            binds k d = none →
+            binds k d none →
             ok d →
             ok ((k, v) :: d)
 
@@ -96,7 +90,7 @@ begin
   apply ok.empty,
 end
 
-lemma ok_empty₂ {key : Type} [eq : decidable_eq key] {value : Type} :
+@[simp] lemma ok_empty₂ {key : Type} [eq : decidable_eq key] {value : Type} :
   @ok key eq value [] := by simp
 
 @[simp] lemma ok_singleton {key : Type} [eq : decidable_eq key] {value : Type} (k : key) (v : value):
@@ -107,44 +101,115 @@ begin
   simp,
 end
 
-lemma ok₂ : ok [("fred",1)] := by simp 
-
-lemma not_ok₂ : ¬ ok [("fred",1),("fred",2)] :=
+@[simp] lemma ok_cdr {key : Type} [eq : decidable_eq key] {value : Type}
+ (k : key) (v : value) (b : list (key × value)): 
+  ok((k,v) :: b) -> ok b :=
 begin
- intros n,
- induction' n,
- induction' h,
+  intros okl,
+  cases okl,
+  assumption,
+end 
+
+@[simp] lemma ok_cons_binds_none_cdr
+{key : Type} [eq : decidable_eq key] {value : Type}
+(k : key) (v : value) (b : list (key × value)): 
+  ok((k,v) :: b) -> binds k b none :=
+begin
+  intros okl,
+  cases okl,
+  assumption,
+end 
+
+/- extendedby d d' means d' extends d, i.e., has all its bindings. -/
+
+inductive extendedby {key : Type} [eq : decidable_eq key] {value : Type}: 
+  list (key × value) → list (key × value) → Prop
+| nil_nil : extendedby [] []
+| nil_d   : ∀ (d : list (key × value)), extendedby [] d
+| binds   : ∀  (d d' : list (key × value)),
+  (∀ (k : key) (v : value),
+   (binds k d (some v) → binds k d' (some v)))
+   -> extendedby d d'
+    
+@[simp] lemma binds_extendedby {key : Type} [eq : decidable_eq key] {value : Type}
+      (k : key) (v : value) (d : list (key × value)) :
+      binds k d (some v) →
+      ∀ (d' : list (key × value)),
+      extendedby d d' →
+      binds k d' (some v) :=
+begin
+ intros bkdv d' extdd',
+ induction' extdd',
+ assumption,
+ exfalso,
+ apply binds_nil_not_some k v,
+ assumption,
+ apply (h k v),
+ assumption,
 end
 
-/- Too hard, let's get some more lemmas. -/ 
-lemma ok₃ : ok [("fred",1),("joe",2)] :=
+@[simp] lemma ok_double_push {key : Type} {value : Type} [eq: decidable_eq key] 
+  (k : key) (v v' : value) (b : list (key × value)) :
+  ¬ ok ((k, v) :: (k, v') :: b) := 
 begin
-  apply ok.notin,
-  unfold binds,
-  cc,
-  simp,
+ intros h,
+ cases h,
+ cases h_a,
+ cc,
 end
 
+@[simp] lemma binds_cons_none {key : Type} {value : Type} [eq: decidable_eq key] 
+  (k k': key) (v : value) (b : list (key × value)) :  
+binds k ((k', v) :: b) none →
+binds k b none := 
+begin
+  intros x,
+  cases x,
+  assumption
+end
 
-/- Check which ok's can find a type instance, they all work with
- a simple @[derive decidable_eq].
--/
--- lemma ok_Heap (h : Heap) :
---    ok h := 
--- sorrycharlie
--- 
--- lemma ok_Delta (d : Delta) :
---   ok d :=
--- sorrycharlie
--- 
--- lemma ok_Gamma (g : Gamma) :
---  ok g  :=
--- sorrycharlie 
---
--- lemma ok_Upsilon (u : Upsilon) :
---  ok u :=
--- sorrycharlie
+@[simp] lemma binds_some_none_ne {key : Type} {value : Type} [eq: decidable_eq key] 
+  (j k: key) (v : value) (b : list (key × value)) :
+  ok b →
+  binds j b (some v) →
+  binds k b none →
+  j ≠ k :=
+begin
+  intros okb jb kb,
+  induction' jb,
+  rw h,
+  symmetry,
+  apply binds_cons_none_ne k k' v b,
+  assumption,
+  apply ih,
+  apply ok_cdr k' v_1 b; assumption,
+  apply binds_cons_none k k' v_1 b,
+  assumption,
+end
 
+@[simp] lemma binds_some_ok_ne 
+ {key : Type} {value : Type} [eq: decidable_eq key] 
+(j k: key) (x y: value) (b : list (key × value)) :
+  binds j b (some x) →
+  ok ((k, y) :: b) →
+  j ≠ k :=
+begin
+  intros bjbx okkyb,
+  let h: binds k b none,
+    apply ok_cons_binds_none_cdr k y b,
+    assumption,
+    apply binds_some_none_ne j k x b,
+    apply ok_cdr k y b,
+    repeat {assumption},
+end
 
-
-
+@[simp] lemma binds_weakening {key : Type} {value : Type} [eq: decidable_eq key] 
+  (j k: key) (x y z: value) (b : list (key × value)) :
+   binds j b (some x) →
+   ok ((k,y) :: b) →
+   binds j ((k,z) :: b) (some x) :=
+begin
+  intros bjbsx okkyb,
+  constructor; try {assumption},
+  apply binds_some_ok_ne j k x y b; assumption,
+end

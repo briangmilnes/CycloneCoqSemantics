@@ -11,13 +11,12 @@ import .Cyclone_Static_Semantics_Kinding_And_Context_Well_Formedness
 
 lemma ok_strength {K : Type} {V : Type} [decidable_eq K] (d : list (K × V)) (k : K) (v : V):
    ok d →
-   binds k d = none → 
+   binds k d none → 
    ok ((k,v) :: d) :=
 begin
-  assume okd b,
-  apply ok.notin,
-  exact b,
-  exact okd,
+  intros, 
+  constructor, 
+  all_goals { assumption},
 end
 
 lemma ok_change_value {K : Type} {V : Type} [decidable_eq K] 
@@ -36,7 +35,7 @@ end
 lemma ok_pop {K : Type} {V : Type} [decidable_eq K] 
   (d : list (K × V)) (k : K) (v : V) :
     ok ((k,v) :: d) →
-    binds k d = none := 
+    binds k d none := 
 begin
   intros okkvd,
   induction' okkvd,
@@ -46,7 +45,7 @@ end
 lemma ok_fresh {K : Type} {V : Type} [decidable_eq K] 
   (d : list (K × V)) (k : K) (v : V) :
     ok((k, v) :: d) →
-    binds k d = none :=
+    binds k d none :=
 begin
   intros, 
   induction' a,
